@@ -4,10 +4,10 @@ import bcrypt from "bcrypt";
 
 export async function POST(request: Request) {
     const body = await request.json();
-    const { email, password, firstName, lastName, role, subject } = body;
+    const { email, password, firstName, lastName, role, subjects } = body;
 
     if (!email || !password || !firstName || !lastName || !role) {
-        if (role === "TEACHER" && !subject) {
+        if (role === "TEACHER" && !subjects) {
             return new NextResponse("Missing fields", { status: 401 });
         } else {
             return new NextResponse("Missing fields", { status: 401 });
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
         firstName,
         lastName,
         role,
-        subject,
+        subjects,
     });
 
     return new NextResponse(JSON.stringify(newUser), {
