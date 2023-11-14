@@ -39,14 +39,61 @@ model Session {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  firstName  String
-  lastName   String
-  password String
-  role String
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String   @unique
+  password  String
+  role      String
   accounts Account[]
   sessions Session[]
+  student   Student?
+  teacher   Teacher?
+}
+
+model Student {
+  userId     Int      @id
+  user       User     @relation(fields: [userId], references: [id])
+  appointments Appointment[]
+  favoriteTeachers Teacher[]
+}
+
+model Teacher {
+  userId     Int      @id
+  user       User     @relation(fields: [userId], references: [id])
+  subjects   Subject[] @relation("TeacherSubjects")
+  appointments Appointment[]
+  students   Student[]
+}
+
+model Subject {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  teachers  Teacher[] @relation("TeacherSubjects")
+  appointments Appointment[]
+}
+
+model Appointment {
+  id         Int      @id @default(autoincrement())
+  date       DateTime
+  subjectId  Int
+  subject    Subject  @relation(fields: [subjectId], references: [id])
+  topic      String
+  description String?
+  goal       Goal
+  teacherId  Int
+  teacher    Teacher  @relation(fields: [teacherId], references: [userId])
+  students   Student[]
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+}
+
+enum Goal {
+  CORRECT_TEST
+  COREPETITIONS
 }
 
 model VerificationToken {

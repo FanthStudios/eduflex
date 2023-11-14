@@ -1,6 +1,7 @@
 "use client";
 
 import Logo from "@/components/Logo";
+import MultiSelect from "@/components/MultiSelect";
 import { slideInVariant } from "@/utils/motion";
 import { motion } from "framer-motion";
 import { signIn } from "next-auth/react";
@@ -9,8 +10,22 @@ import React, { useState } from "react";
 
 type Props = {};
 
+interface Subject {
+    id: number;
+    name: string;
+}
+
+interface User {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    role: string;
+    subjects?: string[];
+}
+
 export default function Register({}: Props) {
-    const [user, setUser] = useState({
+    const [user, setUser] = useState<User>({
         firstName: "",
         lastName: "",
         email: "",
@@ -18,24 +33,71 @@ export default function Register({}: Props) {
         role: "STUDENT",
     });
 
-    const handleRegister = async () => {
-        const res = await fetch("/api/register", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(user),
-        });
+    const [subjects, setSubjects] = useState<string[]>([]);
 
-        if (res.status === 200) {
-            await signIn("credentials", {
-                redirect: false,
-                email: user.email,
-                password: user.password,
-                callbackUrl: "/",
+    const options = [
+        { id: 1, name: "Matematyka" },
+        { id: 2, name: "Fizyka" },
+        { id: 3, name: "Chemia" },
+        { id: 4, name: "Biologia" },
+        { id: 5, name: "Geografia" },
+        { id: 6, name: "Historia" },
+        { id: 7, name: "Wiedza o społeczeństwie" },
+        { id: 8, name: "Język polski" },
+        { id: 9, name: "Język angielski" },
+        { id: 10, name: "Język niemiecki" },
+        { id: 13, name: "Język rosyjski" },
+        { id: 17, name: "Informatyka" },
+        { id: 18, name: "Wychowanie fizyczne" },
+        { id: 19, name: "Edukacja dla bezpieczeństwa" },
+        { id: 21, name: "Religia" },
+        { id: 23, name: "Informatyka" },
+    ];
+
+    const handleRegister = async () => {
+        if (user.role == "STUDENT") {
+            const res = await fetch("/api/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(user),
             });
+
+            if (res.status === 200) {
+                await signIn("credentials", {
+                    redirect: false,
+                    email: user.email,
+                    password: user.password,
+                    callbackUrl: "/",
+                });
+            } else {
+                console.error(await res.text());
+            }
         } else {
-            console.error(await res.text());
+            setUser({
+                ...user,
+                subjects: subjects,
+            });
+
+            const res = await fetch("/api/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(user),
+            });
+
+            if (res.status === 200) {
+                await signIn("credentials", {
+                    redirect: false,
+                    email: user.email,
+                    password: user.password,
+                    callbackUrl: "/",
+                });
+            } else {
+                console.error(await res.text());
+            }
         }
     };
 
@@ -248,6 +310,26 @@ export default function Register({}: Props) {
                                     </select>
                                 </motion.div>
                             </div>
+
+                            {user.role == "TEACHER" && (
+                                <div>
+                                    <motion.label
+                                        variants={slideInVariant("left", 0.1)}
+                                        initial="hidden"
+                                        animate="show"
+                                        exit="exit"
+                                        htmlFor="role"
+                                        className="block text-sm font-medium leading-6 text-gray-900"
+                                    >
+                                        Przedmioty
+                                    </motion.label>
+                                    <MultiSelect
+                                        options={options}
+                                        selectedOptions={subjects}
+                                        setSelectedOptions={setSubjects}
+                                    />
+                                </div>
+                            )}
 
                             <motion.div
                                 className="mt-6"

@@ -1,5 +1,10 @@
 import { prisma } from "@/prisma/client";
 
+enum Role {
+    STUDENT = "STUDENT",
+    TEACHER = "TEACHER",
+}
+
 interface UserProps {
     email: string;
     password: string;
@@ -9,6 +14,7 @@ interface UserProps {
     accounts?: any[];
     id?: number;
     sessions?: any[];
+    subjects?: any[];
 }
 
 export const getUser = async (email: string) => {
@@ -35,6 +41,39 @@ export const createUser = async (userObject: UserProps) => {
             role: userObject.role,
         },
     });
+
+    if (userObject.role === Role.STUDENT) {
+        await prisma.student.create({
+            data: {
+                userId: user.id,
+            },
+        });
+    } else if (userObject.role === Role.TEACHER) {
+        const teacher = await prisma.teacher.create({
+            data: {
+                userId: user.id,
+            },
+        });
+
+        if (userObject.subjects && userObject.subjects.length > 0) {
+            for (const subjectName of userObject.subjects) {
+                const subject = await prisma.subject.upsert({
+                    where: { name: subjectName },
+                    create: { name: subjectName },
+                    update: {},
+                });
+
+                await prisma.teacher.update({
+                    where: { userId: user.id },
+                    data: {
+                        subjects: {
+                            connect: { id: subject.id },
+                        },
+                    },
+                });
+            }
+        }
+    }
 
     return user;
 };

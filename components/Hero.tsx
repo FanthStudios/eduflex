@@ -11,6 +11,7 @@ import Logo from "./Logo";
 import Link from "next/link";
 import { slideInVariant } from "@/utils/motion";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 
 const navigation = [
     { name: "Features", href: "#" },
@@ -21,6 +22,7 @@ const navigation = [
 
 export default function Hero() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const { data: session } = useSession();
 
     return (
         <div className="bg-white">
@@ -63,15 +65,27 @@ export default function Hero() {
                         ))}
                     </div>
                     <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-                        <Link
-                            href="/login"
-                            className="flex items-center justify-center gap-1 text-sm font-semibold leading-6 text-gray-900"
-                        >
-                            Log in{" "}
-                            <span aria-hidden="true">
-                                <ArrowRightIcon className="w-4 aspect-square" />
-                            </span>
-                        </Link>
+                        {session?.user ? (
+                            <Link
+                                href="/panel"
+                                className="flex items-center justify-center gap-1 text-sm font-semibold leading-6 text-gray-900"
+                            >
+                                Panel{" "}
+                                <span aria-hidden="true">
+                                    <ArrowRightIcon className="w-4 aspect-square" />
+                                </span>
+                            </Link>
+                        ) : (
+                            <Link
+                                href="/login"
+                                className="flex items-center justify-center gap-1 text-sm font-semibold leading-6 text-gray-900"
+                            >
+                                Zaloguj się{" "}
+                                <span aria-hidden="true">
+                                    <ArrowRightIcon className="w-4 aspect-square" />
+                                </span>
+                            </Link>
+                        )}
                     </div>
                 </nav>
                 <Dialog
@@ -113,12 +127,21 @@ export default function Hero() {
                                     ))}
                                 </div>
                                 <div className="py-6">
-                                    <Link
-                                        href="/login"
-                                        className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                                    >
-                                        Log in
-                                    </Link>
+                                    {session?.user ? (
+                                        <Link
+                                            href="/panel"
+                                            className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                                        >
+                                            Panel
+                                        </Link>
+                                    ) : (
+                                        <Link
+                                            href="/login"
+                                            className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                                        >
+                                            Zaloguj się
+                                        </Link>
+                                    )}
                                 </div>
                             </div>
                         </div>

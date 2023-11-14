@@ -3,10 +3,12 @@
 /* eslint-disable @next/next/no-img-element */
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
+import { usePathname } from "next/navigation";
 
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Logo from "./Logo";
 import clsx from "clsx";
+import { signOut } from "next-auth/react";
 
 const colorPallete = [
     "red",
@@ -40,12 +42,11 @@ const bgColorSaturation = () => {
 
 const colorSaturation = bgColorSaturation();
 
-type SidebarProps = {
+interface SidebarProps {
     navigation: {
         name: string;
         href: string;
         icon: any;
-        current: boolean;
     }[];
     classNames: (...classes: string[]) => string;
     user:
@@ -58,7 +59,7 @@ type SidebarProps = {
               role: string;
           }
         | undefined;
-};
+}
 
 export function Sidebar({ navigation, classNames, user }: SidebarProps) {
     const [fillColor, setFillColor] = useState("");
@@ -73,6 +74,9 @@ export function Sidebar({ navigation, classNames, user }: SidebarProps) {
             )
         );
     }, []);
+
+    const pathname = usePathname();
+
     return (
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
             {/* Sidebar component, swap this element with another sidebar if you like */}
@@ -92,7 +96,7 @@ export function Sidebar({ navigation, classNames, user }: SidebarProps) {
                                         <a
                                             href={item.href}
                                             className={classNames(
-                                                item.current
+                                                pathname == item.href
                                                     ? "bg-neutral-50 text-green-600"
                                                     : "text-neutral-700 hover:text-green-600 hover:bg-neutral-50",
                                                 "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"
@@ -100,7 +104,7 @@ export function Sidebar({ navigation, classNames, user }: SidebarProps) {
                                         >
                                             <item.icon
                                                 className={classNames(
-                                                    item.current
+                                                    pathname == item.href
                                                         ? "text-green-600"
                                                         : "text-neutral-400 group-hover:text-green-600",
                                                     "h-6 w-6 shrink-0"
@@ -114,7 +118,15 @@ export function Sidebar({ navigation, classNames, user }: SidebarProps) {
                             </ul>
                         </li>
 
-                        <li className="-mx-6 mt-auto">
+                        <li className="-mx-6 mt-auto flex flex-col items-start justify-center">
+                            <button
+                                className="w-full flex items-center justify-center px-6 py-3 text-sm font-semibold leading-6 text-neutral-900 hover:bg-neutral-50"
+                                onClick={() => {
+                                    signOut();
+                                }}
+                            >
+                                <p>Wyloguj się</p>
+                            </button>
                             <a
                                 href="#"
                                 className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-neutral-900 hover:bg-neutral-50"
@@ -142,7 +154,6 @@ interface MobileProps {
         name: string;
         href: string;
         icon: any;
-        current: boolean;
     }[];
     classNames: (...classes: string[]) => string;
 
@@ -177,6 +188,9 @@ export const Mobile = ({
             )
         );
     }, []);
+
+    const pathname = usePathname();
+
     return (
         <>
             <Transition.Root show={sidebarOpen} as={Fragment}>
@@ -258,7 +272,8 @@ export const Mobile = ({
                                                             <a
                                                                 href={item.href}
                                                                 className={classNames(
-                                                                    item.current
+                                                                    pathname ==
+                                                                        item.href
                                                                         ? "bg-neutral-50 text-green-600"
                                                                         : "text-neutral-700 hover:text-green-600 hover:bg-neutral-50",
                                                                     "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"
@@ -266,7 +281,8 @@ export const Mobile = ({
                                                             >
                                                                 <item.icon
                                                                     className={classNames(
-                                                                        item.current
+                                                                        pathname ==
+                                                                            item.href
                                                                             ? "text-green-600"
                                                                             : "text-neutral-400 group-hover:text-green-600",
                                                                         "h-6 w-6 shrink-0"
