@@ -196,7 +196,7 @@ export const Mobile = ({
             <Transition.Root show={sidebarOpen} as={Fragment}>
                 <Dialog
                     as="div"
-                    className="relative z-50 lg:hidden"
+                    className="relative z-50 lg:hidden shadow-lg"
                     onClose={setSidebarOpen}
                 >
                     <Transition.Child

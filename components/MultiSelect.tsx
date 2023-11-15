@@ -17,26 +17,17 @@ export default function MultiSelect({
     selectedOptions,
     setSelectedOptions,
 }: Props) {
-    const [currentlySelectedOptions, setCurrentlySelectedOptions] = useState<
-        string[]
-    >([]);
-
     const handleChange = (e: any) => {
-        const isChecked = e.target.checked;
-        const option = e.target.value;
-
-        const selectedOptionSet = new Set(selectedOptions);
-
-        if (isChecked) {
-            selectedOptionSet.add(option);
+        // check if the checkbox is checked or unchecked
+        if (e.target.checked) {
+            // add the numerical value of the checkbox to options array
+            setSelectedOptions([...selectedOptions, e.target.value]);
         } else {
-            selectedOptionSet.delete(option);
+            // or remove the value from the unchecked checkbox from the array
+            setSelectedOptions(
+                selectedOptions.filter((option) => option !== e.target.value)
+            );
         }
-
-        const newSelectedOptions = Array.from(selectedOptionSet);
-
-        setCurrentlySelectedOptions(newSelectedOptions);
-        setSelectedOptions(newSelectedOptions);
     };
 
     return (
@@ -72,7 +63,7 @@ export default function MultiSelect({
                                 >
                                     <input
                                         type="checkbox"
-                                        name={options[i].name}
+                                        name={i.toString()}
                                         value={options[i].name}
                                         className="cursor-pointer"
                                         onChange={handleChange}

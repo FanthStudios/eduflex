@@ -88,8 +88,8 @@ export default function PanelLayout({ children }: Props) {
                     }
                 />
 
-                <main className="py-10 lg:pl-72">
-                    <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-3 grid-rows-2 gap-12 items-start">
+                <main className="fixed z-40 inset-0 pt-16 lg:py-10 lg:pl-72 h-full">
+                    <div className="px-4 py-4 sm:px-6 lg:px-8 grid grid-cols-3 grid-rows-2 gap-12 items-start h-full">
                         {children}
                     </div>
                 </main>

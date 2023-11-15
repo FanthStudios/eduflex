@@ -6,7 +6,7 @@ import { slideInVariant } from "@/utils/motion";
 import { motion } from "framer-motion";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type Props = {};
 
@@ -51,7 +51,6 @@ export default function Register({}: Props) {
         { id: 18, name: "Wychowanie fizyczne" },
         { id: 19, name: "Edukacja dla bezpieczeństwa" },
         { id: 21, name: "Religia" },
-        { id: 23, name: "Informatyka" },
     ];
 
     const handleRegister = async () => {
@@ -75,11 +74,6 @@ export default function Register({}: Props) {
                 console.error(await res.text());
             }
         } else {
-            setUser({
-                ...user,
-                subjects: subjects,
-            });
-
             const res = await fetch("/api/register", {
                 method: "POST",
                 headers: {
@@ -90,16 +84,29 @@ export default function Register({}: Props) {
 
             if (res.status === 200) {
                 await signIn("credentials", {
-                    redirect: false,
+                    redirect: true,
                     email: user.email,
                     password: user.password,
-                    callbackUrl: "/",
+                    callbackUrl: "/panel",
                 });
             } else {
                 console.error(await res.text());
             }
         }
     };
+
+    useEffect(() => {
+        if (
+            user.role == "TEACHER" &&
+            (subjects.length > 0 || subjects.length == 0) &&
+            user.subjects != subjects
+        ) {
+            setUser({
+                ...user,
+                subjects: subjects,
+            });
+        }
+    }, [user, subjects]);
 
     return (
         <>

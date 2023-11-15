@@ -42,13 +42,13 @@ export const createUser = async (userObject: UserProps) => {
         },
     });
 
-    if (userObject.role === Role.STUDENT) {
+    if (userObject.role == "STUDENT") {
         await prisma.student.create({
             data: {
                 userId: user.id,
             },
         });
-    } else if (userObject.role === Role.TEACHER) {
+    } else if (userObject.role == "TEACHER") {
         const teacher = await prisma.teacher.create({
             data: {
                 userId: user.id,
