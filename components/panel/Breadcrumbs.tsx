@@ -37,8 +37,7 @@ export default function Breadcrumbs({ index, items, goTo }: Props) {
                                     />
                                 </>
                             )}
-                            <button
-                                onClick={() => goTo && goTo(itemIndex)}
+                            <p
                                 className={clsx(
                                     "lg:text-md text-sm font-semibold whitespace-nowrap",
                                     itemIndex <= index
@@ -47,7 +46,7 @@ export default function Breadcrumbs({ index, items, goTo }: Props) {
                                 )}
                             >
                                 {item}
-                            </button>
+                            </p>
                         </div>
                     </li>
                 ))}

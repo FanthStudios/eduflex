@@ -9,6 +9,7 @@ import {
     Summary,
 } from "@/components/panel/appointmentCreation";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 type Props = {};
 
@@ -22,8 +23,7 @@ export default function CreateAppointment({}: Props) {
     const [appointment, setAppointment] = useState({
         subject: "",
         teacherId: 0,
-        date: "",
-        time: "",
+        dateTime: new Date(),
         goal: "",
     });
 
@@ -53,6 +53,19 @@ export default function CreateAppointment({}: Props) {
     const { step, currentIndex, next, previous, goTo } =
         useMultistepForm(steps);
 
+    function validateCanGoNext() {
+        if (currentIndex == 0) {
+            return appointment.subject != "" && appointment.teacherId != 0;
+        } else if (currentIndex == 1) {
+            return appointment.dateTime != null;
+        } else if (currentIndex == 2) {
+            return appointment.goal != "";
+        } else if (currentIndex == 3) {
+            return true;
+        }
+        return false;
+    }
+
     return (
         <div className="row-span-2 col-span-3 flex flex-col items-center justify-center h-full">
             <Breadcrumbs
@@ -77,7 +90,13 @@ export default function CreateAppointment({}: Props) {
                 {currentIndex < steps.length - 1 && (
                     <button
                         className="px-12 py-1 text-white bg-green-500 rounded-md"
-                        onClick={() => next()}
+                        onClick={() => {
+                            if (validateCanGoNext()) {
+                                next();
+                            } else {
+                                toast.error("Uzupełnij wszystkie pola");
+                            }
+                        }}
                     >
                         Następna
                     </button>
@@ -85,7 +104,11 @@ export default function CreateAppointment({}: Props) {
                 {currentIndex == steps.length - 1 && (
                     <button
                         className="px-12 py-1 text-white bg-green-500 rounded-md"
-                        onClick={() => next()}
+                        onClick={() => {
+                            if (validateCanGoNext()) {
+                                next();
+                            }
+                        }}
                     >
                         Zatwierdź
                     </button>

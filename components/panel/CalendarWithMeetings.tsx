@@ -159,8 +159,6 @@ export default function CalendarWithMeetings({}: Props) {
                     selected={day}
                     onSelect={setDay}
                     onDayClick={(day, modifiers): DayClickEventHandler => {
-                        console.log(day);
-                        console.log(modifiers);
                         return () => {};
                     }}
                     modifiers={{ appointment: appointmentDays }}

@@ -4,8 +4,7 @@ import { useEffect } from "react";
 type Appointment = {
     subject: string;
     teacherId: number;
-    date: string;
-    time: string;
+    dateTime: Date;
     goal: string;
 };
 
@@ -36,13 +35,28 @@ export const SubjectSelection = ({ appointment, setAppointment }: Props) => {
     const { teachers } = useTeacher();
     const filteredTeachers =
         appointment.subject != "" &&
-        teachers.filter((teacher: any) => {
-            return teacher.subjects.filter((subject: any) => {
-                return subject.name === appointment.subject;
+        teachers?.filter((teacher) =>
+            teacher.subjects?.some(
+                (subject) => subject.name == appointment.subject
+            )
+        );
+
+    useEffect(() => {
+        // when a subject is changed, set the teacherId to the first teacher that teaches that subject
+        if (
+            filteredTeachers &&
+            filteredTeachers.length > 0 &&
+            appointment.teacherId == 0
+        ) {
+            setAppointment({
+                ...appointment,
+                teacherId: filteredTeachers[0].userId,
             });
-        });
+        }
+    }, [appointment, filteredTeachers, setAppointment]);
+
     return (
-        <div className="flex flex-col items-start justify-start w-full h-5/6 md:p-3 gap-3">
+        <div className="flex flex-col items-center justify-start w-full h-5/6 md:p-3 xl:p-10 gap-3">
             <h1 className="text-xl lg:text-2xl">
                 Wybierz przedmiot i nauczyciela
             </h1>
@@ -57,10 +71,17 @@ export const SubjectSelection = ({ appointment, setAppointment }: Props) => {
                             subject: e.target.value,
                         });
                     }}
+                    style={{
+                        fontSize: "1rem",
+                    }}
                     className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 bg-white focus:ring-2 focus:ring-inset focus:outline-none focus:ring-green-600 sm:text-sm sm:leading-6"
                 >
                     {options.map((option) => (
-                        <option key={option.id} value={option.name}>
+                        <option
+                            className="text-lg"
+                            key={option.id}
+                            value={option.name}
+                        >
                             {option.name}
                         </option>
                     ))}
@@ -77,11 +98,26 @@ export const SubjectSelection = ({ appointment, setAppointment }: Props) => {
                             teacherId: parseInt(e.target.value),
                         });
                     }}
+                    style={{
+                        fontSize: "1rem",
+                    }}
                     className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 bg-white focus:ring-2 focus:ring-inset focus:outline-none focus:ring-green-600 sm:text-sm sm:leading-6"
                 >
                     {filteredTeachers ? (
                         filteredTeachers?.map((option: any) => (
-                            <option key={option.user.id} value={option.user.id}>
+                            <option
+                                className="text-lg"
+                                key={option.userId}
+                                value={option.userId}
+                                onClick={(e) => {
+                                    setAppointment({
+                                        ...appointment,
+                                        teacherId: parseInt(
+                                            (e.target as HTMLInputElement).value
+                                        ),
+                                    });
+                                }}
+                            >
                                 {option.user.firstName} {option.user.lastName}
                             </option>
                         ))
