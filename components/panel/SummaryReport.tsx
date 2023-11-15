@@ -1,11 +1,8 @@
-"use client";
-
 import {
     CalendarIcon,
     ChartPieIcon,
     ClockIcon,
 } from "@heroicons/react/24/solid";
-import { useState } from "react";
 
 type Props = {};
 
@@ -33,13 +30,13 @@ export default function SummaryReport({}: Props) {
     ];
     return (
         <div
-            className={`flex flex-col items-start justify-center w-full gap-6 col-span-3 lg:col-span-2 lg:row-span-1`}
+            className={`flex flex-col items-start justify-center w-full gap-2`}
         >
-            <h3 className="text-base font-semibold leading-6 text-gray-900">
+            <h3 className="text-lg font-semibold leading-6 text-gray-900">
                 Raport podsumowujący
             </h3>
 
-            <dl className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <dl className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 w-full">
                 {cards.map((card, index) => (
                     <ReportCard
                         key={index}

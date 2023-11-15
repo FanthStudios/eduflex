@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-interface Teacher {
+export interface Teacher {
     subjects: {
         id: number;
         name: string;
@@ -13,22 +13,30 @@ interface Teacher {
         lastName: string;
         password: string;
         role: string;
+        lastLogin?: Date;
     };
+    appointments?: any[];
 }
 
-export function useTeacher(userId?: number) {
+export function useTeacher(withAppoinments?: boolean, userId?: number) {
     const [teachers, setTeachers] = useState<Teacher[]>([]);
 
     useEffect(() => {
         const fetchTeachers = async () => {
-            const res = await fetch(`/api/teachers`);
+            const res = await fetch(`/api/teachers`, {
+                method: "POST",
+                body: JSON.stringify({ withAppoinments }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
 
             const data = await res.json();
             setTeachers(data);
         };
 
         fetchTeachers();
-    }, []);
+    }, [withAppoinments]);
 
     return {
         teachers,

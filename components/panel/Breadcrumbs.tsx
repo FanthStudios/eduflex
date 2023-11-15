@@ -1,5 +1,6 @@
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
+import { motion } from "framer-motion";
 import React from "react";
 
 type Props = {
@@ -8,49 +9,60 @@ type Props = {
     goTo?: (index: number) => void;
 };
 
+const currentVariant = (index: number, items: any[]) => {
+    return {
+        initial: {
+            width: "5%",
+        },
+        animate: {
+            width: `${
+                index === 0
+                    ? 5
+                    : index === items.length - 1
+                    ? 100
+                    : (index / items.length) * 100 + 12.5
+            }%`,
+            transition: {
+                duration: 0.5,
+            },
+        },
+    };
+};
+
 export default function Breadcrumbs({ index, items, goTo }: Props) {
     return (
-        <nav className="flex" aria-label="Breadcrumb">
-            <ol role="list" className="flex items-center gap-1 md:gap-4 w-full">
-                {items.map((item, itemIndex) => (
-                    <li key={itemIndex}>
-                        <div className="flex items-center gap-1 md:gap-2">
-                            {itemIndex !== 0 && (
-                                <>
-                                    <div
-                                        className={clsx(
-                                            "hidden md:block h-1 md:w-22 xl:w-28 rounded-full mr-2",
-                                            itemIndex <= index
-                                                ? "bg-green-400"
-                                                : "bg-gray-300"
-                                        )}
-                                        aria-hidden="true"
-                                    />
-                                    <ChevronRightIcon
-                                        className={clsx(
-                                            "md:hidden block h-5 w-5 flex-shrink-0 mr-1 text-gray-400",
-                                            itemIndex <= index
-                                                ? "text-green-600"
-                                                : "text-gray-300"
-                                        )}
-                                        aria-hidden="true"
-                                    />
-                                </>
+        <nav className="w-1/2" aria-label="Breadcrumb">
+            <div aria-hidden="true">
+                <div className="hidden grid-cols-4 text-sm font-medium text-gray-600 sm:grid">
+                    {items.map((item, itemIndex) => (
+                        <div
+                            key={itemIndex}
+                            className={clsx(
+                                "flex items-center gap-1 md:gap-2",
+                                itemIndex <= index
+                                    ? "text-green-500 hover:text-green-600"
+                                    : "text-gray-500 hover:text-gray-600",
+                                itemIndex === items.length - 1
+                                    ? "justify-end"
+                                    : itemIndex === 0
+                                    ? "justify-start"
+                                    : "justify-center"
                             )}
-                            <p
-                                className={clsx(
-                                    "lg:text-md text-sm font-semibold whitespace-nowrap",
-                                    itemIndex <= index
-                                        ? "text-green-500 hover:text-green-600"
-                                        : "text-gray-500 hover:text-gray-600"
-                                )}
-                            >
-                                {item}
-                            </p>
+                        >
+                            <p className="whitespace-nowrap">{item}</p>
                         </div>
-                    </li>
-                ))}
-            </ol>
+                    ))}
+                </div>
+
+                <div className="mt-4 overflow-hidden rounded-full bg-gray-200">
+                    <motion.div
+                        className="h-2 rounded-full bg-green-500"
+                        variants={currentVariant(index, items)}
+                        initial="initial"
+                        animate="animate"
+                    />
+                </div>
+            </div>
         </nav>
     );
 }

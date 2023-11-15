@@ -19,7 +19,7 @@ const navigation = [
         },
         {
             name: "Korepetycje",
-            href: "/panel/createAppointment",
+            href: "/panel/appointments",
             icon: FolderIcon,
         },
     ],
@@ -36,7 +36,7 @@ const navigation = [
         },
         {
             name: "Korepetycje",
-            href: "/panel/appointments",
+            href: "/panel/createAppointment",
             icon: FolderIcon,
         },
     ],

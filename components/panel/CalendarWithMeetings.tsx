@@ -39,9 +39,9 @@ export default function CalendarWithMeetings({}: Props) {
         "after:bg-red-500 after:absolute after:top-0 after:right-0 after:rounded-md after:w-2 after:h-2";
 
     return (
-        <div className="col-span-2 row-span-1">
+        <div className="flex flex-col items-start justify-start gap-2">
             <h2 className="text-lg font-semibold leading-6 text-gray-900">
-                Nadchodzące korki
+                Nadchodzące korepetycje
             </h2>
             <div className="lg:grid lg:grid-cols-12 lg:gap-x-16 shadow rounded-lg p-3">
                 <ol className="mt-4 divide-y divide-gray-100 text-sm leading-6 lg:col-span-7 xl:col-span-8">

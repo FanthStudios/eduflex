@@ -1,7 +1,22 @@
-import React from "react";
+"use client";
+
+import TeacherCard from "@/components/panel/TeacherCard";
+import { useTeacher } from "@/hooks/useTeacher";
 
 type Props = {};
 
 export default function Teachers({}: Props) {
-    return <div>Teachers</div>;
+    const { teachers } = useTeacher(true);
+    return (
+        <div className="flex flex-col items-start justify-start w-full h-full gap-5 col-span-3 row-span-2">
+            <h1 className="text-lg font-medium xl:text-xl">
+                Lista nauczycieli
+            </h1>
+            <ul role="list" className="divide-y divide-gray-100 w-full">
+                {teachers.map((teacher) => (
+                    <TeacherCard key={teacher.userId} teacher={teacher} />
+                ))}
+            </ul>
+        </div>
+    );
 }

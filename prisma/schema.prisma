@@ -44,6 +44,7 @@ model User {
   lastName  String
   email     String   @unique
   password  String
+  lastLogin DateTime?
   role      String
   accounts Account[]
   sessions Session[]
@@ -54,8 +55,8 @@ model User {
 model Student {
   userId     Int      @id
   user       User     @relation(fields: [userId], references: [id])
-  appointments Appointment[]
-  favoriteTeachers Teacher[]
+  appointments StudentAppointment[]
+  favoriteTeachers Teacher[] @relation("FavoriteTeachers")
 }
 
 model Teacher {
@@ -63,7 +64,7 @@ model Teacher {
   user       User     @relation(fields: [userId], references: [id])
   subjects   Subject[] @relation("TeacherSubjects")
   appointments Appointment[]
-  students   Student[]
+  favoritedBy Student[] @relation("FavoriteTeachers")
 }
 
 model Subject {
@@ -74,16 +75,25 @@ model Subject {
 }
 
 model Appointment {
-  id         Int      @id @default(autoincrement())
-  date       DateTime
-  subjectId  Int
-  subject    Subject  @relation(fields: [subjectId], references: [id])
-  topic      String
-  description String?
-  goal       Goal
-  teacherId  Int
-  teacher    Teacher  @relation(fields: [teacherId], references: [userId])
-  students   Student[]
+  id                  Int      @id @default(autoincrement())
+  dateTime            DateTime
+  subjectId           Int
+  subject             Subject  @relation(fields: [subjectId], references: [id])
+  teacherId           Int
+  teacher             Teacher  @relation(fields: [teacherId], references: [userId])
+  studentAppointments StudentAppointment[]
+}
+
+model StudentAppointment {
+  studentId     Int
+  appointmentId Int
+  topic         String
+  goal          Goal
+  description   String?
+  student       Student     @relation(fields: [studentId], references: [userId])
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+
+  @@id([studentId, appointmentId])
 }
 
 enum Role {

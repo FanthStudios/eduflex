@@ -51,6 +51,14 @@ export const options: any = {
     ],
     callbacks: {
         async signIn({ user, account, profile, email, credentials }: any) {
+            await prisma.user.update({
+                where: {
+                    email: user.email,
+                },
+                data: {
+                    lastLogin: new Date(),
+                },
+            });
             return true;
         },
         async session({ session, user, token }: any) {

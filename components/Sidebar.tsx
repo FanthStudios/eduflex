@@ -95,7 +95,7 @@ export function Sidebar({ navigation, classNames, user }: SidebarProps) {
                                     <li key={item.name}>
                                         <a
                                             href={item.href}
-                                            className={classNames(
+                                            className={clsx(
                                                 pathname == item.href
                                                     ? "bg-neutral-50 text-green-600"
                                                     : "text-neutral-700 hover:text-green-600 hover:bg-neutral-50",
@@ -103,7 +103,7 @@ export function Sidebar({ navigation, classNames, user }: SidebarProps) {
                                             )}
                                         >
                                             <item.icon
-                                                className={classNames(
+                                                className={clsx(
                                                     pathname == item.href
                                                         ? "text-green-600"
                                                         : "text-neutral-400 group-hover:text-green-600",
@@ -303,7 +303,7 @@ export const Mobile = ({
                     </div>
                 </Dialog>
             </Transition.Root>
-            <div className="sticky top-0 z-40 flex items-center gap-x-6 bg-white px-4 py-4 shadow-sm sm:px-6 lg:hidden">
+            <div className="sticky top-0 z-50 flex items-center gap-x-6 bg-white px-4 py-4 shadow-sm sm:px-6 lg:hidden">
                 <button
                     type="button"
                     className="-m-2.5 p-2.5 text-neutral-700 lg:hidden"

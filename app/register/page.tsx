@@ -10,11 +10,6 @@ import React, { useEffect, useState } from "react";
 
 type Props = {};
 
-interface Subject {
-    id: number;
-    name: string;
-}
-
 interface User {
     firstName: string;
     lastName: string;
@@ -22,6 +17,8 @@ interface User {
     password: string;
     role: string;
     subjects?: string[];
+    appointments?: string[];
+    lastLogin?: Date;
 }
 
 export default function Register({}: Props) {
@@ -165,7 +162,7 @@ export default function Register({}: Props) {
                                             id="name"
                                             name="name"
                                             type="text"
-                                            autoComplete="name"
+                                            autoComplete="given-name"
                                             required
                                             onChange={(e) => {
                                                 setUser({
@@ -200,7 +197,7 @@ export default function Register({}: Props) {
                                             id="surname"
                                             name="surname"
                                             type="text"
-                                            autoComplete="surname"
+                                            autoComplete="family-name"
                                             required
                                             onChange={(e) => {
                                                 setUser({

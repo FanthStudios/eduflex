@@ -56,11 +56,17 @@ export const SubjectSelection = ({ appointment, setAppointment }: Props) => {
     }, [appointment, filteredTeachers, setAppointment]);
 
     return (
-        <div className="flex flex-col items-center justify-start w-full h-5/6 md:p-3 xl:p-10 gap-3">
+        <div className="flex flex-col items-center justify-start w-full h-full lg:h-3/4 md:p-3 xl:p-10 gap-3">
             <h1 className="text-xl lg:text-2xl">
                 Wybierz przedmiot i nauczyciela
             </h1>
             <div className="md:w-1/3 w-full">
+                <label
+                    htmlFor="subject"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                    Przedmiot
+                </label>
                 <select
                     id="subject"
                     name="subject"
@@ -88,6 +94,12 @@ export const SubjectSelection = ({ appointment, setAppointment }: Props) => {
                 </select>
             </div>
             <div className="md:w-1/3 w-full">
+                <label
+                    htmlFor="teacher"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                    Nauczyciel
+                </label>
                 <select
                     id="teacher"
                     name="teacher"
@@ -136,13 +148,27 @@ export const DateAndTimeSelection = ({
     appointment,
     setAppointment,
 }: Props) => {
-    return <div className="w-full h-5/6 md:p-3">DateAndTimeSelection</div>;
+    return (
+        <div className="flex flex-col items-center justify-start w-full h-full lg:h-3/4 md:p-3 xl:p-10 gap-3">
+            <h1 className="text-xl lg:text-2xl">
+                Wybierz odpowiadający ci termin
+            </h1>
+        </div>
+    );
 };
 
 export const GoalSelection = ({ appointment, setAppointment }: Props) => {
-    return <div className="w-full h-5/6 md:p-3">GoalSelection</div>;
+    return (
+        <div className="flex flex-col items-center justify-start w-full h-full lg:h-3/4 md:p-3 xl:p-10 gap-3">
+            <h1 className="text-xl lg:text-2xl">Podaj cel korepetycji</h1>
+        </div>
+    );
 };
 
 export const Summary = ({ appointment, setAppointment }: Props) => {
-    return <div className="w-full h-5/6 md:p-3">Summary</div>;
+    return (
+        <div className="flex flex-col items-center justify-start w-full h-full lg:h-3/4 md:p-3 xl:p-10 gap-3">
+            <h1 className="text-xl lg:text-2xl">Podsumowanie</h1>
+        </div>
+    );
 };
