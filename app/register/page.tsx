@@ -19,6 +19,7 @@ interface User {
     subjects?: string[];
     appointments?: string[];
     lastLogin?: Date;
+    studentsClass?: string;
 }
 
 export default function Register({}: Props) {
@@ -49,6 +50,8 @@ export default function Register({}: Props) {
         { id: 19, name: "Edukacja dla bezpieczeństwa" },
         { id: 21, name: "Religia" },
     ];
+
+    const classes = ["5pi", "4i", "3i", "2gt", "3gt"];
 
     const handleRegister = async () => {
         if (user.role == "STUDENT") {
@@ -104,6 +107,16 @@ export default function Register({}: Props) {
             });
         }
     }, [user, subjects]);
+
+    useEffect(() => {
+        const availableClasses = ["5pi", "4i", "3i", "2gt", "3gt"];
+        if (!user.studentsClass) {
+            setUser({
+                ...user,
+                studentsClass: availableClasses[0],
+            });
+        }
+    }, [user]);
 
     return (
         <>
@@ -315,7 +328,7 @@ export default function Register({}: Props) {
                                 </motion.div>
                             </div>
 
-                            {user.role == "TEACHER" && (
+                            {user.role == "TEACHER" ? (
                                 <div>
                                     <motion.label
                                         variants={slideInVariant("left", 0.1)}
@@ -332,6 +345,60 @@ export default function Register({}: Props) {
                                         selectedOptions={subjects}
                                         setSelectedOptions={setSubjects}
                                     />
+                                </div>
+                            ) : (
+                                <div>
+                                    <motion.label
+                                        variants={slideInVariant(
+                                            "left",
+                                            user.role == "TEACHER" ? 0.1 : 0.8
+                                        )}
+                                        initial="hidden"
+                                        animate="show"
+                                        exit="exit"
+                                        htmlFor="role"
+                                        className="block text-sm font-medium leading-6 text-gray-900"
+                                    >
+                                        Przedmioty
+                                    </motion.label>
+                                    <motion.div
+                                        className="mt-0.5"
+                                        variants={slideInVariant(
+                                            "left",
+                                            user.role == "TEACHER" ? 0.15 : 0.85
+                                        )}
+                                        initial="hidden"
+                                        animate="show"
+                                        exit="exit"
+                                    >
+                                        <select
+                                            id="class"
+                                            name="class"
+                                            required
+                                            onChange={(e) => {
+                                                setUser({
+                                                    ...user,
+                                                    studentsClass:
+                                                        e.target.value,
+                                                });
+                                            }}
+                                            className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 bg-white focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
+                                        >
+                                            {classes.map(
+                                                (
+                                                    studentsClass: string,
+                                                    index: number
+                                                ) => (
+                                                    <option
+                                                        key={index}
+                                                        value={studentsClass}
+                                                    >
+                                                        {studentsClass}
+                                                    </option>
+                                                )
+                                            )}
+                                        </select>
+                                    </motion.div>
                                 </div>
                             )}
 

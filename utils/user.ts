@@ -15,6 +15,7 @@ interface UserProps {
     id?: number;
     sessions?: any[];
     subjects?: any[];
+    studentsClass?: string;
 }
 
 export const getUser = async (email: string) => {
@@ -43,11 +44,35 @@ export const createUser = async (userObject: UserProps) => {
     });
 
     if (userObject.role == "STUDENT") {
-        await prisma.student.create({
-            data: {
-                userId: user.id,
+        if (!userObject.studentsClass) return null;
+
+        const studentClass = await prisma.class.findUnique({
+            where: {
+                name: userObject.studentsClass,
             },
         });
+
+        if (studentClass && studentClass.id) {
+            await prisma.student.create({
+                data: {
+                    userId: user.id,
+                    classId: studentClass.id,
+                },
+            });
+        } else {
+            const newClass = await prisma.class.create({
+                data: {
+                    name: userObject.studentsClass,
+                },
+            });
+
+            await prisma.student.create({
+                data: {
+                    userId: user.id,
+                    classId: newClass.id,
+                },
+            });
+        }
     } else if (userObject.role == "TEACHER") {
         const teacher = await prisma.teacher.create({
             data: {

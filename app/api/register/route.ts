@@ -4,7 +4,15 @@ import bcrypt from "bcrypt";
 
 export async function POST(request: Request) {
     const body = await request.json();
-    const { email, password, firstName, lastName, role, subjects } = body;
+    const {
+        email,
+        password,
+        firstName,
+        lastName,
+        role,
+        subjects,
+        studentsClass,
+    } = body;
 
     if (!email || !password || !firstName || !lastName || !role) {
         if (role === "TEACHER" && !subjects) {
@@ -30,6 +38,7 @@ export async function POST(request: Request) {
         lastName,
         role,
         subjects,
+        studentsClass,
     });
 
     return new NextResponse(JSON.stringify(newUser), {

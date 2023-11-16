@@ -7,7 +7,7 @@ import {
     DateAndTimeSelection,
     GoalSelection,
     Summary,
-} from "@/components/panel/appointmentCreation";
+} from "@/components/panel/appointmentRegisteration";
 import { useState } from "react";
 import { toast } from "react-toastify";
 

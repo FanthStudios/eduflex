@@ -2,9 +2,21 @@ import { Teacher } from "@/hooks/useTeacher";
 import { useCallback, useEffect, useState } from "react";
 import clsx from "clsx";
 import { HeartIcon } from "@heroicons/react/24/outline";
+import { Student } from "@/hooks/useStudent";
+
+type TeacherCardProps = {
+    teacher: Teacher;
+    fillColor: string;
+};
+
+type StudentCardProps = {
+    student: Student;
+    fillColor: string;
+};
 
 type Props = {
-    teacher: Teacher;
+    teacher?: Teacher;
+    student?: Student;
 };
 
 function formatDate(date: any) {
@@ -44,7 +56,7 @@ function formatDate(date: any) {
     }
 }
 
-export default function TeacherCard({ teacher }: Props) {
+export default function ListCard({ teacher, student }: Props) {
     const randomColor = useCallback(() => {
         const colorPallete = [
             "red",
@@ -87,6 +99,14 @@ export default function TeacherCard({ teacher }: Props) {
         );
     }, [colorSaturation, randomColor]);
 
+    return teacher ? (
+        <TeacherCard teacher={teacher} fillColor={fillColor} />
+    ) : (
+        student && <StudentCard student={student} fillColor={fillColor} />
+    );
+}
+
+function TeacherCard({ teacher, fillColor }: TeacherCardProps) {
     return (
         <li
             key={teacher.user.email}
@@ -143,6 +163,53 @@ export default function TeacherCard({ teacher }: Props) {
                 >
                     <HeartIcon className="w-5 aspect-square text-neutral-500" />
                 </button>
+            </div>
+        </li>
+    );
+}
+
+function StudentCard({ student, fillColor }: StudentCardProps) {
+    return (
+        <li
+            key={student.user.email}
+            className="relative flex justify-between gap-x-6 py-5 lg:w-2/3 w-full"
+        >
+            <div className="flex gap-x-4">
+                <div className={`${fillColor}`}>
+                    <p>{student.user?.firstName[0]}</p>
+                </div>
+                <div className="min-w-0 flex-auto">
+                    <p className="text-sm font-semibold leading-6 text-gray-900">
+                        <span>
+                            <span className="absolute inset-x-0 -top-px bottom-0" />
+                            {student.user.firstName} {student.user.lastName}
+                        </span>
+                    </p>
+                    <p className="mt-1 flex text-xs leading-5 text-gray-500">
+                        <a
+                            href={`mailto:${student.user.email}`}
+                            className="relative truncate hover:underline"
+                        >
+                            {student.user.email}
+                        </a>
+                    </p>
+                </div>
+            </div>
+            <div className="flex items-center gap-x-6">
+                <div className="hidden sm:flex sm:flex-col sm:items-end">
+                    <p className="text-sm leading-6 text-gray-900">
+                        {student.studentsClass.name}
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-gray-500">
+                        Ostatnio{" "}
+                        {student.user.firstName.endsWith("a")
+                            ? "widziana"
+                            : "widziany"}{" "}
+                        <span className="text-green-600">
+                            {formatDate(student.user.lastLogin)}
+                        </span>
+                    </p>
+                </div>
             </div>
         </li>
     );

@@ -1,6 +1,6 @@
 "use client";
 
-import TeacherCard from "@/components/panel/TeacherCard";
+import ListCard from "@/components/panel/ListCard";
 import { useTeacher } from "@/hooks/useTeacher";
 
 type Props = {};
@@ -14,7 +14,7 @@ export default function Teachers({}: Props) {
             </h1>
             <ul role="list" className="divide-y divide-gray-100 w-full">
                 {teachers.map((teacher) => (
-                    <TeacherCard key={teacher.userId} teacher={teacher} />
+                    <ListCard key={teacher.userId} teacher={teacher} />
                 ))}
             </ul>
         </div>

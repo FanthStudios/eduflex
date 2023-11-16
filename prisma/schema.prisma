@@ -52,11 +52,19 @@ model User {
   teacher   Teacher?
 }
 
+model Class {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  students  Student[]
+}
+
 model Student {
-  userId     Int      @id
-  user       User     @relation(fields: [userId], references: [id])
-  appointments StudentAppointment[]
-  favoriteTeachers Teacher[] @relation("FavoriteTeachers")
+  userId              Int      @id
+  user                User     @relation(fields: [userId], references: [id])
+  classId             Int
+  studentsClass       Class    @relation(fields: [classId], references: [id])
+  appointments        StudentAppointment[]
+  favoriteTeachers    Teacher[] @relation("FavoriteTeachers")
 }
 
 model Teacher {

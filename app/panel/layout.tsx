@@ -35,7 +35,7 @@ const navigation = [
             icon: UsersIcon,
         },
         {
-            name: "Korepetycje",
+            name: "Dodaj korepetycje",
             href: "/panel/createAppointment",
             icon: FolderIcon,
         },
