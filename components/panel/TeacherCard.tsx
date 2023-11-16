@@ -1,6 +1,7 @@
 import { Teacher } from "@/hooks/useTeacher";
 import { useCallback, useEffect, useState } from "react";
 import clsx from "clsx";
+import { HeartIcon } from "@heroicons/react/24/outline";
 
 type Props = {
     teacher: Teacher;
@@ -112,7 +113,7 @@ export default function TeacherCard({ teacher }: Props) {
                     </p>
                 </div>
             </div>
-            <div className="flex items-center gap-x-4">
+            <div className="flex items-center gap-x-6">
                 <div className="hidden sm:flex sm:flex-col sm:items-end">
                     <p className="text-sm leading-6 text-gray-900">
                         {teacher.subjects.map((subject) => (
@@ -125,12 +126,23 @@ export default function TeacherCard({ teacher }: Props) {
                         ))}
                     </p>
                     <p className="mt-1 text-xs leading-5 text-gray-500">
-                        Ostatnio widziany/a{" "}
+                        Ostatnio{" "}
+                        {teacher.user.firstName.endsWith("a")
+                            ? "widziana"
+                            : "widziany"}{" "}
                         <span className="text-green-600">
                             {formatDate(teacher.user.lastLogin)}
                         </span>
                     </p>
                 </div>
+                <button
+                    className="relative"
+                    onClick={() => {
+                        console.log(teacher.userId);
+                    }}
+                >
+                    <HeartIcon className="w-5 aspect-square text-neutral-500" />
+                </button>
             </div>
         </li>
     );
