@@ -1,6 +1,5 @@
 import { Teacher } from "@/hooks/useTeacher";
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import clsx from "clsx";
 
 type Props = {
@@ -27,7 +26,7 @@ function formatDate(date: any) {
             if (hours === 1) {
                 return `godzinę temu`;
             } else {
-                `${hours} godzin temu`;
+                return `${hours} godzin temu`;
             }
         case minutes > 0:
             if (minutes === 1) {

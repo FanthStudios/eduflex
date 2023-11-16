@@ -74,9 +74,7 @@ export default function Appointments({}: Props) {
                 goTo={goTo}
             />
             {step}
-            <div
-                className={`flex gap-24 items-center w-full mt-2 justify-center`}
-            >
+            <div className={`flex items-center w-full mt-2 justify-evenly`}>
                 {currentIndex > 0 && (
                     <button
                         className="px-8 py-1 text-neutral-800 bg-neutral-200/80 rounded-md"

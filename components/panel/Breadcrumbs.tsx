@@ -1,7 +1,5 @@
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { motion } from "framer-motion";
-import React from "react";
 
 type Props = {
     index: number;
@@ -31,7 +29,7 @@ const currentVariant = (index: number, items: any[]) => {
 
 export default function Breadcrumbs({ index, items, goTo }: Props) {
     return (
-        <nav className="w-1/2" aria-label="Breadcrumb">
+        <nav className="w-5/6 lg:w-1/2 lg:mb-0 mb-4" aria-label="Breadcrumb">
             <div aria-hidden="true">
                 <div className="hidden grid-cols-4 text-sm font-medium text-gray-600 sm:grid">
                     {items.map((item, itemIndex) => (
