@@ -46,49 +46,70 @@ model User {
   password  String
   lastLogin DateTime?
   role      String
-  accounts Account[]
-  sessions Session[]
+  accounts  Account[]
+  sessions  Session[]
   student   Student?
   teacher   Teacher?
 }
 
 model Class {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
+  id        Int         @id @default(autoincrement())
+  name      String      @unique
   students  Student[]
 }
 
 model Student {
-  userId              Int      @id
-  user                User     @relation(fields: [userId], references: [id])
+  userId              Int                   @id
+  user                User                  @relation(fields: [userId], references: [id])
   classId             Int
-  studentsClass       Class    @relation(fields: [classId], references: [id])
+  studentsClass       Class                 @relation(fields: [classId], references: [id])
   appointments        StudentAppointment[]
-  favoriteTeachers    Teacher[] @relation("FavoriteTeachers")
+  favoriteTeachers    Teacher[]             @relation("FavoriteTeachers")
 }
 
 model Teacher {
-  userId     Int      @id
-  user       User     @relation(fields: [userId], references: [id])
-  subjects   Subject[] @relation("TeacherSubjects")
-  appointments Appointment[]
-  favoritedBy Student[] @relation("FavoriteTeachers")
+  userId        Int             @id
+  user          User            @relation(fields: [userId], references: [id])
+  subjects      Subject[]       @relation("TeacherSubjects")
+  appointments  Appointment[]
+  favoritedBy   Student[]       @relation("FavoriteTeachers")
 }
 
 model Subject {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  teachers  Teacher[] @relation("TeacherSubjects")
-  appointments Appointment[]
+  id            Int             @id @default(autoincrement())
+  name          String          @unique
+  teachers      Teacher[]       @relation("TeacherSubjects")
+  appointments  Appointment[]
+}
+
+model Location {
+  id             Int            @id @default(autoincrement())
+  lat            Float          @unique
+  lng            Float          @unique
+  city           String
+  postalCode     String
+  address        String         @unique
+  appointments   Appointment[]
+}
+
+enum Recurring {
+  NEVER
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
 }
 
 model Appointment {
-  id                  Int      @id @default(autoincrement())
+  id                  Int                     @id @default(autoincrement())
   dateTime            DateTime
+  roomNumber          Int
+  recurring           Recurring
   subjectId           Int
-  subject             Subject  @relation(fields: [subjectId], references: [id])
+  subject             Subject                 @relation(fields: [subjectId], references: [id])
   teacherId           Int
-  teacher             Teacher  @relation(fields: [teacherId], references: [userId])
+  teacher             Teacher                 @relation(fields: [teacherId], references: [userId])
+  locationId          Int                     @unique
+  location            Location                @relation(fields: [locationId], references: [id])
   studentAppointments StudentAppointment[]
 }
 
@@ -98,8 +119,8 @@ model StudentAppointment {
   topic         String
   goal          Goal
   description   String?
-  student       Student     @relation(fields: [studentId], references: [userId])
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  student       Student       @relation(fields: [studentId], references: [userId])
+  appointment   Appointment   @relation(fields: [appointmentId], references: [id])
 
   @@id([studentId, appointmentId])
 }
@@ -115,9 +136,9 @@ enum Goal {
 }
 
 model VerificationToken {
-  identifier String
-  token String @unique
-  expires DateTime
+  identifier  String
+  token       String    @unique
+  expires     DateTime
 
   @@id([identifier, token])
 }

@@ -18,14 +18,14 @@ export interface Teacher {
     appointments?: any[];
 }
 
-export function useTeacher(withAppoinments?: boolean, userId?: number) {
+export function useTeacher(withAppoinments?: boolean, userId?: string) {
     const [teachers, setTeachers] = useState<Teacher[]>([]);
 
     useEffect(() => {
         const fetchTeachers = async () => {
             const res = await fetch(`/api/teachers`, {
                 method: "POST",
-                body: JSON.stringify({ withAppoinments }),
+                body: JSON.stringify({ withAppoinments, userId }),
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -36,7 +36,7 @@ export function useTeacher(withAppoinments?: boolean, userId?: number) {
         };
 
         fetchTeachers();
-    }, [withAppoinments]);
+    }, [withAppoinments, userId]);
 
     return {
         teachers,

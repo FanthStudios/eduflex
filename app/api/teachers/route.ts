@@ -3,8 +3,8 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
     const body = await request.json();
-    const { withAppoinments } = body;
-    const teachers = await getTeachers(withAppoinments);
+    const { withAppoinments, userId } = body;
+    const teachers = await getTeachers(withAppoinments, userId);
 
     return new NextResponse(JSON.stringify(teachers), {
         status: 200,

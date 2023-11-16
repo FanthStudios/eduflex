@@ -1,5 +1,7 @@
+import { useAppointments } from "@/hooks/useAppointments";
 import { useTeacher } from "@/hooks/useTeacher";
-import { useEffect } from "react";
+import { use, useEffect } from "react";
+import AppointmentCard from "./AppointmentCard";
 
 type Appointment = {
     subject: string;
@@ -148,11 +150,24 @@ export const DateAndTimeSelection = ({
     appointment,
     setAppointment,
 }: Props) => {
+    const { appointments } = useAppointments();
+    const filteredAppointments =
+        appointments &&
+        appointments.filter(
+            (app) =>
+                app.teacherId == appointment.teacherId &&
+                app.subject.name == appointment.subject
+        );
     return (
         <div className="flex flex-col items-center justify-start w-full h-full lg:h-3/4 md:p-3 xl:p-10 gap-3">
             <h1 className="text-xl lg:text-2xl">
                 Wybierz odpowiadający ci termin
             </h1>
+            {filteredAppointments &&
+                filteredAppointments.length > 0 &&
+                filteredAppointments.map((app) => (
+                    <AppointmentCard key={app.id} appointment={app} />
+                ))}
         </div>
     );
 };

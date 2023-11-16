@@ -38,18 +38,33 @@ function formatDate(date: any) {
         case hours > 0:
             if (hours === 1) {
                 return `godzinę temu`;
+            } else if (
+                hours.toString().endsWith("2" || "3" || "4") &&
+                !hours.toString().endsWith("12" || "13" || "14")
+            ) {
+                return `${hours} godziny temu`;
             } else {
                 return `${hours} godzin temu`;
             }
         case minutes > 0:
             if (minutes === 1) {
                 return `minutę temu`;
+            } else if (
+                minutes.toString().endsWith("2" || "3" || "4") &&
+                !minutes.toString().endsWith("12" || "13" || "14")
+            ) {
+                return `${minutes} minuty temu`;
             } else {
                 return `${minutes} minut temu`;
             }
         default:
             if (seconds === 1) {
                 return `sekundę temu`;
+            } else if (
+                seconds.toString().endsWith("2" || "3" || "4") &&
+                !seconds.toString().endsWith("12" || "13" || "14")
+            ) {
+                return `${seconds} sekundy temu`;
             } else {
                 return `${seconds} sekund temu`;
             }
