@@ -1,5 +1,6 @@
 import { Recurring } from "@prisma/client";
 import { useEffect, useState } from "react";
+import { Teacher } from "./useTeacher";
 
 export type Location = {
     address: string;
@@ -22,9 +23,7 @@ export interface Appointment {
         name: string;
     };
     subjectId: number;
-    teacher: {
-        userId: number;
-    };
+    teacher: Teacher;
     teacherId: number;
 }
 

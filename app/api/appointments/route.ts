@@ -6,7 +6,11 @@ export async function GET() {
     const appointments = await prisma.appointment.findMany({
         include: {
             subject: true,
-            teacher: true,
+            teacher: {
+                select: {
+                    user: true,
+                },
+            },
             location: true,
         },
     });

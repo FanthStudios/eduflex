@@ -1,43 +1,89 @@
+"use client";
+
+/* eslint-disable @next/next/no-img-element */
 import { Appointment } from "@/hooks/useAppointments";
-import { useTeacher } from "@/hooks/useTeacher";
-import React from "react";
+import { CalendarIcon, MapPinIcon } from "@heroicons/react/24/outline";
+import { DoorOpen } from "lucide-react";
 
 type Props = {
     appointment: Appointment;
+    onClick: () => void;
 };
 
-export default function AppointmentCard({ appointment }: Props) {
-    const { teachers } = useTeacher(false, appointment.teacherId.toString());
-    const teacher = teachers[0];
+export default function AppointmentCard({ appointment, onClick }: Props) {
     return (
-        <div className="lg:w-2/3 w-full flex items-center justify-evenly">
-            <div className="flex flex-col items-center justify-center">
-                <h1 className="text-lg font-medium xl:text-xl">
-                    {appointment.subject.name}
-                </h1>
-                <p className="text-sm text-gray-500">
-                    {new Date(appointment.dateTime).toLocaleString("pl-PL", {
-                        weekday: "long",
-                        day: "numeric",
-                        month: "long",
-                        hour: "numeric",
-                        minute: "numeric",
-                    })}
-                </p>
+        <button
+            type="button"
+            onClick={onClick}
+            key={appointment.id}
+            className="relative flex space-x-6 p-3 xl:static border border-neutral-300 rounded-lg"
+        >
+            <div className="flex-auto text-start">
+                <h3 className="pr-10 font-semibold text-gray-900 xl:pr-0">
+                    {appointment.teacher.user.firstName}{" "}
+                    {appointment.teacher.user.lastName}
+                </h3>
+                <dl className="mt-2 flex flex-col text-gray-500 xl:flex-row">
+                    <div className="flex items-start space-x-3">
+                        <dt className="mt-0.5">
+                            <span className="sr-only">Date</span>
+                            <CalendarIcon
+                                className="h-5 w-5 text-gray-400"
+                                aria-hidden="true"
+                            />
+                        </dt>
+                        <dd>
+                            <time
+                                className="capitalize"
+                                dateTime={new Date(
+                                    appointment.dateTime
+                                ).toISOString()}
+                            >
+                                {/* 10 Listopada, 2023 o 10:00 */}
+                                {new Date(
+                                    appointment.dateTime
+                                ).toLocaleDateString("pl-PL", {
+                                    weekday: "long",
+                                    day: "numeric",
+                                    month: "long",
+                                    year: "numeric",
+                                })}
+                                <span className="lowercase">{" o "}</span>
+                                {new Date(
+                                    appointment.dateTime
+                                ).toLocaleTimeString("pl-PL", {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                })}
+                            </time>
+                        </dd>
+                    </div>
+                    <div className="mt-2 flex items-start space-x-3 xl:ml-3.5 xl:mt-0 xl:border-l xl:border-gray-400 xl:border-opacity-50 xl:pl-3.5">
+                        <dt className="mt-0.5">
+                            <span className="sr-only">Location</span>
+                            <MapPinIcon
+                                className="h-5 w-5 text-gray-400"
+                                aria-hidden="true"
+                            />
+                        </dt>
+                        <dd>
+                            {appointment.location.address},{" "}
+                            {appointment.location.postalCode}{" "}
+                            {appointment.location.city}
+                        </dd>
+                    </div>
+                    <div className="mt-2 flex items-start space-x-3 xl:ml-3.5 xl:mt-0 xl:border-l xl:border-gray-400 xl:border-opacity-50 xl:pl-3.5">
+                        <dt className="mt-0.5">
+                            <span className="sr-only">Room</span>
+                            <DoorOpen
+                                className="h-5 w-5 text-gray-400"
+                                aria-hidden="true"
+                            />
+                        </dt>
+                        <dd>{appointment.roomNumber}</dd>
+                    </div>
+                </dl>
             </div>
-            <div className="flex flex-col items-center justify-center">
-                <h1 className="text-lg font-medium xl:text-xl">
-                    {teacher?.user.firstName} {teacher?.user.lastName}
-                </h1>
-            </div>
-            <div className="flex flex-col items-center justify-center">
-                <h1 className="text-lg font-medium xl:text-xl">
-                    {appointment.subject.name}
-                </h1>
-                <p className="text-sm text-gray-500">
-                    {appointment.roomNumber}
-                </p>
-            </div>
-        </div>
+        </button>
     );
 }
