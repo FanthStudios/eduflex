@@ -201,19 +201,21 @@ function TeacherCard({ teacher, fillColor }: TeacherCardProps) {
                         </span>
                     </p>
                 </div>
-                <button
-                    className={`relative ${
-                        student?.favoriteTeachers?.find(
-                            (favoriteTeacher) =>
-                                favoriteTeacher.userId === teacher.userId
-                        ) && "text-red-600"
-                    }`}
-                    onClick={async () => {
-                        await addToFavorites();
-                    }}
-                >
-                    <HeartIcon className="w-5 aspect-square" />
-                </button>
+                {student && (
+                    <button
+                        className={`relative ${
+                            student.favoriteTeachers?.find(
+                                (favoriteTeacher) =>
+                                    favoriteTeacher.userId === teacher.userId
+                            ) && "text-red-600"
+                        }`}
+                        onClick={async () => {
+                            await addToFavorites();
+                        }}
+                    >
+                        <HeartIcon className="w-5 aspect-square" />
+                    </button>
+                )}
             </div>
         </li>
     );
