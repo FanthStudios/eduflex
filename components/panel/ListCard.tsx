@@ -2,7 +2,8 @@ import { Teacher } from "@/hooks/useTeacher";
 import { useCallback, useEffect, useState } from "react";
 import clsx from "clsx";
 import { HeartIcon } from "@heroicons/react/24/outline";
-import { Student } from "@/hooks/useStudent";
+import { Student, useStudent } from "@/hooks/useStudent";
+import { useSession } from "next-auth/react";
 
 type TeacherCardProps = {
     teacher: Teacher;
@@ -122,6 +123,36 @@ export default function ListCard({ teacher, student }: Props) {
 }
 
 function TeacherCard({ teacher, fillColor }: TeacherCardProps) {
+    const { data: session } = useSession();
+    const {
+        students,
+        addStudentsFavoriteTeacher,
+        removeStudentsFavoriteTeacher,
+    } = useStudent();
+    const student = students?.find(
+        (student) => student.user.email === session?.user.email
+    );
+
+    async function addToFavorites() {
+        const res = await fetch("/api/favorite", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                teacherId: teacher.userId,
+                userId: session?.user.id,
+            }),
+        });
+        const data = await res.json();
+
+        if (data.isFavorited) {
+            addStudentsFavoriteTeacher(teacher.userId, student!.userId);
+        } else {
+            removeStudentsFavoriteTeacher(teacher.userId, student!.userId);
+        }
+    }
+
     return (
         <li
             key={teacher.user.email}
@@ -171,12 +202,17 @@ function TeacherCard({ teacher, fillColor }: TeacherCardProps) {
                     </p>
                 </div>
                 <button
-                    className="relative"
-                    onClick={() => {
-                        console.log(teacher.userId);
+                    className={`relative ${
+                        student?.favoriteTeachers?.find(
+                            (favoriteTeacher) =>
+                                favoriteTeacher.userId === teacher.userId
+                        ) && "text-red-600"
+                    }`}
+                    onClick={async () => {
+                        await addToFavorites();
                     }}
                 >
-                    <HeartIcon className="w-5 aspect-square text-neutral-500" />
+                    <HeartIcon className="w-5 aspect-square" />
                 </button>
             </div>
         </li>

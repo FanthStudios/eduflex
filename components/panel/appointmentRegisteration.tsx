@@ -197,6 +197,7 @@ export const DateAndTimeSelection = ({
                 app.subject.name == appointment.subject
         );
     console.log(appointments);
+    console.log(filteredAppointments);
     return (
         <div className="flex flex-col items-center justify-start w-full h-full lg:h-3/4 md:p-3 xl:p-10 gap-3">
             <h1 className="text-xl lg:text-2xl">
@@ -212,6 +213,7 @@ export const DateAndTimeSelection = ({
                                 dateTime: app.dateTime,
                             });
                         }}
+                        selected={appointment.dateTime == app.dateTime}
                         key={app.id}
                         appointment={app}
                     />

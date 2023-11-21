@@ -43,6 +43,9 @@ export const createAppointment = async (appointment: Appointment) => {
         where: {
             lat: appointment.location.lat,
             lng: appointment.location.lng,
+            city: appointment.location.city,
+            postalCode: appointment.location.postalCode,
+            address: appointment.location.address,
         },
     });
 

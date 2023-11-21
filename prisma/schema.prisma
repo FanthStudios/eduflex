@@ -108,7 +108,7 @@ model Appointment {
   subject             Subject                 @relation(fields: [subjectId], references: [id])
   teacherId           Int
   teacher             Teacher                 @relation(fields: [teacherId], references: [userId])
-  locationId          Int                     @unique
+  locationId          Int
   location            Location                @relation(fields: [locationId], references: [id])
   studentAppointments StudentAppointment[]
 }

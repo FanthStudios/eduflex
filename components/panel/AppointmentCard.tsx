@@ -8,15 +8,23 @@ import { DoorOpen } from "lucide-react";
 type Props = {
     appointment: Appointment;
     onClick: () => void;
+    selected: boolean;
 };
 
-export default function AppointmentCard({ appointment, onClick }: Props) {
+export default function AppointmentCard({
+    appointment,
+    onClick,
+    selected,
+}: Props) {
     return (
         <button
             type="button"
             onClick={onClick}
-            key={appointment.id}
-            className="relative flex space-x-6 p-3 xl:static border border-neutral-300 rounded-lg"
+            className={`relative flex space-x-6 p-3 xl:static ${
+                selected
+                    ? "border-green-400 border-2"
+                    : "border border-neutral-300"
+            } rounded-lg`}
         >
             <div className="flex-auto text-start">
                 <h3 className="pr-10 font-semibold text-gray-900 xl:pr-0">

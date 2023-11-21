@@ -14,6 +14,7 @@ export const getTeachers = async (
                   subjects: true,
                   appointments:
                       withAppoinments && withAppoinments == true ? true : false,
+                  favoritedBy: true,
               },
           })
         : await prisma.teacher.findMany({
@@ -22,6 +23,7 @@ export const getTeachers = async (
                   subjects: true,
                   appointments:
                       withAppoinments && withAppoinments == true ? true : false,
+                  favoritedBy: true,
               },
           });
 

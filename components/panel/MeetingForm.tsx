@@ -35,7 +35,9 @@ type Props = {
 export default function MeetingForm({ appointment, setAppointment }: Props) {
     const { data: session } = useSession();
     const { teachers } = useTeacher(false, session?.user.id);
-    const teacher = teachers[0];
+    const teacher = teachers.filter(
+        (teacher) => teacher.userId.toString() == session?.user.id
+    )[0];
 
     const getLocationByAddress = (address: string) => {
         return locations.find((location) => location.address == address);

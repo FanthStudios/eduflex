@@ -69,7 +69,7 @@ export default function CreateAppointment({}: Props) {
 
         if (res.status == 200) {
             toast.success("Spotkanie zostało dodane");
-            return (window.location.href = "/panel/appointments");
+            return (window.location.href = "/panel/createAppointment");
         }
     }
     return (

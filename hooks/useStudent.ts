@@ -18,11 +18,52 @@ export interface Student {
         name: string;
     };
     appointments: any[];
-    favoriteTeachers: Teacher[];
+    favoriteTeachers: { userId: number }[];
 }
 
 export function useStudent() {
     const [students, setStudents] = useState<Student[]>([]);
+
+    const removeStudentsFavoriteTeacher = (
+        teacherId: number,
+        studentId: number
+    ) => {
+        const updatedStudents = students.map((student) => {
+            if (student.userId === studentId) {
+                return {
+                    ...student,
+                    favoriteTeachers: student.favoriteTeachers.filter(
+                        (teacher) => teacher.userId !== teacherId
+                    ),
+                };
+            }
+
+            return student;
+        });
+
+        setStudents(updatedStudents);
+    };
+
+    const addStudentsFavoriteTeacher = (
+        teacherId: number,
+        studentId: number
+    ) => {
+        const updatedStudents = students.map((student) => {
+            if (student.userId === studentId) {
+                return {
+                    ...student,
+                    favoriteTeachers: [
+                        ...student.favoriteTeachers,
+                        { userId: teacherId },
+                    ],
+                };
+            }
+
+            return student;
+        });
+
+        setStudents(updatedStudents);
+    };
 
     useEffect(() => {
         const fetchTeachers = async () => {
@@ -37,5 +78,7 @@ export function useStudent() {
 
     return {
         students,
+        removeStudentsFavoriteTeacher,
+        addStudentsFavoriteTeacher,
     };
 }
