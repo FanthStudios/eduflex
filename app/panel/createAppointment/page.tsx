@@ -65,11 +65,12 @@ export default function CreateAppointment({}: Props) {
             method: "POST",
             body: JSON.stringify(newAppointment),
         });
-        const data = await res.json();
 
         if (res.status == 200) {
+            goTo(0);
             toast.success("Spotkanie zostało dodane");
-            return (window.location.href = "/panel/createAppointment");
+        } else {
+            toast.error("Wystąpił błąd");
         }
     }
     return (

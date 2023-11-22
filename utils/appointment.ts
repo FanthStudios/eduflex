@@ -38,47 +38,23 @@ export const createAppointment = async (appointment: Appointment) => {
         throw new Error("Appointment already exists");
     }
 
-    // check if location already exists
-    const existingLocation = await prisma.location.findFirst({
+    let location = await prisma.location.findFirst({
         where: {
-            lat: appointment.location.lat,
-            lng: appointment.location.lng,
-            city: appointment.location.city,
-            postalCode: appointment.location.postalCode,
             address: appointment.location.address,
         },
     });
 
-    if (!existingLocation) {
-        // create new location
-        const newLocation = await prisma.location.create({
-            data: {
-                lat: appointment.location.lat,
-                lng: appointment.location.lng,
-                city: appointment.location.city,
-                postalCode: appointment.location.postalCode,
-                address: appointment.location.address,
-            },
+    // If the Location record doesn't exist, create a new one
+    if (!location) {
+        location = await prisma.location.create({
+            data: appointment.location,
         });
 
         const newAppointment = await prisma.appointment.create({
             data: {
                 subjectId: appointment.subject.id,
                 dateTime: appointment.dateTime,
-                locationId: newLocation.id,
-                roomNumber: appointment.roomNumber,
-                recurring: appointment.recurring as Recurring,
-                teacherId: appointment.teacherId,
-            },
-        });
-
-        return newAppointment;
-    } else {
-        const newAppointment = await prisma.appointment.create({
-            data: {
-                subjectId: appointment.subject.id,
-                dateTime: appointment.dateTime,
-                locationId: existingLocation.id,
+                locationAddress: location.address,
                 roomNumber: appointment.roomNumber,
                 recurring: appointment.recurring as Recurring,
                 teacherId: appointment.teacherId,
@@ -87,4 +63,17 @@ export const createAppointment = async (appointment: Appointment) => {
 
         return newAppointment;
     }
+
+    const newAppointment = await prisma.appointment.create({
+        data: {
+            subjectId: appointment.subject.id,
+            dateTime: appointment.dateTime,
+            locationAddress: location.address,
+            roomNumber: appointment.roomNumber,
+            recurring: appointment.recurring as Recurring,
+            teacherId: appointment.teacherId,
+        },
+    });
+
+    return newAppointment;
 };

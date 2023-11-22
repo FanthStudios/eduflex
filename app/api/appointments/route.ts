@@ -30,7 +30,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
     const body = await request.json();
-    console.log(body);
+
+    //! console.log(body);
+
     const { subject, dateTime, location, roomNumber, recurring, teacherId } =
         body;
 
@@ -79,18 +81,33 @@ export async function POST(request: Request) {
         teacherId,
     };
 
-    const newAppointment = await createAppointment(appointment);
+    try {
+        const newAppointment = await createAppointment(appointment);
 
-    return new NextResponse(
-        JSON.stringify({
-            message: "Appointment created successfully",
-            appointment: newAppointment,
-        }),
-        {
-            status: 200,
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }
-    );
+        return new NextResponse(
+            JSON.stringify({
+                message: "Appointment created successfully",
+                appointment: newAppointment,
+            }),
+            {
+                status: 200,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+    } catch (e: any) {
+        console.log(e);
+        return new NextResponse(
+            JSON.stringify({
+                message: e.message,
+            }),
+            {
+                status: 400,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+    }
 }
