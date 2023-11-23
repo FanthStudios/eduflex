@@ -23,6 +23,8 @@ type Appointment = {
     roomNumber: number;
     recurring: Recurring | null;
     teacherId: number;
+    availableSlots: number;
+    studentAppointments?: any[];
 };
 
 export const createAppointment = async (appointment: Appointment) => {
@@ -58,6 +60,7 @@ export const createAppointment = async (appointment: Appointment) => {
                 roomNumber: appointment.roomNumber,
                 recurring: appointment.recurring as Recurring,
                 teacherId: appointment.teacherId,
+                availableSlots: appointment.availableSlots,
             },
         });
 
@@ -72,6 +75,7 @@ export const createAppointment = async (appointment: Appointment) => {
             roomNumber: appointment.roomNumber,
             recurring: appointment.recurring as Recurring,
             teacherId: appointment.teacherId,
+            availableSlots: appointment.availableSlots,
         },
     });
 

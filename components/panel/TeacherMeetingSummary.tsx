@@ -19,6 +19,9 @@ type Appointment = {
     };
     roomNumber: number;
     recurring: Recurring | null;
+    availableSlots: number;
+    studentAppointments?: any[];
+    occurrences: number;
 };
 
 type Props = {
@@ -51,6 +54,26 @@ export default function TeacherMeetingSummary({ appointment }: Props) {
                 </p>
             </div>
             <div className="w-full lg:w-2/3">
+                <p className="text-sm mb-1">Cykliczność</p>
+                <p className="py-1 px-3 bg-neutral-50 border border-neutral-300 rounded-lg w-full">
+                    {appointment.recurring?.toLowerCase() == "never"
+                        ? "Nigdy"
+                        : appointment.recurring?.toLowerCase() == "weekly"
+                        ? "Co tydzień"
+                        : appointment.recurring?.toLowerCase() == "biweekly"
+                        ? "Co dwa tygodnie"
+                        : appointment.recurring?.toLowerCase() == "monthly"
+                        ? "Co miesiąc"
+                        : "Nigdy"}
+                </p>
+            </div>
+            <div className="w-full lg:w-2/3">
+                <p className="text-sm mb-1">Ilość powtórzeń</p>
+                <p className="py-1 px-3 bg-neutral-50 border border-neutral-300 rounded-lg w-full">
+                    {appointment.occurrences}
+                </p>
+            </div>
+            <div className="w-full lg:w-2/3">
                 <p className="text-sm mb-1">Lokalizacja</p>
                 <p className="py-1 px-3 bg-neutral-50 border border-neutral-300 rounded-lg w-full">
                     {appointment.location.address},{" "}
@@ -65,17 +88,9 @@ export default function TeacherMeetingSummary({ appointment }: Props) {
                 </p>
             </div>
             <div className="w-full lg:w-2/3">
-                <p className="text-sm mb-1">Cykliczność</p>
+                <p className="text-sm mb-1">Wolne miejsca</p>
                 <p className="py-1 px-3 bg-neutral-50 border border-neutral-300 rounded-lg w-full">
-                    {appointment.recurring?.toLowerCase() == "never"
-                        ? "Nigdy"
-                        : appointment.recurring?.toLowerCase() == "weekly"
-                        ? "Co tydzień"
-                        : appointment.recurring?.toLowerCase() == "biweekly"
-                        ? "Co dwa tygodnie"
-                        : appointment.recurring?.toLowerCase() == "monthly"
-                        ? "Co miesiąc"
-                        : "Nigdy"}
+                    {appointment.availableSlots}
                 </p>
             </div>
         </div>

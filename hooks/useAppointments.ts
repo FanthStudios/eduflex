@@ -25,6 +25,8 @@ export interface Appointment {
     subjectId: number;
     teacher: Teacher;
     teacherId: number;
+    availableSlots: number;
+    studentAppointments?: any[];
 }
 
 export function useAppointments() {

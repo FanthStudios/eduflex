@@ -18,6 +18,8 @@ type Appointment = {
     teacherId: number;
     dateTime: Date | null;
     goal: string;
+    customGoal?: string;
+    availableSlots: number;
 };
 
 export default function Appointments({}: Props) {
@@ -32,6 +34,7 @@ export default function Appointments({}: Props) {
         teacherId: 0,
         dateTime: null,
         goal: "",
+        availableSlots: 0,
     });
 
     const breadcrumbsList = ["Przedmiot", "Termin", "Cel", "Podsumowanie"];
@@ -73,6 +76,10 @@ export default function Appointments({}: Props) {
         return false;
     }
 
+    async function enrollToAppointment() {
+        console.log(appointment);
+    }
+
     return (
         <div className="row-span-2 col-span-3 flex flex-col items-center justify-center h-full">
             <Breadcrumbs
@@ -95,6 +102,18 @@ export default function Appointments({}: Props) {
                         className="px-12 py-1 text-white bg-green-500 rounded-md"
                         onClick={() => {
                             if (validateCanGoNext()) {
+                                if (currentIndex == steps.length - 2) {
+                                    if (
+                                        appointment.customGoal &&
+                                        appointment.customGoal != ""
+                                    ) {
+                                        setAppointment({
+                                            ...appointment,
+                                            goal: appointment.customGoal,
+                                            customGoal: "",
+                                        });
+                                    }
+                                }
                                 next();
                             } else {
                                 toast.error("Uzupełnij wszystkie pola");
@@ -107,10 +126,8 @@ export default function Appointments({}: Props) {
                 {currentIndex == steps.length - 1 && (
                     <button
                         className="px-12 py-1 text-white bg-green-500 rounded-md"
-                        onClick={() => {
-                            if (validateCanGoNext()) {
-                                next();
-                            }
+                        onClick={async () => {
+                            await enrollToAppointment();
                         }}
                     >
                         Zatwierdź

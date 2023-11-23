@@ -111,14 +111,14 @@ model Appointment {
   locationAddress     String
   location            Location             @relation(fields: [locationAddress], references: [address])
   studentAppointments StudentAppointment[]
+  availableSlots      Int
 }
 
 model StudentAppointment {
   studentId     Int
   appointmentId String
-  topic         String
+  subject       String
   goal          String
-  description   String?
   student       Student     @relation(fields: [studentId], references: [userId])
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
 

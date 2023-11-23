@@ -2,7 +2,12 @@
 
 /* eslint-disable @next/next/no-img-element */
 import { Appointment } from "@/hooks/useAppointments";
-import { CalendarIcon, MapPinIcon } from "@heroicons/react/24/outline";
+import {
+    CalendarIcon,
+    MapPinIcon,
+    UserGroupIcon,
+} from "@heroicons/react/24/outline";
+import clsx from "clsx";
 import { DoorOpen } from "lucide-react";
 
 type Props = {
@@ -89,6 +94,32 @@ export default function AppointmentCard({
                             />
                         </dt>
                         <dd>{appointment.roomNumber}</dd>
+                    </div>
+
+                    <div className="mt-2 flex items-start space-x-3 xl:ml-3.5 xl:mt-0 xl:border-l xl:border-gray-400 xl:border-opacity-50 xl:pl-3.5">
+                        <dt className="mt-0.5">
+                            <span className="sr-only">Available slots</span>
+                            <UserGroupIcon
+                                className="h-5 w-5 text-gray-400"
+                                aria-hidden="true"
+                            />
+                        </dt>
+                        <dd>
+                            <span
+                                className={clsx(
+                                    // if the number of students is greater than the half of the available slots, color it red else green
+                                    appointment.studentAppointments &&
+                                        appointment.studentAppointments.length >
+                                            appointment.availableSlots / 2
+                                        ? "text-orange-500"
+                                        : "text-green-600"
+                                )}
+                            >
+                                {appointment.studentAppointments &&
+                                    appointment.studentAppointments.length}
+                            </span>
+                            /{appointment.availableSlots}
+                        </dd>
                     </div>
                 </dl>
             </div>

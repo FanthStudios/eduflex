@@ -33,6 +33,8 @@ export default function CreateAppointment({}: Props) {
         },
         roomNumber: 0,
         recurring: null as Recurring | null,
+        availableSlots: 0,
+        occurrences: 0,
     });
 
     const breadcrumbsList = ["Dodaj spotkanie", "Podsumowanie"];

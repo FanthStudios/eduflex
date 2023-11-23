@@ -7,6 +7,53 @@ import { NextResponse } from "next/server";
 interface PostProps extends Omit<Appointment, "subject"> {
     subject: string;
     recurring: Recurring;
+    occurrences: number;
+}
+
+function addMinutes(date: Date, minutes: number) {
+    var result = new Date(date);
+    result.setMinutes(result.getMinutes() + minutes);
+    return result;
+}
+
+function addDays(date: Date, days: number) {
+    var result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+}
+
+function addMonths(date: Date, months: number) {
+    var result = new Date(date);
+    result.setMonth(result.getMonth() + months);
+    return result;
+}
+
+function calculateRecurringDates(
+    startDate: Date,
+    recurrenceRule: Recurring,
+    numberOfOccurrences: number
+) {
+    let dates = [];
+    for (let i = 0; i < numberOfOccurrences; i++) {
+        let date;
+        switch (recurrenceRule) {
+            case Recurring.NEVER:
+                date = startDate;
+                break;
+            case Recurring.WEEKLY:
+                date = addDays(startDate, i * 7);
+                break;
+            case Recurring.BIWEEKLY:
+                date = addDays(startDate, i * 14);
+                break;
+            case Recurring.MONTHLY:
+                date = addMonths(startDate, i);
+                break;
+            // Add more cases if you have more recurrence rules
+        }
+        dates.push(date);
+    }
+    return dates;
 }
 
 export async function GET() {
@@ -19,6 +66,15 @@ export async function GET() {
                 },
             },
             location: true,
+            studentAppointments: {
+                select: {
+                    student: {
+                        select: {
+                            user: true,
+                        },
+                    },
+                },
+            },
         },
     });
 
@@ -40,8 +96,16 @@ export async function POST(request: Request) {
 
     //! console.log(body);
 
-    const { subject, dateTime, location, roomNumber, recurring, teacherId } =
-        body as PostProps;
+    const {
+        subject,
+        dateTime,
+        location,
+        roomNumber,
+        recurring,
+        teacherId,
+        availableSlots,
+        occurrences,
+    } = body as PostProps;
 
     // validate that every field is present
     if (
@@ -50,7 +114,9 @@ export async function POST(request: Request) {
         !location ||
         !roomNumber ||
         !recurring ||
-        !teacherId
+        !teacherId ||
+        !availableSlots ||
+        !occurrences
     ) {
         return new NextResponse(
             JSON.stringify({
@@ -62,6 +128,8 @@ export async function POST(request: Request) {
                     roomNumber,
                     recurring,
                     teacherId,
+                    availableSlots,
+                    occurrences,
                 },
             }),
             {
@@ -102,22 +170,134 @@ export async function POST(request: Request) {
         },
     });
 
-    const appointment = {
+    let appointment = {
         subject: validSubject!,
         dateTime,
         location,
         roomNumber,
         recurring,
         teacherId,
+        availableSlots,
     };
 
     try {
-        const newAppointment = await createAppointment(appointment);
+        let dates = calculateRecurringDates(
+            appointment.dateTime,
+            recurring,
+            occurrences
+        );
+
+        for (let date of dates) {
+            let newAppointment = {
+                ...appointment,
+                dateTime: date,
+            };
+
+            // check if there already is an appointment at this time, in this location, room and if there is no appointment in the next 45 minutes
+            // if there is, skip this appointment
+
+            const appointmentExists = await prisma.appointment.findFirst({
+                where: {
+                    dateTime: newAppointment.dateTime,
+                    locationAddress: newAppointment.location.address,
+                    roomNumber: newAppointment.roomNumber,
+                },
+            });
+
+            const appointmentExistsInNext45Minutes =
+                await prisma.appointment.findFirst({
+                    where: {
+                        dateTime: {
+                            gte: addMinutes(newAppointment.dateTime, 45),
+                        },
+                        locationAddress: newAppointment.location.address,
+                        roomNumber: newAppointment.roomNumber,
+                    },
+                });
+
+            const appointmentExistsInPrevious45Minutes =
+                await prisma.appointment.findFirst({
+                    where: {
+                        dateTime: {
+                            lte: addMinutes(newAppointment.dateTime, -45),
+                        },
+                        locationAddress: newAppointment.location.address,
+                        roomNumber: newAppointment.roomNumber,
+                    },
+                });
+
+            if (
+                appointmentExistsInNext45Minutes ||
+                appointmentExistsInPrevious45Minutes
+            ) {
+                const actualDate = new Date(
+                    newAppointment.dateTime
+                ).toLocaleString("pl-PL", {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                });
+
+                return new NextResponse(
+                    JSON.stringify({
+                        // message: `Korepetycje już istnieją w dniu ${newAppointment.dateTime}, zostały pominięte`,
+                        // send a message that there is an appointment in the next 45 minutes
+                        message: `Korepetycje nie mogą zostać dodane w dniu: ${actualDate}, ponieważ najeżdżają na inne korepetycje.\nProszę wybrać inny termin`,
+                    }),
+                    {
+                        status: 403,
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+            }
+
+            if (appointmentExists) {
+                return new NextResponse(
+                    JSON.stringify({
+                        message: `Korepetycje już istnieją w dniu ${newAppointment.dateTime}, zostały pominięte`,
+                    }),
+                    {
+                        status: 403,
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+            }
+
+            // const appointmentExists = await prisma.appointment.findFirst({
+            //     where: {
+            //         dateTime: newAppointment.dateTime,
+            //         locationAddress: newAppointment.location.address,
+            //         roomNumber: newAppointment.roomNumber,
+            //     },
+            // });
+
+            // if (appointmentExists) {
+            //     return new NextResponse(
+            //         JSON.stringify({
+            //             message: `Korepetycje już istnieją w dniu ${newAppointment.dateTime}, zostały pominięte`,
+            //         }),
+            //         {
+            //             status: 403,
+            //             headers: {
+            //                 "Content-Type": "application/json",
+            //             },
+            //         }
+            //     );
+            // }
+
+            // await createAppointment(newAppointment);
+        }
 
         return new NextResponse(
             JSON.stringify({
                 message: "Appointment created successfully",
-                appointment: newAppointment,
             }),
             {
                 status: 200,
@@ -131,6 +311,7 @@ export async function POST(request: Request) {
         return new NextResponse(
             JSON.stringify({
                 message: e.message,
+                error: e,
             }),
             {
                 status: 400,
