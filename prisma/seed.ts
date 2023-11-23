@@ -1,7 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
+import bcrypt from "bcrypt";
 
 async function main() {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash("ZAQ!2wsx", salt);
+
     const bartek = await prisma.user.upsert({
         where: { email: "bartek@paczesny.pl" },
         update: {},
@@ -9,7 +13,7 @@ async function main() {
             email: "bartek@paczesny.pl",
             firstName: "Bartek",
             lastName: "Paczesny",
-            password: "ZAQ!2wsx",
+            password: hash,
             role: "STUDENT",
             lastLogin: new Date(),
         },
@@ -32,6 +36,9 @@ async function main() {
         },
     });
 
+    const salt1 = await bcrypt.genSalt(10);
+    const hash1 = await bcrypt.hash("ZAQ!2wsx", salt1);
+
     const teacherUser = await prisma.user.upsert({
         where: { email: "becz00nia.zs14@gmail.com" },
         update: {},
@@ -39,7 +46,7 @@ async function main() {
             email: "becz00nia.zs14@gmail.com",
             firstName: "Adam",
             lastName: "Beczek",
-            password: "ZAQ!2wsx",
+            password: hash1,
             role: "TEACHER",
             lastLogin: new Date(),
             teacher: {
