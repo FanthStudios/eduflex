@@ -65,11 +65,13 @@ export default function CreateAppointment({}: Props) {
             body: JSON.stringify(newAppointment),
         });
 
+        const body = await res.json();
+
         if (res.status == 200) {
             goTo(0);
             toast.success("Spotkanie zostało dodane");
         } else {
-            toast.error("Wystąpił błąd");
+            toast.error(body.message ?? "Wystąpił błąd");
         }
     }
     return (

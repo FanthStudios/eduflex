@@ -1,6 +1,6 @@
 import { prisma } from "@/prisma/client";
 
-enum Recurring {
+export enum Recurring {
     NEVER = "NEVER",
     WEEKLY = "WEEKLY",
     BIWEEKLY = "BIWEEKLY",

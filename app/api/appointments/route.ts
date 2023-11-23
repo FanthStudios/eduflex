@@ -1,6 +1,13 @@
+import { Appointment } from "@/hooks/useAppointments";
+import { Recurring } from "@/utils/appointment";
 import { prisma } from "@/prisma/client";
 import { createAppointment } from "@/utils/appointment";
 import { NextResponse } from "next/server";
+
+interface PostProps extends Omit<Appointment, "subject"> {
+    subject: string;
+    recurring: Recurring;
+}
 
 export async function GET() {
     const appointments = await prisma.appointment.findMany({
@@ -34,7 +41,7 @@ export async function POST(request: Request) {
     //! console.log(body);
 
     const { subject, dateTime, location, roomNumber, recurring, teacherId } =
-        body;
+        body as PostProps;
 
     // validate that every field is present
     if (
@@ -47,7 +54,7 @@ export async function POST(request: Request) {
     ) {
         return new NextResponse(
             JSON.stringify({
-                message: "Missing fields",
+                message: "Uzupełnij wszystkie pola",
                 value: {
                     subject,
                     dateTime,
@@ -59,6 +66,29 @@ export async function POST(request: Request) {
             }),
             {
                 status: 400,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+    }
+
+    const appointmentExists = await prisma.appointment.findFirst({
+        where: {
+            dateTime,
+            locationAddress: location.address,
+            roomNumber,
+            teacherId,
+        },
+    });
+
+    if (appointmentExists) {
+        return new NextResponse(
+            JSON.stringify({
+                message: "Korepetycje już istnieją",
+            }),
+            {
+                status: 403,
                 headers: {
                     "Content-Type": "application/json",
                 },

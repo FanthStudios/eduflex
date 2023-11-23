@@ -1,9 +1,15 @@
-"use client";
-
 import { useTeacher } from "@/hooks/useTeacher";
-import { set } from "date-fns";
+// import { set } from "date-fns";
 import { useSession } from "next-auth/react";
-import React, { useEffect } from "react";
+import { DateTimePicker } from "@/components/ui/datetime";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 enum Recurring {
     NEVER = "NEVER",
@@ -59,56 +65,6 @@ export default function MeetingForm({ appointment, setAppointment }: Props) {
             address: "ul. Szanajcy 17",
         },
     ];
-
-    useEffect(() => {
-        const locations1 = [
-            {
-                lat: 52.2620461,
-                lng: 21.0266347,
-                city: "Warszawa",
-                postalCode: "03-481",
-                address: "ul. Szanajcy 5",
-            },
-            {
-                lat: 52.2639814,
-                lng: 21.0312258,
-                city: "Warszawa",
-                postalCode: "03-481",
-                address: "ul. Szanajcy 17",
-            },
-        ];
-
-        const getLocationByAddress1 = (address: string) => {
-            return locations1.find((location) => location.address == address);
-        };
-
-        if (appointment.subject == "") {
-            setAppointment({
-                ...appointment,
-                subject: teacher?.subjects[0].name,
-            });
-        }
-        if (appointment.location.address == "") {
-            setAppointment({
-                ...appointment,
-                location: getLocationByAddress1(locations1[0].address)!,
-            });
-        }
-
-        if (appointment.recurring == null) {
-            setAppointment({
-                ...appointment,
-                recurring: Recurring.NEVER,
-            });
-        }
-
-        if (appointment.teacherId == undefined) {
-            setAppointment({
-                ...appointment,
-                teacherId: teacher?.userId,
-            });
-        }
-    }, [appointment, setAppointment, teacher?.subjects, teacher?.userId]);
     return (
         <div className="flex flex-col items-center justify-start w-full h-full lg:h-3/4 md:p-3 xl:p-10 gap-3">
             <h1 className="text-xl lg:text-2xl">
@@ -121,27 +77,26 @@ export default function MeetingForm({ appointment, setAppointment }: Props) {
                 >
                     Przedmiot
                 </label>
-                <select
-                    id="subject"
-                    name="subject"
-                    required
-                    onChange={(e) => {
+                <Select
+                    onValueChange={(value) => {
                         setAppointment({
                             ...appointment,
-                            subject: e.target.value,
+                            subject: value,
+                            teacherId: teacher?.userId,
                         });
                     }}
-                    style={{
-                        fontSize: "1rem",
-                    }}
-                    className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 bg-white focus:ring-2 focus:ring-inset focus:outline-none focus:ring-green-600 sm:text-sm sm:leading-6"
                 >
-                    {teacher?.subjects?.map((subject) => (
-                        <option key={subject.id} value={subject.name}>
-                            {subject.name}
-                        </option>
-                    ))}
-                </select>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Wybierz przedmiot" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {teacher?.subjects?.map((subject) => (
+                            <SelectItem key={subject.id} value={subject.name}>
+                                {subject.name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
             <div className="md:w-1/3 w-full">
                 <label
@@ -150,19 +105,14 @@ export default function MeetingForm({ appointment, setAppointment }: Props) {
                 >
                     Data i godzina
                 </label>
-                <input
-                    type="datetime-local"
-                    name="dateAndTime"
-                    id="dateAndTime"
-                    required
-                    value={appointment.dateTime.toISOString().slice(0, -8)}
-                    onChange={(e) => {
+                <DateTimePicker
+                    date={appointment.dateTime}
+                    setDate={(date) => {
                         setAppointment({
                             ...appointment,
-                            dateTime: new Date(e.target.value),
+                            dateTime: date,
                         });
                     }}
-                    className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 bg-white focus:ring-2 focus:ring-inset focus:outline-none focus:ring-green-600 sm:text-sm sm:leading-6"
                 />
             </div>
             <div className="md:w-1/3 w-full">
@@ -172,26 +122,30 @@ export default function MeetingForm({ appointment, setAppointment }: Props) {
                 >
                     Powtarzalność
                 </label>
-                <select
-                    id="recurring"
-                    name="recurring"
-                    required
-                    onChange={(e) => {
+                <Select
+                    onValueChange={(value) => {
                         setAppointment({
                             ...appointment,
-                            recurring: e.target.value as Recurring,
+                            recurring: value as Recurring,
                         });
                     }}
-                    style={{
-                        fontSize: "1rem",
-                    }}
-                    className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 bg-white focus:ring-2 focus:ring-inset focus:outline-none focus:ring-green-600 sm:text-sm sm:leading-6"
                 >
-                    <option value={Recurring.NEVER}>Nigdy</option>
-                    <option value={Recurring.WEEKLY}>Co tydzień</option>
-                    <option value={Recurring.BIWEEKLY}>Co dwa tygodnie</option>
-                    <option value={Recurring.MONTHLY}>Co miesiąc</option>
-                </select>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Wybierz powtarzalność" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value={Recurring.NEVER}>Nigdy</SelectItem>
+                        <SelectItem value={Recurring.WEEKLY}>
+                            Co tydzień
+                        </SelectItem>
+                        <SelectItem value={Recurring.BIWEEKLY}>
+                            Co dwa tygodnie
+                        </SelectItem>
+                        <SelectItem value={Recurring.MONTHLY}>
+                            Co miesiąc
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
             <div className="md:w-1/3 w-full">
                 <label
@@ -200,28 +154,29 @@ export default function MeetingForm({ appointment, setAppointment }: Props) {
                 >
                     Lokalizacja
                 </label>
-                <select
-                    id="location"
-                    name="location"
-                    required
-                    onChange={(e) => {
+                <Select
+                    onValueChange={(value) => {
                         setAppointment({
                             ...appointment,
-                            location: getLocationByAddress(e.target.value)!,
+                            location: getLocationByAddress(value)!,
                         });
                     }}
-                    style={{
-                        fontSize: "1rem",
-                    }}
-                    className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 bg-white focus:ring-2 focus:ring-inset focus:outline-none focus:ring-green-600 sm:text-sm sm:leading-6"
                 >
-                    {locations.map((location) => (
-                        <option key={location.address} value={location.address}>
-                            {location.address}, {location.postalCode}{" "}
-                            {location.city}
-                        </option>
-                    ))}
-                </select>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Wybierz lokalizację" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {locations.map((location) => (
+                            <SelectItem
+                                key={location.address}
+                                value={location.address}
+                            >
+                                {location.address}, {location.postalCode}{" "}
+                                {location.city}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
             <div className="md:w-1/3 w-full">
                 <label
@@ -230,7 +185,20 @@ export default function MeetingForm({ appointment, setAppointment }: Props) {
                 >
                     Numer sali
                 </label>
-                <input
+                <Input
+                    type="number"
+                    name="room"
+                    id="room"
+                    placeholder="Podaj numer sali"
+                    required
+                    onChange={(e) => {
+                        setAppointment({
+                            ...appointment,
+                            roomNumber: parseInt(e.target.value),
+                        });
+                    }}
+                />
+                {/* <input
                     type="number"
                     name="room"
                     id="room"
@@ -243,7 +211,7 @@ export default function MeetingForm({ appointment, setAppointment }: Props) {
                         });
                     }}
                     className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 bg-white focus:ring-2 focus:ring-inset focus:outline-none focus:ring-green-600 sm:text-sm sm:leading-6"
-                />
+                /> */}
             </div>
         </div>
     );
