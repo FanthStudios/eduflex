@@ -9,6 +9,7 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Logo from "./Logo";
 import clsx from "clsx";
 import { signOut } from "next-auth/react";
+import { motion } from "framer-motion";
 
 const colorPallete = [
     "red",
@@ -92,7 +93,15 @@ export function Sidebar({ navigation, classNames, user }: SidebarProps) {
                             </div>
                             <ul role="list" className="-mx-2 space-y-1">
                                 {navigation.map((item) => (
-                                    <li key={item.name}>
+                                    <motion.li
+                                        whileTap={{
+                                            scale: 0.95,
+                                            transition: {
+                                                duration: 0.1,
+                                            },
+                                        }}
+                                        key={item.name}
+                                    >
                                         <a
                                             href={item.href}
                                             className={clsx(
@@ -113,7 +122,7 @@ export function Sidebar({ navigation, classNames, user }: SidebarProps) {
                                             />
                                             {item.name}
                                         </a>
-                                    </li>
+                                    </motion.li>
                                 ))}
                             </ul>
                         </li>

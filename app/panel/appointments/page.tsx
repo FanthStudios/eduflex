@@ -13,6 +13,13 @@ import { toast } from "react-toastify";
 
 type Props = {};
 
+type Appointment = {
+    subject: string;
+    teacherId: number;
+    dateTime: Date | null;
+    goal: string;
+};
+
 export default function Appointments({}: Props) {
     //TODO neccessary informations to collect from students
     // 1. subject, teacher
@@ -20,10 +27,10 @@ export default function Appointments({}: Props) {
     // 3. select the goal of the lesson, if "other" then input a description of the goal
     // 4. review the appointment and confirm it
 
-    const [appointment, setAppointment] = useState({
+    const [appointment, setAppointment] = useState<Appointment>({
         subject: "",
         teacherId: 0,
-        dateTime: new Date(),
+        dateTime: null,
         goal: "",
     });
 

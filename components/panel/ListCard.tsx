@@ -1,9 +1,11 @@
 import { Teacher } from "@/hooks/useTeacher";
 import { useCallback, useEffect, useState } from "react";
 import clsx from "clsx";
-import { HeartIcon } from "@heroicons/react/24/outline";
+import { HeartIcon as HeartIconOutline } from "@heroicons/react/24/outline";
+import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import { Student, useStudent } from "@/hooks/useStudent";
 import { useSession } from "next-auth/react";
+import { motion } from "framer-motion";
 
 type TeacherCardProps = {
     teacher: Teacher;
@@ -202,7 +204,9 @@ function TeacherCard({ teacher, fillColor }: TeacherCardProps) {
                     </p>
                 </div>
                 {student && (
-                    <button
+                    <motion.button
+                        whileTap={{ scale: 0.8 }}
+                        whileHover={{ scale: 1.1 }}
                         className={`relative ${
                             student.favoriteTeachers?.find(
                                 (favoriteTeacher) =>
@@ -213,8 +217,15 @@ function TeacherCard({ teacher, fillColor }: TeacherCardProps) {
                             await addToFavorites();
                         }}
                     >
-                        <HeartIcon className="w-5 aspect-square" />
-                    </button>
+                        {student.favoriteTeachers?.find(
+                            (favoriteTeacher) =>
+                                favoriteTeacher.userId === teacher.userId
+                        ) ? (
+                            <HeartIconSolid className="w-5 aspect-square" />
+                        ) : (
+                            <HeartIconOutline className="w-5 aspect-square" />
+                        )}
+                    </motion.button>
                 )}
             </div>
         </li>

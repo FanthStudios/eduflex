@@ -2,6 +2,7 @@ import SummaryReport from "@/components/panel/SummaryReport";
 import CalendarWithMeetings from "@/components/panel/CalendarWithMeetings";
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import FavoriteTeachers from "@/components/panel/FavoriteTeachers";
 
 export const metadata: Metadata = {
     title: "Twój Panel | EduFlex",
@@ -18,14 +19,10 @@ export default async function Page() {
                     <CalendarWithMeetings />
                 </Suspense>
             </div>
-            <div className="w-full xl:w-1/3 xl:pl-6">
-                <div
-                    className={`flex flex-col items-start justify-center w-full gap-6`}
-                >
-                    <h3 className="text-lg font-semibold leading-6 text-gray-900">
-                        Ulubieni nauczyciele
-                    </h3>
-                </div>
+            <div className="w-full 2xl:w-1/3 xl:pl-6">
+                <Suspense fallback={<div>loading...</div>}>
+                    <FavoriteTeachers />
+                </Suspense>
             </div>
         </div>
     );

@@ -20,7 +20,7 @@ export default function AppointmentCard({
         <button
             type="button"
             onClick={onClick}
-            className={`relative flex space-x-6 p-3 xl:static ${
+            className={`relative flex space-x-6 p-3 w-2/3 xl:static ${
                 selected
                     ? "border-green-400 border-2"
                     : "border border-neutral-300"
@@ -31,8 +31,8 @@ export default function AppointmentCard({
                     {appointment.teacher.user.firstName}{" "}
                     {appointment.teacher.user.lastName}
                 </h3>
-                <dl className="mt-2 flex flex-col text-gray-500 xl:flex-row">
-                    <div className="flex items-start space-x-3">
+                <dl className="mt-2 flex flex-col xl:justify-start text-gray-500 xl:flex-row">
+                    <div className="flex items-start space-x-3 xl:w-1/2">
                         <dt className="mt-0.5">
                             <span className="sr-only">Date</span>
                             <CalendarIcon

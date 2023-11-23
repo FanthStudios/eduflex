@@ -16,7 +16,10 @@ export interface Teacher {
         lastLogin?: Date;
     };
     appointments?: any[];
-    favouritedBy?: any[];
+    favoritedBy?: {
+        userId: number;
+        classId: number;
+    }[];
 }
 
 export function useTeacher(withAppoinments?: boolean, userId?: string) {

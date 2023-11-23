@@ -48,7 +48,6 @@ export default function CreateAppointment({}: Props) {
         useMultistepForm(steps);
     function validateCanGoNext() {
         if (currentIndex == 0) {
-            console.log(newAppointment);
             return (
                 newAppointment.subject != "" &&
                 newAppointment.location.address != "" &&
