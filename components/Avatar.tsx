@@ -6,9 +6,10 @@ import { useCallback, useEffect, useState } from "react";
 type Props = {
     letter: string;
     width: number;
+    className?: string;
 };
 
-export default function Avatar({ letter, width = 12 }: Props) {
+export default function Avatar({ letter, width = 12, className }: Props) {
     const randomColor = useCallback(() => {
         const colorPallete = [
             "red",
@@ -45,11 +46,11 @@ export default function Avatar({ letter, width = 12 }: Props) {
             clsx(
                 `bg-${randColor}-${colorSaturation()} text-${randColor}-${
                     colorSaturation() + 600
-                } w-${width} h-${width} xl:h-auto`,
+                } w-${width} h-${width} xl:h-auto ${className}`,
                 "aspect-square rounded-full flex items-center text-center justify-center pointer-events-none"
             )
         );
-    }, [colorSaturation, randomColor, width]);
+    }, [colorSaturation, randomColor, width, className]);
     return (
         <div className={fillColor}>
             <p
