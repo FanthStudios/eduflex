@@ -55,16 +55,22 @@ export default function CreateAppointment({}: Props) {
                 newAppointment.location.address != "" &&
                 newAppointment.roomNumber != 0 &&
                 newAppointment.dateTime != new Date() &&
-                newAppointment.recurring != null
+                newAppointment.recurring != null &&
+                newAppointment.availableSlots != 0 &&
+                newAppointment.occurrences != 0
             );
         }
         return false;
     }
 
     async function createNewAppointment() {
+        console.log(newAppointment);
         const res = await fetch("/api/appointments", {
             method: "POST",
-            body: JSON.stringify(newAppointment),
+            body: JSON.stringify({
+                ...newAppointment,
+                occurences: newAppointment.occurrences,
+            }),
         });
 
         const body = await res.json();
