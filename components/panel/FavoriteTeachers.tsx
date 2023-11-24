@@ -34,9 +34,10 @@ export default function FavoriteTeachers({}: Props) {
                         >
                             <Avatar
                                 letter={teacher.user.firstName.charAt(0)}
-                                width={14}
+                                width={12}
+                                className="flex-shrink-0"
                             />
-                            <div className="flex flex-col gap-2 items-start justify-center xl:w-3/5">
+                            <div className="flex flex-col gap-2 items-start justify-center flex-grow">
                                 <span className="text-sm font-medium text-gray-900">
                                     {teacher.user.firstName}{" "}
                                     {teacher.user.lastName}
@@ -47,7 +48,7 @@ export default function FavoriteTeachers({}: Props) {
                                     })}
                                 </span>
                             </div>
-                            <button className="bg-green-500 rounded-lg py-1 px-4 text-white">
+                            <button className="bg-green-500 rounded-lg py-1 px-4 text-white flex-grow-0">
                                 Umów się
                             </button>
                         </li>
