@@ -10,6 +10,7 @@ import {
 } from "@/components/panel/appointmentRegisteration";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useSession } from "next-auth/react";
 
 type Props = {};
 
@@ -18,8 +19,8 @@ type Appointment = {
     teacherId: number;
     dateTime: Date | null;
     goal: string;
+    topic?: string;
     customGoal?: string;
-    availableSlots: number;
 };
 
 export default function Appointments({}: Props) {
@@ -34,7 +35,7 @@ export default function Appointments({}: Props) {
         teacherId: 0,
         dateTime: null,
         goal: "",
-        availableSlots: 0,
+        topic: "",
     });
 
     const breadcrumbsList = ["Przedmiot", "Termin", "Cel", "Podsumowanie"];
@@ -69,19 +70,45 @@ export default function Appointments({}: Props) {
         } else if (currentIndex == 1) {
             return appointment.dateTime != null;
         } else if (currentIndex == 2) {
-            return appointment.goal != "";
+            return (
+                (appointment.goal != "inne" && appointment.topic != "") ||
+                (appointment.goal == "inne" && appointment.customGoal != "")
+            );
         } else if (currentIndex == 3) {
             return true;
         }
         return false;
     }
 
+    const { data: session } = useSession();
+
     async function enrollToAppointment() {
-        console.log(appointment);
+        if (!session?.user.id) {
+            toast.error("Nie jesteś zalogowany");
+            return;
+        }
+
+        const res = await fetch("/api/enroll", {
+            method: "POST",
+            body: JSON.stringify({
+                ...appointment,
+                studentId: session?.user.id!,
+            }),
+        });
+
+        const body = await res.json();
+
+        if (res.status == 200) {
+            window.location.href = "/panel/appointments";
+            toast.success("Zapisano na konsultacje");
+        } else {
+            console.log(body);
+            toast.error(body.message);
+        }
     }
 
     return (
-        <div className="row-span-2 col-span-3 flex flex-col items-center justify-center h-full">
+        <div className="row-span-2 col-span-3 flex flex-col items-center justify-center h-full overflow-y-auto">
             <Breadcrumbs
                 items={breadcrumbsList}
                 index={currentIndex}

@@ -9,16 +9,15 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useEffect } from "react";
+import { Input } from "@/components/ui/input";
 
 type Appointment = {
     subject: string;
     teacherId: number;
     dateTime: Date | null;
     goal: string;
+    topic?: string;
     customGoal?: string;
-    availableSlots: number;
-    studentAppointments?: any[];
 };
 
 interface Props {
@@ -152,43 +151,30 @@ export const DateAndTimeSelection = ({
             <h1 className="text-xl lg:text-2xl">
                 Wybierz odpowiadający ci termin
             </h1>
-            {filteredAppointments && filteredAppointments.length > 0 ? (
-                filteredAppointments.map((app) => (
-                    <AppointmentCard
-                        onClick={() => {
-                            setAppointment({
-                                ...appointment,
-                                dateTime: app.dateTime,
-                            });
-                        }}
-                        selected={appointment.dateTime == app.dateTime}
-                        key={app.id}
-                        appointment={app}
-                    />
-                ))
-            ) : (
-                <p className="text-lg">Brak dostępnych terminów</p>
-            )}
+            <div className="flex flex-col items-center justify-start w-full h-full gap-4 py-4 overflow-y-auto">
+                {filteredAppointments && filteredAppointments.length > 0 ? (
+                    filteredAppointments.map((app) => (
+                        <AppointmentCard
+                            onClick={() => {
+                                setAppointment({
+                                    ...appointment,
+                                    dateTime: app.dateTime,
+                                });
+                            }}
+                            selected={appointment.dateTime == app.dateTime}
+                            key={app.id}
+                            appointment={app}
+                        />
+                    ))
+                ) : (
+                    <p className="text-lg">Brak dostępnych terminów</p>
+                )}
+            </div>
         </div>
     );
 };
 
 export const GoalSelection = ({ appointment, setAppointment }: Props) => {
-    // use useeffect to set the goal to the first goal in the options array
-    // if the customgoal is not empty, set the goal to the customgoal
-
-    // useEffect(() => {
-    //     // when the customGoal changes, set the goal to the customGoal
-    //     if (appointment.customGoal != "" && appointment.goal == "inne") {
-    //         setTimeout(() => {
-    //             setAppointment({
-    //                 ...appointment,
-    //                 goal: appointment.customGoal!,
-    //             });
-    //         }, 0);
-    //     }
-    // }, [appointment, appointment.customGoal, setAppointment]);
-
     return (
         <div className="flex flex-col items-center justify-start w-full h-full lg:h-3/4 md:p-3 xl:p-10 gap-3">
             <h1 className="text-xl lg:text-2xl">Podaj cel korepetycji</h1>
@@ -207,12 +193,18 @@ export const GoalSelection = ({ appointment, setAppointment }: Props) => {
                     <Select
                         name="goal"
                         onValueChange={(value) => {
-                            console.log(value);
-                            setAppointment({
-                                ...appointment,
-                                goal: value,
-                            });
-                            console.log(appointment);
+                            if (value == "inne") {
+                                setAppointment({
+                                    ...appointment,
+                                    goal: value,
+                                    topic: "",
+                                });
+                            } else {
+                                setAppointment({
+                                    ...appointment,
+                                    goal: value,
+                                });
+                            }
                         }}
                     >
                         <SelectTrigger>
@@ -230,7 +222,7 @@ export const GoalSelection = ({ appointment, setAppointment }: Props) => {
                         </SelectContent>
                     </Select>
                 </div>
-                {appointment.goal === "inne" && (
+                {appointment.goal === "inne" ? (
                     <div className="w-full">
                         <label
                             htmlFor="customGoal"
@@ -248,6 +240,25 @@ export const GoalSelection = ({ appointment, setAppointment }: Props) => {
                             }}
                         />
                     </div>
+                ) : (
+                    <div className="w-full">
+                        <label
+                            htmlFor="topic"
+                            className="block text-sm font-medium leading-6 text-gray-900"
+                        >
+                            Temat
+                        </label>
+                        <Input
+                            className="py-1"
+                            name="topic"
+                            onChange={(e) => {
+                                setAppointment({
+                                    ...appointment,
+                                    topic: e.target.value,
+                                });
+                            }}
+                        />
+                    </div>
                 )}
             </div>
         </div>
@@ -255,48 +266,81 @@ export const GoalSelection = ({ appointment, setAppointment }: Props) => {
 };
 
 export const Summary = ({ appointment, setAppointment }: Props) => {
+    const { teachers } = useTeacher();
+    const { appointments } = useAppointments();
+    const teacher = teachers?.find(
+        (teacher) => teacher.userId == appointment.teacherId
+    );
+    const appointmentWithSameTeacherAndSubject =
+        appointments?.filter(
+            (app) =>
+                app.teacherId == appointment.teacherId &&
+                app.subject.name == appointment.subject &&
+                app.dateTime == appointment.dateTime
+        )[0] || null;
     return (
         <div className="flex flex-col items-center justify-start w-full h-full lg:h-3/4 md:p-3 xl:p-10 gap-3">
             <h1 className="text-xl lg:text-2xl">Podsumowanie</h1>
-            <div className="flex flex-col items-center justify-start w-full h-full lg:h-3/4 md:p-3 xl:p-10 gap-3">
-                <div className="flex flex-col items-center justify-start w-full h-full lg:h-3/4 md:p-3 xl:p-10 gap-3">
-                    <p className="text-lg">Przedmiot: {appointment.subject}</p>
-                    <p className="text-lg">
-                        Nauczyciel:{" "}
-                        {appointment.teacherId != 0
-                            ? appointment.teacherId
-                            : "Brak nauczyciela"}
-                    </p>
-                    <p className="text-lg">
-                        Termin:{" "}
-                        {appointment.dateTime != null
-                            ? new Date(appointment.dateTime).toLocaleDateString(
-                                  "pl-PL",
-                                  {
-                                      weekday: "long",
-                                      day: "numeric",
-                                      month: "long",
-                                      year: "numeric",
-                                  }
-                              ) +
-                              " o " +
-                              new Date(appointment.dateTime).toLocaleTimeString(
-                                  "pl-PL",
-                                  {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                  }
-                              )
-                            : "Brak terminu"}
-                    </p>
-                    <p className="text-lg">
-                        Cel:{" "}
-                        {appointment.goal != ""
-                            ? appointment.goal
-                            : "Brak celu"}
+            {/* map the appointment */}
+            <div className="w-full lg:w-2/3">
+                <p className="text-sm mb-1">Przedmiot i nauczyciel</p>
+                <p className="py-1 px-3 bg-neutral-50 border border-neutral-300 rounded-lg w-full">
+                    {appointment.subject} - {teacher?.user.firstName}{" "}
+                    {teacher?.user.lastName}
+                </p>
+            </div>
+            <div className="w-full lg:w-2/3">
+                <p className="text-sm mb-1">Data i godzina</p>
+                <p className="py-1 px-3 bg-neutral-50 border capitalize border-neutral-300 rounded-lg w-full">
+                    {new Date(appointment.dateTime!).toLocaleString("pl-PL", {
+                        weekday: "long",
+                        day: "numeric",
+                        month: "long",
+                        hour: "numeric",
+                        minute: "numeric",
+                    })}
+                </p>
+            </div>
+            {appointmentWithSameTeacherAndSubject && (
+                <div className="w-full lg:w-2/3">
+                    <p className="text-sm mb-1">Lokalizacja</p>
+                    <p className="py-1 px-3 bg-neutral-50 border capitalize border-neutral-300 rounded-lg w-full">
+                        {appointmentWithSameTeacherAndSubject.location.city},{" "}
+                        {appointmentWithSameTeacherAndSubject.location.address},{" "}
+                        Sala {appointmentWithSameTeacherAndSubject.roomNumber}
                     </p>
                 </div>
-            </div>
+            )}
+            {appointment.goal ===
+            ("poprawa_kartkowki" || "poprawa_sprawdzianu" || "nauka") ? (
+                <>
+                    <div className="w-full lg:w-2/3">
+                        <p className="text-sm mb-1">Cel</p>
+                        <p className="py-1 px-3 bg-neutral-50 border border-neutral-300 rounded-lg w-full">
+                            {appointment.goal == "poprawa_kartkowki"
+                                ? "Poprawa kartkówki"
+                                : appointment.goal == "poprawa_sprawdzianu"
+                                ? "Poprawa sprawdzianu"
+                                : "Nauka"}
+                        </p>
+                    </div>
+                    <div className="w-full lg:w-2/3">
+                        <p className="text-sm mb-1">Temat</p>
+                        <p className="py-1 px-3 bg-neutral-50 border border-neutral-300 rounded-lg w-full">
+                            {appointment.topic}
+                        </p>
+                    </div>
+                </>
+            ) : (
+                <>
+                    <div className="w-full lg:w-2/3">
+                        <p className="text-sm mb-1">Cel</p>
+                        <p className="py-1 px-3 bg-neutral-50 border border-neutral-300 rounded-lg w-full">
+                            {appointment.goal}
+                        </p>
+                    </div>
+                </>
+            )}
         </div>
     );
 };

@@ -115,10 +115,11 @@ model Appointment {
 }
 
 model StudentAppointment {
-  studentId     Int
+  studentId     Int        @unique
   appointmentId String
   subject       String
   goal          String
+  topic         String?
   student       Student     @relation(fields: [studentId], references: [userId])
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
 
