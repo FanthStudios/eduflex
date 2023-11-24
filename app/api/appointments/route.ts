@@ -10,6 +10,12 @@ interface PostProps extends Omit<Appointment, "subject"> {
     occurrences: number;
 }
 
+function removeMinutes(date: Date, minutes: number) {
+    var result = new Date(date);
+    result.setMinutes(result.getMinutes() - minutes);
+    return result;
+}
+
 function addMinutes(date: Date, minutes: number) {
     var result = new Date(date);
     result.setMinutes(result.getMinutes() + minutes);
@@ -204,22 +210,36 @@ export async function POST(request: Request) {
                 },
             });
 
-            const appointmentExistsInNext45Minutes =
+            if (appointmentExists) {
+                return new NextResponse(
+                    JSON.stringify({
+                        message: `Korepetycje już istnieją w dniu ${newAppointment.dateTime}, zostały pominięte`,
+                    }),
+                    {
+                        status: 403,
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+            }
+
+            const appointmentExistsInPrevious45Minutes =
                 await prisma.appointment.findFirst({
                     where: {
                         dateTime: {
-                            gte: addMinutes(newAppointment.dateTime, 45),
+                            gte: removeMinutes(newAppointment.dateTime, 45),
                         },
                         locationAddress: newAppointment.location.address,
                         roomNumber: newAppointment.roomNumber,
                     },
                 });
 
-            const appointmentExistsInPrevious45Minutes =
+            const appointmentExistsInNext45Minutes =
                 await prisma.appointment.findFirst({
                     where: {
                         dateTime: {
-                            lte: addMinutes(newAppointment.dateTime, -45),
+                            gte: addMinutes(newAppointment.dateTime, 45),
                         },
                         locationAddress: newAppointment.location.address,
                         roomNumber: newAppointment.roomNumber,
@@ -256,43 +276,7 @@ export async function POST(request: Request) {
                 );
             }
 
-            if (appointmentExists) {
-                return new NextResponse(
-                    JSON.stringify({
-                        message: `Korepetycje już istnieją w dniu ${newAppointment.dateTime}, zostały pominięte`,
-                    }),
-                    {
-                        status: 403,
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
-            }
-
-            // const appointmentExists = await prisma.appointment.findFirst({
-            //     where: {
-            //         dateTime: newAppointment.dateTime,
-            //         locationAddress: newAppointment.location.address,
-            //         roomNumber: newAppointment.roomNumber,
-            //     },
-            // });
-
-            // if (appointmentExists) {
-            //     return new NextResponse(
-            //         JSON.stringify({
-            //             message: `Korepetycje już istnieją w dniu ${newAppointment.dateTime}, zostały pominięte`,
-            //         }),
-            //         {
-            //             status: 403,
-            //             headers: {
-            //                 "Content-Type": "application/json",
-            //             },
-            //         }
-            //     );
-            // }
-
-            // await createAppointment(newAppointment);
+            await createAppointment(newAppointment);
         }
 
         return new NextResponse(
