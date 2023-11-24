@@ -14,10 +14,9 @@ import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 
 const navigation = [
-    { name: "Features", href: "#" },
+    { name: "Nasza oferta", href: "#features" },
+    { name: "FAQ", href: "#faq" },
     { name: "Referencje", href: "#testimonials" },
-    { name: "Marketplace", href: "#" },
-    { name: "Company", href: "#" },
 ];
 
 export default function Hero() {
