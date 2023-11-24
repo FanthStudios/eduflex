@@ -45,9 +45,8 @@ export default function Avatar({ letter, width = 12 }: Props) {
             clsx(
                 `bg-${randColor}-${colorSaturation()} text-${randColor}-${
                     colorSaturation() + 600
-                }`,
-                `w-${width}`,
-                "aspect-square rounded-full flex items-center text-center justify-center"
+                } w-${width} h-${width} xl:h-auto`,
+                "aspect-square rounded-full flex items-center text-center justify-center pointer-events-none"
             )
         );
     }, [colorSaturation, randomColor, width]);
