@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 type Props = {};
 
@@ -83,13 +84,9 @@ export default function Register({}: Props) {
             });
 
             if (res.status === 200) {
-                await signIn("credentials", {
-                    redirect: true,
-                    email: user.email,
-                    password: user.password,
-                    callbackUrl: "/panel",
-                });
+                toast.success("Konto stworzone, możesz się zalogować!");
             } else {
+                toast.error("Coś poszło nie tak!");
                 console.error(await res.text());
             }
         }
