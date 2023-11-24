@@ -92,7 +92,7 @@ export default function Features() {
                         initial="hidden"
                         whileInView="show"
                         exit="exit"
-                        src="https://tailwindui.com/img/component-images/project-app-screenshot.png"
+                        src="./screenshot.png"
                         alt="App screenshot"
                         className="mb-[-12%] rounded-xl shadow-2xl ring-1 ring-gray-900/10"
                         width={2432}

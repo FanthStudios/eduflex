@@ -53,13 +53,19 @@ export default function CalendarWithMeetings({}: Props) {
         );
 
     useEffect(() => {
+        // set appointmentsForSelectedDay to appointments with the teacherId of the current user and at the selected day and month
         setAppointmentsForSelectedDay(
             appointments.filter((app) => {
                 const date = new Date(app.dateTime);
-                return date.getDate() === day?.getDate();
+                return (
+                    date.getDate() === day?.getDate() &&
+                    date.getMonth() === day?.getMonth() &&
+                    date.getFullYear() === day?.getFullYear() &&
+                    app.teacherId === parseInt(session?.user?.id!)
+                );
             })
         );
-    }, [day, appointments]);
+    }, [day, appointments, session?.user?.id]);
 
     const appointmentDaysClassNames =
         "after:bg-red-500 after:absolute after:top-0 after:right-0 after:rounded-md after:w-2 after:h-2";

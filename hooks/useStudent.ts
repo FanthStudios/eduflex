@@ -21,8 +21,9 @@ export interface Student {
     favoriteTeachers: { userId: number }[];
 }
 
-export function useStudent() {
+export function useStudent(userId?: number) {
     const [students, setStudents] = useState<Student[]>([]);
+    const [student, setStudent] = useState<Student | null>(null);
 
     const removeStudentsFavoriteTeacher = (
         teacherId: number,
@@ -66,17 +67,26 @@ export function useStudent() {
     };
 
     useEffect(() => {
-        const fetchTeachers = async () => {
+        const fetchStudents = async () => {
             const res = await fetch(`/api/students`);
 
             const data = await res.json();
             setStudents(data);
         };
 
-        fetchTeachers();
+        fetchStudents();
     }, []);
 
+    useEffect(() => {
+        if (userId) {
+            setStudent(
+                students.find((student) => student.userId === userId) || null
+            );
+        }
+    }, [userId, students]);
+
     return {
+        student,
         students,
         removeStudentsFavoriteTeacher,
         addStudentsFavoriteTeacher,

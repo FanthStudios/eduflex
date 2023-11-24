@@ -2,7 +2,12 @@
 
 import { Mobile, Sidebar } from "@/components/Sidebar";
 import { useState } from "react";
-import { FolderIcon, HomeIcon, UsersIcon } from "@heroicons/react/24/outline";
+import {
+    CalendarDaysIcon,
+    HomeIcon,
+    PencilSquareIcon,
+    UsersIcon,
+} from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
 
 const navigation = [
@@ -18,9 +23,14 @@ const navigation = [
             icon: UsersIcon,
         },
         {
-            name: "Korepetycje",
+            name: "Zapisz się",
             href: "/panel/appointments",
-            icon: FolderIcon,
+            icon: PencilSquareIcon,
+        },
+        {
+            name: "Moje korepetycje",
+            href: "/panel/myAppointments",
+            icon: CalendarDaysIcon,
         },
     ],
     [
@@ -35,9 +45,9 @@ const navigation = [
             icon: UsersIcon,
         },
         {
-            name: "Dodaj korepetycje",
+            name: "Stwórz korepetycje",
             href: "/panel/createAppointment",
-            icon: FolderIcon,
+            icon: PencilSquareIcon,
         },
     ],
 ];
