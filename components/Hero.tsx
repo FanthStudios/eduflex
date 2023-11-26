@@ -173,7 +173,7 @@ export default function Hero() {
                             Odkryj nowe możliwości lekcji i zaplanuj swój
                             grafik.{" "}
                             <Link
-                                href="#"
+                                href="#features"
                                 className="font-semibold text-green-600"
                             >
                                 <span
@@ -213,7 +213,7 @@ export default function Hero() {
                                 initial="hidden"
                                 whileInView="show"
                                 exit="exit"
-                                href="#"
+                                href="/login"
                                 className="rounded-md bg-green-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
                             >
                                 Zacznijmy
@@ -223,7 +223,7 @@ export default function Hero() {
                                 initial="hidden"
                                 whileInView="show"
                                 exit="exit"
-                                href="#"
+                                href="#faq"
                                 className="flex items-center justify-center gap-2 text-sm font-semibold leading-6 text-gray-900"
                             >
                                 Dowiedz się więcej{" "}

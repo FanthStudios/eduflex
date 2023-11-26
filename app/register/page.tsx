@@ -3,6 +3,7 @@
 import Logo from "@/components/Logo";
 import MultiSelect from "@/components/MultiSelect";
 import { slideInVariant } from "@/utils/motion";
+import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
@@ -84,13 +85,20 @@ export default function Register({}: Props) {
             });
 
             if (res.status === 200) {
-                toast.success("Konto stworzone, możesz się zalogować!");
+                window.location.href = "/login";
+                toast.success("Konto stworzone, możesz się zalogować!", {
+                    autoClose: 6000,
+                });
             } else {
-                toast.error("Coś poszło nie tak!");
+                toast.error("Coś poszło nie tak!", {
+                    autoClose: 6000,
+                });
                 console.error(await res.text());
             }
         }
     };
+
+    const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
         if (
@@ -117,7 +125,7 @@ export default function Register({}: Props) {
 
     return (
         <>
-            <div className="relative w-screen h-screen isolate md:overflow-hidden">
+            <div className="relative w-screen h-screen isolate md:overflow-x-hidden overflow-y-auto">
                 <div className="flex flex-col justify-center flex-1 min-h-full px-6 py-12 lg:px-8">
                     <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                         <Link href="/">
@@ -264,15 +272,19 @@ export default function Register({}: Props) {
                                 >
                                     Hasło
                                 </motion.label>
-                                <div className="mt-0.5">
-                                    <motion.input
-                                        variants={slideInVariant("left", 0.65)}
-                                        initial="hidden"
-                                        animate="show"
-                                        exit="exit"
+                                <motion.div
+                                    variants={slideInVariant("left", 0.65)}
+                                    initial="hidden"
+                                    animate="show"
+                                    exit="exit"
+                                    className="relative mt-0.5"
+                                >
+                                    <input
                                         id="password"
                                         name="password"
-                                        type="password"
+                                        type={
+                                            showPassword ? "text" : "password"
+                                        }
                                         autoComplete="current-password"
                                         required
                                         onChange={(e) => {
@@ -283,7 +295,28 @@ export default function Register({}: Props) {
                                         }}
                                         className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
                                     />
-                                </div>
+                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 cursor-pointer">
+                                        {showPassword ? (
+                                            <EyeIcon
+                                                className="h-5 w-5"
+                                                onClick={() =>
+                                                    setShowPassword(
+                                                        !showPassword
+                                                    )
+                                                }
+                                            />
+                                        ) : (
+                                            <EyeSlashIcon
+                                                className="h-5 w-5"
+                                                onClick={() =>
+                                                    setShowPassword(
+                                                        !showPassword
+                                                    )
+                                                }
+                                            />
+                                        )}
+                                    </div>
+                                </motion.div>
                             </div>
 
                             <div>

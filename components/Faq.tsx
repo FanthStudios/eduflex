@@ -5,12 +5,12 @@ import { MinusSmallIcon, PlusSmallIcon } from "@heroicons/react/24/outline";
 
 const faqs = [
     {
-        question: "Jak mogę zarezerwować lekcję prywatną?",
-        answer: "Aby zarezerwować lekcję prywatną, musisz najpierw zalogować się na swoje konto. Następnie przejdź do panelu ucznia i kliknij na 'Korepetycje'. Wybierz przedmiot i nauczyciela, którego chcesz się pouczyć, wybierz datę i godzinę lekcji, a następnie podaj swój cel. Kliknij na 'Zarezerwuj', aby potwierdzić swoją rezerwację.",
+        question: "Jak mogę się zapisać na korepetycje?",
+        answer: "Aby zapisać się na korepetycje, musisz najpierw zalogować się na swoje konto. Następnie przejdź do panelu ucznia i kliknij na 'Zapisz się'. Wybierz nauczyciela i przedmiot, którego chcesz się pouczyć, wybierz spotkani z listy, a następnie podaj swój cel. Kliknij na 'Zarezerwuj', aby potwierdzić swoją rezerwację.",
     },
     {
         question: "Jak mogę wyświetlić korepetycje na które się umówiłem?",
-        answer: "Możesz wyświetlić swoje rezerwacje, przechodząc do panelu studenta i klikając na 'Moje korepetycje'. Zostaniesz przekierowany do strony, na której zobaczysz listę wszystkich swoich rezerwowanych lekcji.",
+        answer: "Możesz wyświetlić swoje korepetycje, przejdź do panelu ucznia i kliknij na 'Moje korepetycje'. Zostaniesz przekierowany do strony, na której zobaczysz listę wszystkich swoich rezerwowanych lekcji.",
     },
     {
         question: "Jak mogę anulować moją obecność na korepetycjach?",
