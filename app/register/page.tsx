@@ -56,6 +56,15 @@ export default function Register({}: Props) {
     const classes = ["5pi", "4i", "3i", "2gt", "3gt"];
 
     const handleRegister = async () => {
+        // check if the domain in email is @chmura.zs14.edu.pl using regex
+        const emailRegex = new RegExp(/^[a-zA-Z0-9._-]+@chmura.zs14.edu.pl$/);
+        if (!emailRegex.test(user.email)) {
+            toast.error("E-mail musi być z domeny @chmura.zs14.edu.pl", {
+                autoClose: 6000,
+            });
+            return;
+        }
+
         if (user.role == "STUDENT") {
             const res = await fetch("/api/register", {
                 method: "POST",
