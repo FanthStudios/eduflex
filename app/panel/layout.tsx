@@ -49,6 +49,11 @@ const navigation = [
             href: "/panel/createAppointment",
             icon: PencilSquareIcon,
         },
+        {
+            name: "Moje korepetycje",
+            href: "/panel/myAppointments",
+            icon: CalendarDaysIcon,
+        },
     ],
 ];
 

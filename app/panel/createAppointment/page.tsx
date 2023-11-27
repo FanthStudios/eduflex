@@ -1,10 +1,10 @@
 "use client";
 
+import Modal from "@/components/Modal";
 import Breadcrumbs from "@/components/panel/Breadcrumbs";
 import MeetingForm from "@/components/panel/MeetingForm";
 import TeacherMeetingSummary from "@/components/panel/TeacherMeetingSummary";
 import { useMultistepForm } from "@/hooks/useMultistepForm";
-import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
@@ -18,9 +18,6 @@ enum Recurring {
 }
 
 export default function CreateAppointment({}: Props) {
-    const { data: session } = useSession();
-    // TODO: create appointment as a teacher
-    // 1. select the subject, a dateTime and location
     const [newAppointment, setNewAppointment] = useState({
         subject: "",
         dateTime: new Date(),
@@ -36,6 +33,8 @@ export default function CreateAppointment({}: Props) {
         availableSlots: 0,
         occurrences: 0,
     });
+
+    const [modalOpen, setModalOpen] = useState(false);
 
     const breadcrumbsList = ["Dodaj spotkanie", "Podsumowanie"];
     const steps = [
@@ -76,54 +75,81 @@ export default function CreateAppointment({}: Props) {
         const body = await res.json();
 
         if (res.status == 200) {
-            goTo(0);
             toast.success("Spotkanie zostało dodane");
+            setModalOpen(true);
         } else {
             toast.error(body.message ?? "Wystąpił błąd");
         }
     }
     return (
-        <div className="row-span-2 col-span-3 flex flex-col items-center justify-center h-full">
-            <Breadcrumbs
-                items={breadcrumbsList}
-                index={currentIndex}
-                goTo={goTo}
-            />
-            {step}
-            <div className={`flex items-center w-full mt-2 justify-evenly`}>
-                {currentIndex > 0 && (
-                    <button
-                        className="px-8 py-1 text-neutral-800 bg-neutral-200/80 rounded-md"
-                        onClick={() => previous()}
-                    >
-                        Poprzednia
-                    </button>
-                )}
-                {currentIndex < steps.length - 1 && (
-                    <button
-                        className="px-12 py-1 text-white bg-green-500 rounded-md"
+        <>
+            <Modal isOpen={modalOpen} closeModal={() => setModalOpen(false)}>
+                <Modal.Title align="center">
+                    Czy chcesz dodać następne korepetycje
+                </Modal.Title>
+                <Modal.Footer>
+                    <Modal.Button
+                        color="green"
                         onClick={() => {
-                            if (validateCanGoNext()) {
-                                next();
-                            } else {
-                                toast.error("Uzupełnij wszystkie pola");
-                            }
+                            goTo(0);
+                            setModalOpen(false);
                         }}
                     >
-                        Następna
-                    </button>
-                )}
-                {currentIndex == steps.length - 1 && (
-                    <button
-                        className="px-12 py-1 text-white bg-green-500 rounded-md"
-                        onClick={async () => {
-                            await createNewAppointment();
+                        Dodaj następne
+                    </Modal.Button>
+                    <Modal.Button
+                        color="red"
+                        onClick={() => {
+                            window.location.href = "/panel/myAppointments";
+                            setModalOpen(false);
                         }}
                     >
-                        Zatwierdź
-                    </button>
-                )}
+                        Nie
+                    </Modal.Button>
+                </Modal.Footer>
+            </Modal>
+            <div className="row-span-2 col-span-3 flex flex-col items-center justify-center h-full">
+                <Breadcrumbs
+                    items={breadcrumbsList}
+                    index={currentIndex}
+                    goTo={goTo}
+                />
+                {step}
+                <div className={`flex items-center w-full mt-2 justify-evenly`}>
+                    {currentIndex > 0 && (
+                        <button
+                            className="px-8 py-1 text-neutral-800 bg-neutral-200/80 rounded-md"
+                            onClick={() => previous()}
+                        >
+                            Poprzednia
+                        </button>
+                    )}
+                    {currentIndex < steps.length - 1 && (
+                        <button
+                            className="px-12 py-1 text-white bg-green-500 rounded-md"
+                            onClick={() => {
+                                if (validateCanGoNext()) {
+                                    next();
+                                } else {
+                                    toast.error("Uzupełnij wszystkie pola");
+                                }
+                            }}
+                        >
+                            Następna
+                        </button>
+                    )}
+                    {currentIndex == steps.length - 1 && (
+                        <button
+                            className="px-12 py-1 text-white bg-green-500 rounded-md"
+                            onClick={async () => {
+                                await createNewAppointment();
+                            }}
+                        >
+                            Zatwierdź
+                        </button>
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     );
 }
