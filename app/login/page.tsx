@@ -6,6 +6,7 @@ import Logo from "@/components/Logo";
 import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
 import { slideInVariant } from "@/utils/motion";
+import { toast } from "react-toastify";
 
 type Props = {};
 
@@ -14,12 +15,27 @@ export default function Login({}: Props) {
     const [password, setPassword] = useState("");
 
     const handleLogin = async () => {
-        const data = await signIn("credentials", {
-            redirect: true,
-            email: email,
-            password: password,
-            callbackUrl: "/panel",
-        });
+        try {
+            const data = await signIn("credentials", {
+                redirect: false,
+                email: email,
+                password: password,
+                callbackUrl: "/panel",
+            });
+
+            const error = data && data.error;
+
+            if (error) {
+                const parsedError = JSON.parse(error);
+                toast.error(parsedError.error, {
+                    autoClose: 60000,
+                });
+            } else {
+                window.location.href = "/panel";
+            }
+        } catch (e: any) {
+            console.log(e);
+        }
     };
 
     return (

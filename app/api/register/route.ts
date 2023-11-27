@@ -14,34 +14,60 @@ export async function POST(request: Request) {
         studentsClass,
     } = body;
 
-    if (!email || !password || !firstName || !lastName || !role) {
-        if (role === "TEACHER" && !subjects) {
-            return new NextResponse("Missing fields", { status: 401 });
-        } else {
-            return new NextResponse("Missing fields", { status: 401 });
+    if (
+        !email ||
+        !password ||
+        !firstName ||
+        !lastName ||
+        !role ||
+        !(subjects.length > 0)
+    ) {
+        if (role === "TEACHER" && !(subjects.length > 0)) {
+            return new NextResponse("Proszę wybrać przedmioty nauczania", {
+                status: 401,
+            });
+        } else if (
+            (!email ||
+                !password ||
+                !firstName ||
+                !lastName ||
+                !studentsClass) &&
+            role == "STUDENT"
+        ) {
+            return new NextResponse("Jedno z pól jest puste", { status: 401 });
         }
     }
 
     const user = await getUser(email);
 
     if (user) {
-        return new NextResponse("User already exists", { status: 401 });
+        return new NextResponse(
+            "Użytkownik o podanym adresie email już istnieje",
+            { status: 401 }
+        );
     }
 
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
-    const newUser = await createUser({
-        email,
-        password: hash,
-        firstName,
-        lastName,
-        role,
-        subjects,
-        studentsClass,
-    });
+    // const newUser = await createUser({
+    //     email,
+    //     password: hash,
+    //     firstName,
+    //     lastName,
+    //     role,
+    //     subjects,
+    //     studentsClass,
+    // });
 
-    return new NextResponse(JSON.stringify(newUser), {
+    // return new NextResponse(JSON.stringify(newUser), {
+    //     status: 200,
+    //     headers: {
+    //         "Content-Type": "application/json",
+    //     },
+    // });
+
+    return new NextResponse(JSON.stringify({ asd: "asdasd" }), {
         status: 200,
         headers: {
             "Content-Type": "application/json",

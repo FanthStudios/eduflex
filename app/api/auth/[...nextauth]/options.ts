@@ -5,6 +5,7 @@ import { z } from "zod";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/prisma/client";
 import { getUser } from "@/utils/user";
+import { NextResponse } from "next/server";
 
 export const options: any = {
     adapter: PrismaAdapter(prisma),
@@ -16,51 +17,61 @@ export const options: any = {
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials, req) {
-                try {
-                    const parsedCredentials = z
-                        .object({
-                            email: z.string().email(),
-                            password: z.string().min(6),
-                        })
-                        .safeParse(credentials);
+                const parsedCredentials = z
+                    .object({
+                        email: z.string().email(),
+                        password: z.string().min(6),
+                    })
+                    .safeParse(credentials);
 
-                    if (parsedCredentials.success) {
-                        const { email, password } = parsedCredentials.data;
+                if (parsedCredentials.success) {
+                    const { email, password } = parsedCredentials.data;
 
-                        const user = await getUser(email);
+                    const user = await getUser(email);
 
-                        if (!user) return null;
-
-                        const passwordsMatch = await bcrypt.compare(
-                            password,
-                            user.password
+                    if (!user)
+                        throw new Error(
+                            JSON.stringify({
+                                error: "Nie znaleziono użytkownika o podanym adresie email",
+                                status: false,
+                            })
                         );
 
-                        if (passwordsMatch) {
-                            return user as any;
-                        }
-                    }
+                    const passwordsMatch = await bcrypt.compare(
+                        password,
+                        user.password
+                    );
 
-                    console.log("Invalid credentials");
-                } catch (error) {
-                    console.log(error);
+                    if (passwordsMatch) {
+                        await prisma.user.update({
+                            where: {
+                                email: user.email,
+                            },
+                            data: {
+                                lastLogin: new Date(),
+                            },
+                        });
+                        return user as any;
+                    } else {
+                        throw new Error(
+                            JSON.stringify({
+                                error: "Hasło jest niepoprawne",
+                                status: false,
+                            })
+                        );
+                    }
+                } else {
+                    throw new Error(
+                        JSON.stringify({
+                            error: "Niepoprawne dane logowania",
+                            status: false,
+                        })
+                    );
                 }
-                return null;
             },
         }),
     ],
     callbacks: {
-        async signIn({ user, account, profile, email, credentials }: any) {
-            await prisma.user.update({
-                where: {
-                    email: user.email,
-                },
-                data: {
-                    lastLogin: new Date(),
-                },
-            });
-            return true;
-        },
         async session({ session, user, token }: any) {
             session.user = token.user;
             return session;

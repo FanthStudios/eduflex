@@ -73,7 +73,10 @@ export default function Register({}: Props) {
                     callbackUrl: "/",
                 });
             } else {
-                console.error(await res.text());
+                const data = await res.text();
+                toast.error(data, {
+                    autoClose: 60000,
+                });
             }
         } else {
             const res = await fetch("/api/register", {
@@ -90,10 +93,10 @@ export default function Register({}: Props) {
                     autoClose: 6000,
                 });
             } else {
-                toast.error("Coś poszło nie tak!", {
+                const data = await res.text();
+                toast.error(data, {
                     autoClose: 6000,
                 });
-                console.error(await res.text());
             }
         }
     };
