@@ -55,9 +55,11 @@ export async function POST(request: Request) {
     }
 
     try {
+        const goal = appointment.goal;
         if (
-            appointment.goal !==
-            ("poprawa_kartkowki" || "poprawa_sprawdzianu" || "nauka")
+            goal !== "poprawa_sprawdzianu" &&
+            goal !== "przygotowanie_do_sprawdzianu" &&
+            goal !== "przygotowanie_do_kolokwium"
         ) {
             // the goal is "other" and the goal is saved to the appointment.goal field
             const studentAppointment = await prisma.studentAppointment.create({
@@ -101,6 +103,7 @@ export async function POST(request: Request) {
             );
         }
     } catch (error: any) {
+        console.log(error);
         return new NextResponse(
             JSON.stringify({
                 message: error.message,

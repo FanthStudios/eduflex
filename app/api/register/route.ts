@@ -50,24 +50,17 @@ export async function POST(request: Request) {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
-    // const newUser = await createUser({
-    //     email,
-    //     password: hash,
-    //     firstName,
-    //     lastName,
-    //     role,
-    //     subjects,
-    //     studentsClass,
-    // });
+    const newUser = await createUser({
+        email,
+        password: hash,
+        firstName,
+        lastName,
+        role,
+        subjects,
+        studentsClass,
+    });
 
-    // return new NextResponse(JSON.stringify(newUser), {
-    //     status: 200,
-    //     headers: {
-    //         "Content-Type": "application/json",
-    //     },
-    // });
-
-    return new NextResponse(JSON.stringify({ asd: "asdasd" }), {
+    return new NextResponse(JSON.stringify(newUser), {
         status: 200,
         headers: {
             "Content-Type": "application/json",

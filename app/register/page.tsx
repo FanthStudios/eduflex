@@ -75,8 +75,11 @@ export default function Register({}: Props) {
             });
 
             if (res.status === 200) {
+                toast.success("Konto stworzone!", {
+                    autoClose: 6000,
+                });
                 await signIn("credentials", {
-                    redirect: false,
+                    redirect: true,
                     email: user.email,
                     password: user.password,
                     callbackUrl: "/",
@@ -97,10 +100,16 @@ export default function Register({}: Props) {
             });
 
             if (res.status === 200) {
-                window.location.href = "/login";
-                toast.success("Konto stworzone, możesz się zalogować!", {
+                toast.success("Konto stworzone!", {
                     autoClose: 6000,
                 });
+                await signIn("credentials", {
+                    redirect: true,
+                    email: user.email,
+                    password: user.password,
+                    callbackUrl: "/",
+                });
+                window.location.href = "/panel";
             } else {
                 const data = await res.text();
                 toast.error(data, {

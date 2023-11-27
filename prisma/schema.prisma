@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -24,8 +21,7 @@ model Account {
   idToken           String?
   sessionState      String?
   isSubscribed      Boolean @default(false)
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -36,17 +32,19 @@ model Session {
   userId       Int
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "Session_userId_fkey")
 }
 
 model User {
   id        Int       @id @default(autoincrement())
+  email     String    @unique
   firstName String
   lastName  String
-  email     String    @unique
   password  String
-  lastLogin DateTime?
   role      String
-  accounts  Account[]
+  lastLogin DateTime?
+  accounts  Account?
   sessions  Session[]
   student   Student?
   teacher   Teacher?
@@ -60,26 +58,28 @@ model Class {
 
 model Student {
   userId           Int                  @id
-  user             User                 @relation(fields: [userId], references: [id])
   classId          Int
   studentsClass    Class                @relation(fields: [classId], references: [id])
+  user             User                 @relation(fields: [userId], references: [id])
   appointments     StudentAppointment[]
   favoriteTeachers Teacher[]            @relation("FavoriteTeachers")
+
+  @@index([classId], map: "Student_classId_fkey")
 }
 
 model Teacher {
   userId       Int           @id
-  user         User          @relation(fields: [userId], references: [id])
-  subjects     Subject[]     @relation("TeacherSubjects")
   appointments Appointment[]
+  user         User          @relation(fields: [userId], references: [id])
   favoritedBy  Student[]     @relation("FavoriteTeachers")
+  subjects     Subject[]     @relation("TeacherSubjects")
 }
 
 model Subject {
   id           Int           @id @default(autoincrement())
   name         String        @unique
-  teachers     Teacher[]     @relation("TeacherSubjects")
   appointments Appointment[]
+  teachers     Teacher[]     @relation("TeacherSubjects")
 }
 
 model Location {
@@ -88,47 +88,41 @@ model Location {
   lng          Float
   city         String
   postalCode   String
-  address      String       @unique
+  address      String        @unique
   appointments Appointment[]
-}
-
-enum Recurring {
-  NEVER
-  WEEKLY
-  BIWEEKLY
-  MONTHLY
 }
 
 model Appointment {
   id                  String               @id @default(cuid())
-  dateTime            DateTime
-  roomNumber          Int
-  recurring           Recurring
-  subjectId           Int
-  subject             Subject              @relation(fields: [subjectId], references: [id])
   teacherId           Int
-  teacher             Teacher              @relation(fields: [teacherId], references: [userId])
+  subjectId           Int
+  dateTime            DateTime
+  recurring           Recurring
+  roomNumber          Int
   locationAddress     String
-  location            Location             @relation(fields: [locationAddress], references: [address])
-  studentAppointments StudentAppointment[]
   availableSlots      Int
+  location            Location             @relation(fields: [locationAddress], references: [address])
+  subject             Subject              @relation(fields: [subjectId], references: [id])
+  teacher             Teacher              @relation(fields: [teacherId], references: [userId])
+  studentAppointments StudentAppointment[]
+
+  @@index([locationAddress], map: "Appointment_locationAddress_fkey")
+  @@index([subjectId], map: "Appointment_subjectId_fkey")
+  @@index([teacherId], map: "Appointment_teacherId_fkey")
 }
 
 model StudentAppointment {
-  studentId     Int        @unique
+  studentId     Int
   appointmentId String
-  subject       String
   goal          String
+  subject       String
   topic         String?
-  student       Student     @relation(fields: [studentId], references: [userId])
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  student       Student     @relation(fields: [studentId], references: [userId])
 
   @@id([studentId, appointmentId])
-}
-
-enum Role {
-  STUDENT
-  TEACHER
+  @@index([appointmentId], map: "StudentAppointment_appointmentId_fkey")
+  @@index([studentId], map: "StudentAppointment_studentId_key")
 }
 
 model VerificationToken {
@@ -137,4 +131,11 @@ model VerificationToken {
   expires    DateTime
 
   @@id([identifier, token])
+}
+
+enum Recurring {
+  NEVER
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
 }

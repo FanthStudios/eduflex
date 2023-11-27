@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Teacher } from "@/hooks/useTeacher";
+import { Appointment } from "./useAppointments";
 
 export interface Student {
     userId: number;
@@ -17,13 +18,12 @@ export interface Student {
         id: number;
         name: string;
     };
-    appointments: any[];
+    appointments: Appointment[];
     favoriteTeachers: { userId: number }[];
 }
 
-export function useStudent(userId?: number) {
+export function useStudent(userId?: string) {
     const [students, setStudents] = useState<Student[]>([]);
-    const [student, setStudent] = useState<Student | null>(null);
 
     const removeStudentsFavoriteTeacher = (
         teacherId: number,
@@ -68,25 +68,23 @@ export function useStudent(userId?: number) {
 
     useEffect(() => {
         const fetchStudents = async () => {
-            const res = await fetch(`/api/students`);
+            const res = await fetch(`/api/students`, {
+                method: "POST",
+                body: JSON.stringify({ userId }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
 
             const data = await res.json();
             setStudents(data);
         };
 
         fetchStudents();
-    }, []);
-
-    useEffect(() => {
-        if (userId) {
-            setStudent(
-                students.find((student) => student.userId === userId) || null
-            );
-        }
-    }, [userId, students]);
+    }, [userId]);
 
     return {
-        student,
+        student: students[0],
         students,
         removeStudentsFavoriteTeacher,
         addStudentsFavoriteTeacher,
