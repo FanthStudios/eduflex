@@ -59,8 +59,8 @@ model Class {
 model Student {
   userId           Int                  @id
   classId          Int
-  studentsClass    Class                @relation(fields: [classId], references: [id])
-  user             User                 @relation(fields: [userId], references: [id])
+  studentsClass    Class                @relation(fields: [classId], references: [id], onDelete: NoAction)
+  user             User                 @relation(fields: [userId], references: [id], onDelete: NoAction)
   appointments     StudentAppointment[]
   favoriteTeachers Teacher[]            @relation("FavoriteTeachers")
 
@@ -70,7 +70,7 @@ model Student {
 model Teacher {
   userId       Int           @id
   appointments Appointment[]
-  user         User          @relation(fields: [userId], references: [id])
+  user         User          @relation(fields: [userId], references: [id], onDelete: NoAction)
   favoritedBy  Student[]     @relation("FavoriteTeachers")
   subjects     Subject[]     @relation("TeacherSubjects")
 }
@@ -101,9 +101,9 @@ model Appointment {
   roomNumber          Int
   locationAddress     String
   availableSlots      Int
-  location            Location             @relation(fields: [locationAddress], references: [address])
-  subject             Subject              @relation(fields: [subjectId], references: [id])
-  teacher             Teacher              @relation(fields: [teacherId], references: [userId])
+  location            Location             @relation(fields: [locationAddress], references: [address], onDelete: NoAction)
+  subject             Subject              @relation(fields: [subjectId], references: [id], onDelete: NoAction)
+  teacher             Teacher              @relation(fields: [teacherId], references: [userId], onDelete: NoAction)
   studentAppointments StudentAppointment[]
 
   @@index([locationAddress], map: "Appointment_locationAddress_fkey")
@@ -117,8 +117,8 @@ model StudentAppointment {
   goal          String
   subject       String
   topic         String?
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
-  student       Student     @relation(fields: [studentId], references: [userId])
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: NoAction)
+  student       Student     @relation(fields: [studentId], references: [userId], onDelete: NoAction)
 
   @@id([studentId, appointmentId])
   @@index([appointmentId], map: "StudentAppointment_appointmentId_fkey")
