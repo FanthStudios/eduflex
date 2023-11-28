@@ -49,8 +49,7 @@ export default function CalendarWithMeetings({}: Props) {
                       // date.setMonth(date.getMonth() - 1);
                       return date;
                   })
-            : // filter appointments by studentAppointments where the userId is the current user
-              appointments
+            : appointments
                   .filter(
                       (appointment) =>
                           appointment.studentAppointments?.find(
