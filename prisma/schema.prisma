@@ -112,7 +112,6 @@ model Appointment {
 }
 
 model StudentAppointment {
-  id            String       @id @default(cuid())
   studentId     Int
   appointmentId String
   goal          String
@@ -121,6 +120,7 @@ model StudentAppointment {
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
   student       Student     @relation(fields: [studentId], references: [userId])
 
+  @@id([studentId, appointmentId])
   @@index([appointmentId], map: "StudentAppointment_appointmentId_fkey")
   @@index([studentId], map: "StudentAppointment_studentId_key")
 }
