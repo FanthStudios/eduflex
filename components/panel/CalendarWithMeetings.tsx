@@ -30,19 +30,41 @@ export default function CalendarWithMeetings({}: Props) {
 
     const { appointments } = useAppointments();
 
+    const userRole = session?.user?.role;
+    // filter appointments by studentAppointments where the userId is the current user
+
     // create appointmentDays variable with appointments with the teacherId of the current user
-    const appointmentDays = appointments
-        .filter(
-            (appointment) =>
-                appointment.teacher.user.id === parseInt(session?.user?.id!) &&
-                new Date(appointment.dateTime) > new Date()
-        )
-        .map((appointment) => {
-            // back up the date by a month and return it
-            const date = new Date(appointment.dateTime);
-            // date.setMonth(date.getMonth() - 1);
-            return date;
-        });
+    const appointmentDays =
+        userRole == "TEACHER"
+            ? appointments
+                  .filter(
+                      (appointment) =>
+                          appointment.teacher.user.id ===
+                              parseInt(session?.user?.id!) &&
+                          new Date(appointment.dateTime) > new Date()
+                  )
+                  .map((appointment) => {
+                      // back up the date by a month and return it
+                      const date = new Date(appointment.dateTime);
+                      // date.setMonth(date.getMonth() - 1);
+                      return date;
+                  })
+            : // filter appointments by studentAppointments where the userId is the current user
+              appointments
+                  .filter(
+                      (appointment) =>
+                          appointment.studentAppointments?.find(
+                              (studentAppointment) =>
+                                  studentAppointment.student.user.id ===
+                                  parseInt(session?.user?.id!)
+                          ) && new Date(appointment.dateTime) > new Date()
+                  )
+                  .map((appointment) => {
+                      // back up the date by a month and return it
+                      const date = new Date(appointment.dateTime);
+                      // date.setMonth(date.getMonth() - 1);
+                      return date;
+                  });
 
     const [appointmentsForSelectedDay, setAppointmentsForSelectedDay] =
         useState(
@@ -61,11 +83,18 @@ export default function CalendarWithMeetings({}: Props) {
                     date.getDate() === day?.getDate() &&
                     date.getMonth() === day?.getMonth() &&
                     date.getFullYear() === day?.getFullYear() &&
-                    app.teacherId === parseInt(session?.user?.id!)
+                    ((userRole == "TEACHER" &&
+                        app.teacherId === parseInt(session?.user?.id!)) ||
+                        (userRole == "STUDENT" &&
+                            app.studentAppointments?.find(
+                                (studentAppointment) =>
+                                    studentAppointment.student.user.id ===
+                                    parseInt(session?.user?.id!)
+                            )))
                 );
             })
         );
-    }, [day, appointments, session?.user?.id]);
+    }, [day, appointments, session?.user?.id, userRole]);
 
     const appointmentDaysClassNames =
         "after:bg-red-500 after:absolute after:top-0 after:right-0 after:rounded-md after:w-2 after:h-2";
