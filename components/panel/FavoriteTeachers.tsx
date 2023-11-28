@@ -43,8 +43,15 @@ export default function FavoriteTeachers({}: Props) {
                                     {teacher.user.lastName}
                                 </span>
                                 <span className="text-xs font-medium text-gray-500">
-                                    {teacher.subjects.map((subject) => {
-                                        return subject.name;
+                                    {teacher.subjects.map((subject, index) => {
+                                        if (
+                                            index ===
+                                            teacher.subjects.length - 1
+                                        ) {
+                                            return subject.name;
+                                        } else {
+                                            return subject.name + ", ";
+                                        }
                                     })}
                                 </span>
                             </div>
