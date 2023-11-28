@@ -1,3 +1,5 @@
+"use client";
+
 import {
     CalendarIcon,
     EllipsisHorizontalIcon,
@@ -7,37 +9,188 @@ import {
 import clsx from "clsx";
 import { DoorOpen } from "lucide-react";
 import { Appointment, useAppointments } from "@/hooks/useAppointments";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { Transition } from "@headlessui/react";
 import { Menu } from "@headlessui/react";
 
 type Props = {
-    studentAppointments?: any[];
-    teacherAppointments?: Appointment[];
+    studentAppointments?: {
+        past: Appointment[];
+        thisWeek: Appointment[];
+        upcoming: Appointment[];
+    };
+    teacherAppointments?: {
+        past: Appointment[];
+        thisWeek: Appointment[];
+        upcoming: Appointment[];
+    };
+    session: any;
 };
 
 export default function PersonalAppointments({
     studentAppointments,
     teacherAppointments,
+    session,
 }: Props) {
+    const userRole = session?.user?.role;
     return (
-        <div className="flex flex-col items-center xl:items-start justify-start gap-5 overflow-y-auto w-full">
-            {studentAppointments && studentAppointments.length > 0 ? (
+        <div className="flex flex-col items-center xl:items-start justify-start gap-5 overflow-y-auto w-full overflow-x-hidden">
+            {/* STUDENT APPOINTMENTS */}
+
+            {userRole == "STUDENT" && studentAppointments ? (
                 <>
-                    {studentAppointments.map((appointment, index) => (
+                    <AppointmentSection
+                        title="Minione"
+                        appointments={
+                            studentAppointments.past.length > 0
+                                ? studentAppointments.past
+                                : []
+                        }
+                        userRole={userRole}
+                    />
+                    <AppointmentSection
+                        title="W tym tygodniu"
+                        appointments={
+                            studentAppointments.thisWeek.length > 0
+                                ? studentAppointments.thisWeek
+                                : []
+                        }
+                        userRole={userRole}
+                    />
+                    <AppointmentSection
+                        title="Nadchodzące"
+                        appointments={
+                            studentAppointments.upcoming.length > 0
+                                ? studentAppointments.upcoming
+                                : []
+                        }
+                        userRole={userRole}
+                    />
+                </>
+            ) : (
+                userRole == "STUDENT" && (
+                    <div className="flex flex-col items-center justify-center gap-5 w-full">
+                        <h3 className="text-neutral-400">Brak korepetycji</h3>
+                    </div>
+                )
+            )}
+
+            {/*!TEACHER APPOINTMENTS  */}
+            {/*!TEACHER APPOINTMENTS  */}
+            {/*!TEACHER APPOINTMENTS  */}
+            {/*!TEACHER APPOINTMENTS  */}
+            {/*!TEACHER APPOINTMENTS  */}
+            {/*!TEACHER APPOINTMENTS  */}
+
+            {userRole == "TEACHER" && teacherAppointments ? (
+                <>
+                    <AppointmentSection
+                        title="Minione"
+                        appointments={
+                            teacherAppointments.past.length > 0
+                                ? teacherAppointments.past
+                                : []
+                        }
+                        userRole={userRole}
+                    />
+                    <AppointmentSection
+                        title="W tym tygodniu"
+                        appointments={
+                            teacherAppointments.thisWeek.length > 0
+                                ? teacherAppointments.thisWeek
+                                : []
+                        }
+                        userRole={userRole}
+                    />
+                    <AppointmentSection
+                        title="Nadchodzące"
+                        appointments={
+                            teacherAppointments.upcoming.length > 0
+                                ? teacherAppointments.upcoming
+                                : []
+                        }
+                        userRole={userRole}
+                    />
+                </>
+            ) : (
+                userRole == "TEACHER" && (
+                    <div className="flex flex-col items-center justify-center gap-5 w-full">
+                        <h3 className="text-neutral-400">Brak korepetycji</h3>
+                    </div>
+                )
+            )}
+        </div>
+    );
+}
+
+function AppointmentSection({
+    title,
+    appointments,
+    userRole,
+}: {
+    title: "Minione" | "W tym tygodniu" | "Nadchodzące";
+    appointments: Appointment[];
+    userRole: string;
+}) {
+    const [isOpen, setIsOpen] = useState(
+        title == "W tym tygodniu" ? true : false
+    );
+    return (
+        <div
+            className={clsx(
+                "flex flex-col items-center xl:items-start justify-start gap-5 w-full",
+                isOpen ? "flex-grow" : "flex-shrink-0"
+            )}
+        >
+            <button
+                disabled={appointments.length == 0}
+                onClick={() => setIsOpen(!isOpen)}
+                className="flex items-center justify-center gap-4 w-full"
+            >
+                <div
+                    className={clsx(
+                        "w-full flex-grow h-1 rounded-full",
+                        title == "Minione"
+                            ? "bg-neutral-300"
+                            : title == "W tym tygodniu"
+                            ? "bg-green-300"
+                            : "bg-yellow-300"
+                    )}
+                />
+                <h3
+                    className={clsx(
+                        "text-lg text-gray-900 flex-shrink-0",
+                        title == "Minione"
+                            ? "text-neutral-500"
+                            : title == "W tym tygodniu"
+                            ? "text-green-500"
+                            : "text-yellow-500"
+                    )}
+                >
+                    {title}
+                </h3>
+                <div
+                    className={clsx(
+                        "w-full flex-grow h-1 rounded-full",
+                        title == "Minione"
+                            ? "bg-neutral-300"
+                            : title == "W tym tygodniu"
+                            ? "bg-green-300"
+                            : "bg-yellow-300"
+                    )}
+                />
+            </button>
+            {isOpen &&
+                appointments.map((appointment, index) =>
+                    userRole == "STUDENT" ? (
                         <StudentAppointment
                             key={index}
                             appointment={appointment}
                             enrolledStudentsCount={
-                                appointment.appointment.studentAppointments
-                                    .length
+                                appointment?.studentAppointments?.length!
                             }
                         />
-                    ))}
-                </>
-            ) : teacherAppointments && teacherAppointments.length > 0 ? (
-                <>
-                    {teacherAppointments.map((appointment, index) => (
+                    ) : (
                         <TeacherAppointment
                             key={index}
                             appointment={appointment}
@@ -45,11 +198,8 @@ export default function PersonalAppointments({
                                 appointment?.studentAppointments?.length!
                             }
                         />
-                    ))}
-                </>
-            ) : (
-                <div>Brak korepetycji</div>
-            )}
+                    )
+                )}
         </div>
     );
 }
@@ -310,7 +460,7 @@ function TeacherAppointment({
                                                     className={clsx(
                                                         active
                                                             ? "bg-red-50 text-red-600"
-                                                            : "text-red-500",
+                                                            : "text-red-400",
                                                         "block px-4 py-2 text-sm"
                                                     )}
                                                 >
