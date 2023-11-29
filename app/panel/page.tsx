@@ -19,11 +19,11 @@ export default async function Page() {
                     <CalendarWithMeetings />
                 </Suspense>
             </div>
-            <div className="w-full 2xl:w-1/3 xl:pl-6">
-                <Suspense fallback={<div>loading...</div>}>
+            <Suspense fallback={<div>loading...</div>}>
+                <div className="w-full 2xl:w-1/3 xl:pl-6">
                     <FavoriteTeachers />
-                </Suspense>
-            </div>
+                </div>
+            </Suspense>
         </div>
     );
 }

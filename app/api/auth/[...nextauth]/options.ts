@@ -5,7 +5,6 @@ import { z } from "zod";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/prisma/client";
 import { getUser } from "@/utils/user";
-import { NextResponse } from "next/server";
 
 export const options: any = {
     adapter: PrismaAdapter(prisma),
@@ -72,11 +71,11 @@ export const options: any = {
         }),
     ],
     callbacks: {
-        async session({ session, user, token }: any) {
+        async session({ session, token }: any) {
             session.user = token.user;
             return session;
         },
-        async jwt({ token, user, account, profile, isNewUser }: any) {
+        async jwt({ token, user }: any) {
             if (user) token.user = user;
             return token;
         },

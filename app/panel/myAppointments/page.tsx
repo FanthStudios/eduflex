@@ -58,22 +58,24 @@ export default function Page({}: Props) {
                     today.getDay() === 0 ? 0 : 7 - today.getDay(); // 1-7 for Monday-Sunday
                 let nextWeek = new Date();
                 nextWeek.setDate(today.getDate() + daysUntilEndOfWeek + 1); // +1 to get to the next week
-                if (
-                    appointmentDate.getTime() < today.getTime() ||
-                    appointmentDate.getFullYear() < today.getFullYear()
-                ) {
-                    if (
-                        appointmentDate.getTime() < nextWeek.getTime() ||
-                        appointmentDate.getFullYear() < nextWeek.getFullYear()
-                    ) {
-                        thisWeek.push(appointment);
+                if (appointmentDate.getTime() < today.getTime()) {
+                    if (appointmentDate.getTime() < nextWeek.getTime()) {
+                        // check if the appointment is past from today
+                        if (appointmentDate.getDay() < today.getDay()) {
+                            past.push(appointment);
+                        } else {
+                            thisWeek.push(appointment);
+                        }
                     } else {
                         upcoming.push(appointment);
                     }
                 } else {
                     if (appointmentDate.getFullYear() > today.getFullYear()) {
                         upcoming.push(appointment);
-                    } else if (appointmentDate.getMonth() > today.getMonth()) {
+                    } else if (
+                        appointmentDate.getMonth() > today.getMonth() &&
+                        appointmentDate.getFullYear() === today.getFullYear()
+                    ) {
                         upcoming.push(appointment);
                     } else past.push(appointment);
                 }
@@ -102,14 +104,22 @@ export default function Page({}: Props) {
                 nextWeek.setDate(today.getDate() + daysUntilEndOfWeek + 1); // +1 to get to the next week
                 if (appointmentDate.getTime() < today.getTime()) {
                     if (appointmentDate.getTime() < nextWeek.getTime()) {
-                        thisWeek.push(appointment);
+                        // check if the appointment is past from today
+                        if (appointmentDate.getDay() < today.getDay()) {
+                            past.push(appointment);
+                        } else {
+                            thisWeek.push(appointment);
+                        }
                     } else {
                         upcoming.push(appointment);
                     }
                 } else {
                     if (appointmentDate.getFullYear() > today.getFullYear()) {
                         upcoming.push(appointment);
-                    } else if (appointmentDate.getMonth() > today.getMonth()) {
+                    } else if (
+                        appointmentDate.getMonth() > today.getMonth() &&
+                        appointmentDate.getFullYear() === today.getFullYear()
+                    ) {
                         upcoming.push(appointment);
                     } else past.push(appointment);
                 }
