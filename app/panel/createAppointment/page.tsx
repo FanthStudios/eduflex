@@ -55,8 +55,8 @@ export default function CreateAppointment({}: Props) {
                 newAppointment.roomNumber != 0 &&
                 newAppointment.dateTime != new Date() &&
                 newAppointment.recurring != null &&
-                newAppointment.availableSlots != 0 &&
-                newAppointment.occurrences != 0
+                (newAppointment.recurring == Recurring.NEVER ||
+                    newAppointment.occurrences != 0)
             );
         }
         return false;
@@ -115,7 +115,7 @@ export default function CreateAppointment({}: Props) {
                     goTo={goTo}
                 />
                 {step}
-                <div className={`flex items-center w-full mt-2 justify-evenly`}>
+                <div className={`flex items-center w-full pt-2 justify-evenly`}>
                     {currentIndex > 0 && (
                         <button
                             className="px-8 py-1 text-neutral-800 bg-neutral-200/80 rounded-md"

@@ -186,6 +186,22 @@ export async function POST(request: Request) {
         availableSlots,
     };
 
+    if (recurring == Recurring.NEVER) {
+        await createAppointment(appointment);
+
+        return new NextResponse(
+            JSON.stringify({
+                message: "Pomyślnie dodano korepetycje",
+            }),
+            {
+                status: 200,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+    }
+
     try {
         let dates = calculateRecurringDates(
             appointment.dateTime,
@@ -260,6 +276,9 @@ export async function POST(request: Request) {
                     hour: "numeric",
                     minute: "numeric",
                 });
+
+                console.log(appointmentExistsInNext45Minutes);
+                console.log(appointmentExistsInPrevious45Minutes);
 
                 return new NextResponse(
                     JSON.stringify({
