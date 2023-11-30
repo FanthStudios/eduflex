@@ -13,6 +13,7 @@ import { cn } from "@/utils";
 import { SelectSingleEventHandler } from "react-day-picker";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { pl } from "date-fns/locale";
 
 interface DateTimePickerProps {
     date: Date;
@@ -57,7 +58,7 @@ export function DateTimePicker({ date, setDate }: DateTimePickerProps) {
                 <Input
                     type="time"
                     onChange={handleTimeChange}
-                    value={selectedDateTime.toFormat("HH:mm")}
+                    value={selectedDateTime.toFormat("hh:mm")}
                 />
             </div>
             {!selectedDateTime && <p>Please pick a day.</p>}
@@ -71,20 +72,28 @@ export function DateTimePicker({ date, setDate }: DateTimePickerProps) {
                     size={"sm"}
                     variant={"outline"}
                     className={cn(
-                        "w-full justify-start text-left font-normal",
+                        "w-full justify-start text-left font-normal capitalize",
                         !date && "text-muted-foreground"
                     )}
                 >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {date ? (
-                        selectedDateTime.toFormat("DDD HH:mm")
+                        new Date(
+                            selectedDateTime.toJSDate()
+                        ).toLocaleDateString("pl-PL", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                        })
                     ) : (
-                        <span>Pick a date</span>
+                        <span>Wybierz date</span>
                     )}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
                 <Calendar
+                    locale={pl}
                     mode="single"
                     selected={selectedDateTime.toJSDate()}
                     onSelect={handleSelect}

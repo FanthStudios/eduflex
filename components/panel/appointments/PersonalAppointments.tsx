@@ -12,6 +12,12 @@ import { Appointment, useAppointments } from "@/hooks/useAppointments";
 import { Fragment, useState } from "react";
 import { Transition } from "@headlessui/react";
 import { Menu } from "@headlessui/react";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type Props = {
     studentAppointments?: {
@@ -142,44 +148,53 @@ function AppointmentSection({
                 isOpen ? "flex-grow" : "flex-shrink-0"
             )}
         >
-            <button
-                disabled={appointments.length == 0}
-                onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center justify-center gap-4 w-full"
-            >
-                <div
-                    className={clsx(
-                        "w-full flex-grow h-1 rounded-full",
-                        title == "Minione"
-                            ? "bg-neutral-300"
-                            : title == "W tym tygodniu"
-                            ? "bg-green-300"
-                            : "bg-yellow-300"
-                    )}
-                />
-                <h3
-                    className={clsx(
-                        "text-lg text-gray-900 flex-shrink-0",
-                        title == "Minione"
-                            ? "text-neutral-500"
-                            : title == "W tym tygodniu"
-                            ? "text-green-500"
-                            : "text-yellow-500"
-                    )}
-                >
-                    {title}
-                </h3>
-                <div
-                    className={clsx(
-                        "w-full flex-grow h-1 rounded-full",
-                        title == "Minione"
-                            ? "bg-neutral-300"
-                            : title == "W tym tygodniu"
-                            ? "bg-green-300"
-                            : "bg-yellow-300"
-                    )}
-                />
-            </button>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button
+                            disabled={appointments.length == 0}
+                            onClick={() => setIsOpen(!isOpen)}
+                            className="flex items-center justify-center gap-4 w-full group"
+                        >
+                            <div
+                                className={clsx(
+                                    "w-full flex-grow h-1 rounded-full transition-color duration-300",
+                                    title == "Minione"
+                                        ? "bg-neutral-300 group-hover:bg-neutral-400"
+                                        : title == "W tym tygodniu"
+                                        ? "bg-green-300 group-hover:bg-green-400"
+                                        : "bg-yellow-300 group-hover:bg-yellow-400"
+                                )}
+                            />
+                            <h3
+                                className={clsx(
+                                    "text-lg text-gray-900 flex-shrink-0 transition-color duration-300",
+                                    title == "Minione"
+                                        ? "text-neutral-500"
+                                        : title == "W tym tygodniu"
+                                        ? "text-green-500"
+                                        : "text-yellow-500"
+                                )}
+                            >
+                                {title}
+                            </h3>
+                            <div
+                                className={clsx(
+                                    "w-full flex-grow h-1 rounded-full transition-color duration-300",
+                                    title == "Minione"
+                                        ? "bg-neutral-300 group-hover:bg-neutral-400"
+                                        : title == "W tym tygodniu"
+                                        ? "bg-green-300 group-hover:bg-green-400"
+                                        : "bg-yellow-300 group-hover:bg-yellow-400"
+                                )}
+                            />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Kliknij, aby rozwinąć sekcje</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
             {isOpen &&
                 appointments.map((appointment, index) =>
                     userRole == "STUDENT" ? (
