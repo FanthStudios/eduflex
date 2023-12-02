@@ -39,7 +39,7 @@ export default function CalendarWithMeetings({}: Props) {
             ? appointments
                   .filter(
                       (appointment) =>
-                          appointment.teacher.user.id ===
+                          appointment.teacherId ===
                               parseInt(session?.user?.id!) &&
                           new Date(appointment.dateTime) > new Date()
                   )
@@ -54,7 +54,7 @@ export default function CalendarWithMeetings({}: Props) {
                       (appointment) =>
                           appointment.studentAppointments?.find(
                               (studentAppointment) =>
-                                  studentAppointment.student.user.id ===
+                                  studentAppointment.studentId ===
                                   parseInt(session?.user?.id!)
                           ) && new Date(appointment.dateTime) > new Date()
                   )
@@ -99,17 +99,17 @@ export default function CalendarWithMeetings({}: Props) {
         "after:bg-red-500 after:absolute after:top-0 after:right-0 after:rounded-md after:w-2 after:h-2";
 
     return (
-        <div className="flex flex-col items-start justify-start gap-2">
+        <div className="flex flex-col items-start justify-start gap-2 w-full">
             <h2 className="text-lg font-semibold leading-6 text-gray-900">
                 Nadchodzące korepetycje
             </h2>
-            <div className="lg:grid lg:grid-cols-12 lg:gap-x-16 shadow rounded-lg p-3">
-                <ol className="mt-4 divide-y divide-gray-100 text-sm leading-6 lg:col-span-7 xl:col-span-8 overflow-y-auto overflow-x-hidden">
+            <div className="flex xl:flex-row flex-col items-center xl:items-start justify-center shadow rounded-lg p-3 w-full">
+                <ol className="h-full divide-y xl:flex-grow xl:flex-shrink-0 divide-gray-100 text-sm leading-6 overflow-y-auto overflow-x-hidden flex flex-col items-start justify-start">
                     {appointmentsForSelectedDay.length > 0 ? (
                         appointmentsForSelectedDay.map((appointment) => (
                             <li
                                 key={appointment.id}
-                                className="flex gap-6 py-6"
+                                className="flex gap-6 py-6 w-full xl:pr-5 2xl:pr-10"
                             >
                                 <Avatar
                                     width={16}
