@@ -8,9 +8,9 @@ import {
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { DoorOpen } from "lucide-react";
-import { Appointment, useAppointments } from "@/hooks/useAppointments";
 import { Fragment, useState } from "react";
 import { Transition } from "@headlessui/react";
+import type { Appointment } from "@/hooks/useAppointments";
 import { Menu } from "@headlessui/react";
 import {
     Tooltip,
@@ -19,11 +19,94 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+// {
+//     studentId: 1,
+//     appointmentId: 'clphicmm4000a75sp7aiedfy3',
+//     goal: 'nauka',
+//     subject: 'Chemia',
+//     topic: null,
+//     student: { userId: 1, classId: 1 },
+//     appointment: {
+//       subject: { id: 4, name: 'Chemia' },
+//       teacher: {
+//         user: {
+//           id: 3,
+//           email: 'zmijewskab@chmura.zs14.edu.pl',
+//           firstName: 'Barbara',
+//           lastName: 'Żmijewska',
+//           password: '$2b$10$M8JgDT5FdzW6Ss2/18y0VOIEpCHFb7pP.rKt0PcVA1bLnGDMLaGma',
+//           role: 'TEACHER',
+//           lastLogin: '2023-12-02T13:17:03.718Z'
+//         }
+//       },
+//       location: {
+//         id: 'clphicmk1000075sps0dxw3d6',
+//         lat: 52.2639814,
+//         lng: 21.0312258,
+//         city: 'Warszawa',
+//         postalCode: '03-481',
+//         address: 'ul. Szanajcy 17'
+//       },
+//       dateTime: '2024-01-01T06:10:00.000Z',
+//       roomNumber: 24,
+//       studentAppointments: [
+//         {
+//           studentId: 1,
+//           appointmentId: 'clphicmm4000a75sp7aiedfy3',
+//           goal: 'nauka',
+//           subject: 'Chemia',
+//           topic: null
+//         }
+//       ],
+//       availableSlots: 32
+//     }
+//   }
+export interface StudentAppointment {
+    studentId: number;
+    appointmentId: string;
+    goal: string;
+    subject: string;
+    topic: string | null;
+    student: { userId: number; classId: number };
+    appointment: {
+        subject: { id: number; name: string };
+        teacher: {
+            user: {
+                id: number;
+                email: string;
+                firstName: string;
+                lastName: string;
+                password: string;
+                role: string;
+                lastLogin: string;
+            };
+        };
+        location: {
+            id: string;
+            lat: number;
+            lng: number;
+            city: string;
+            postalCode: string;
+            address: string;
+        };
+        dateTime: string;
+        roomNumber: number;
+        studentAppointments: {
+            studentId: number;
+            appointmentId: string;
+            goal: string;
+            subject: string;
+            topic: string | null;
+        }[];
+        availableSlots: number;
+    };
+}
+
 type Props = {
     studentAppointments?: {
-        past: Appointment[];
-        thisWeek: Appointment[];
-        upcoming: Appointment[];
+        past: StudentAppointment[];
+        thisWeek: StudentAppointment[];
+        upcoming: StudentAppointment[];
     };
     teacherAppointments?: {
         past: Appointment[];
@@ -135,7 +218,7 @@ function AppointmentSection({
     userRole,
 }: {
     title: "Minione" | "W tym tygodniu" | "Nadchodzące";
-    appointments: Appointment[];
+    appointments: StudentAppointment[] | Appointment[];
     userRole: string;
 }) {
     const [isOpen, setIsOpen] = useState(
@@ -202,15 +285,17 @@ function AppointmentSection({
                             key={index}
                             appointment={appointment}
                             enrolledStudentsCount={
-                                appointment?.studentAppointments?.length!
+                                (appointment as StudentAppointment)?.appointment
+                                    .studentAppointments?.length!
                             }
                         />
                     ) : (
                         <TeacherAppointment
                             key={index}
-                            appointment={appointment}
+                            appointment={appointment as Appointment}
                             enrolledStudentsCount={
-                                appointment?.studentAppointments?.length!
+                                (appointment as Appointment)
+                                    ?.studentAppointments?.length!
                             }
                         />
                     )
@@ -226,17 +311,18 @@ function StudentAppointment({
     appointment: any;
     enrolledStudentsCount: number;
 }) {
-    const teacherAppointment = appointment.appointment;
+    const studentAppointment = appointment.appointment;
+    console.log(appointment);
 
     return (
         <div className="relative flex space-x-6 p-3 w-full xl:static border border-neutral-300 rounded-lg">
             <div className="flex-auto text-start">
                 <h3 className="pr-10 font-semibold text-gray-900 xl:pr-0">
-                    {teacherAppointment.subject.name}
+                    {studentAppointment.subject.name}
                     <span className="font-normal">
                         {" "}
-                        - {teacherAppointment.teacher.user.firstName}{" "}
-                        {teacherAppointment.teacher.user.lastName}
+                        - {studentAppointment.teacher.user.firstName}{" "}
+                        {studentAppointment.teacher.user.lastName}
                     </span>
                 </h3>
                 <dl className="mt-2 flex flex-col xl:justify-start text-gray-500 xl:flex-row">
@@ -252,12 +338,12 @@ function StudentAppointment({
                             <time
                                 className="capitalize"
                                 dateTime={new Date(
-                                    teacherAppointment.dateTime
+                                    studentAppointment.dateTime
                                 ).toISOString()}
                             >
                                 {/* 10 Listopada, 2023 o 10:00 */}
                                 {new Date(
-                                    teacherAppointment.dateTime
+                                    studentAppointment.dateTime
                                 ).toLocaleDateString("pl-PL", {
                                     weekday: "long",
                                     day: "numeric",
@@ -266,7 +352,7 @@ function StudentAppointment({
                                 })}
                                 <span className="lowercase">{" o "}</span>
                                 {new Date(
-                                    teacherAppointment.dateTime
+                                    studentAppointment.dateTime
                                 ).toLocaleTimeString("pl-PL", {
                                     hour: "2-digit",
                                     minute: "2-digit",
@@ -283,9 +369,9 @@ function StudentAppointment({
                             />
                         </dt>
                         <dd>
-                            {teacherAppointment.location.address},{" "}
-                            {teacherAppointment.location.postalCode}{" "}
-                            {teacherAppointment.location.city}
+                            {studentAppointment.location.address},{" "}
+                            {studentAppointment.location.postalCode}{" "}
+                            {studentAppointment.location.city}
                         </dd>
                     </div>
                     <div className="mt-2 flex items-start space-x-3 xl:ml-3.5 xl:mt-0 xl:border-l xl:border-gray-400 xl:border-opacity-50 xl:pl-3.5">
@@ -296,7 +382,7 @@ function StudentAppointment({
                                 aria-hidden="true"
                             />
                         </dt>
-                        <dd>{teacherAppointment.roomNumber}</dd>
+                        <dd>{studentAppointment.roomNumber}</dd>
                     </div>
                     <div className="mt-2 flex items-start space-x-3 xl:ml-3.5 xl:mt-0 xl:border-l xl:border-gray-400 xl:border-opacity-50 xl:pl-3.5">
                         <dt className="mt-0.5">
@@ -310,7 +396,7 @@ function StudentAppointment({
                             <span
                                 className={clsx(
                                     enrolledStudentsCount >
-                                        teacherAppointment.availableSlots / 2
+                                        studentAppointment.availableSlots / 2
                                         ? "text-orange-500"
                                         : "text-green-600"
                                 )}
@@ -318,7 +404,7 @@ function StudentAppointment({
                                 {enrolledStudentsCount}
                             </span>
                             {" / "}
-                            {teacherAppointment.availableSlots}
+                            {studentAppointment.availableSlots}
                         </dd>
                     </div>
                 </dl>

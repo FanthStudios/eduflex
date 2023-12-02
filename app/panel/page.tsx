@@ -1,5 +1,3 @@
-import SummaryReport from "@/components/panel/SummaryReport";
-import CalendarWithMeetings from "@/components/panel/CalendarWithMeetings";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import FavoriteTeachers from "@/components/panel/FavoriteTeachers";

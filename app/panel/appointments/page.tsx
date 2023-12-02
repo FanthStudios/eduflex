@@ -23,6 +23,14 @@ type Appointment = {
     customGoal?: string;
 };
 
+const initialAppointment: Appointment = {
+    subject: "",
+    teacherId: 0,
+    dateTime: null,
+    goal: "",
+    topic: "",
+};
+
 export default function Appointments({}: Props) {
     //TODO neccessary informations to collect from students
     // 1. subject, teacher
@@ -30,13 +38,8 @@ export default function Appointments({}: Props) {
     // 3. select the goal of the lesson, if "other" then input a description of the goal
     // 4. review the appointment and confirm it
 
-    const [appointment, setAppointment] = useState<Appointment>({
-        subject: "",
-        teacherId: 0,
-        dateTime: null,
-        goal: "",
-        topic: "",
-    });
+    const [appointment, setAppointment] =
+        useState<Appointment>(initialAppointment);
 
     const breadcrumbsList = ["Przedmiot", "Termin", "Cel", "Podsumowanie"];
     const steps = [
@@ -65,19 +68,24 @@ export default function Appointments({}: Props) {
         useMultistepForm(steps);
 
     function validateCanGoNext() {
-        if (currentIndex == 0) {
-            return appointment.subject != "" && appointment.teacherId != 0;
-        } else if (currentIndex == 1) {
-            return appointment.dateTime != null;
-        } else if (currentIndex == 2) {
-            return (
-                (appointment.goal != "inne" && appointment.topic != "") ||
-                (appointment.goal == "inne" && appointment.customGoal != "")
-            );
-        } else if (currentIndex == 3) {
-            return true;
+        switch (currentIndex) {
+            case 0:
+                return (
+                    appointment.subject !== "" && appointment.teacherId !== 0
+                );
+            case 1:
+                return appointment.dateTime !== null;
+            case 2:
+                return (
+                    (appointment.goal !== "inne" && appointment.topic !== "") ||
+                    (appointment.goal === "inne" &&
+                        appointment.customGoal !== "")
+                );
+            case 3:
+                return true;
+            default:
+                return false;
         }
-        return false;
     }
 
     const { data: session } = useSession();
@@ -107,6 +115,27 @@ export default function Appointments({}: Props) {
         }
     }
 
+    const handleNextClick = () => {
+        if (validateCanGoNext()) {
+            if (currentIndex == steps.length - 2) {
+                if (appointment.customGoal && appointment.customGoal != "") {
+                    setAppointment({
+                        ...appointment,
+                        goal: appointment.customGoal,
+                        customGoal: "",
+                    });
+                }
+            }
+            next();
+        } else {
+            toast.error("Uzupełnij wszystkie pola");
+        }
+    };
+
+    const handleConfirmClick = async () => {
+        await enrollToAppointment();
+    };
+
     return (
         <div className="row-span-2 col-span-3 flex flex-col items-center justify-center h-full overflow-y-auto">
             <Breadcrumbs
@@ -116,36 +145,17 @@ export default function Appointments({}: Props) {
             />
             {step}
             <div className={`flex items-center w-full mt-2 justify-evenly`}>
-                {currentIndex > 0 && (
-                    <button
-                        className="px-8 py-1 text-neutral-800 bg-neutral-200/80 rounded-md"
-                        onClick={() => previous()}
-                    >
-                        Poprzednia
-                    </button>
-                )}
+                <button
+                    disabled={currentIndex == 0}
+                    className="px-8 py-1 text-neutral-800 bg-neutral-200/80 rounded-md disabled:cursor-not-allowed disabled:bg-neutral-100 disabled:text-neutral-600"
+                    onClick={previous}
+                >
+                    Poprzednia
+                </button>
                 {currentIndex < steps.length - 1 && (
                     <button
                         className="px-12 py-1 text-white bg-green-500 rounded-md"
-                        onClick={() => {
-                            if (validateCanGoNext()) {
-                                if (currentIndex == steps.length - 2) {
-                                    if (
-                                        appointment.customGoal &&
-                                        appointment.customGoal != ""
-                                    ) {
-                                        setAppointment({
-                                            ...appointment,
-                                            goal: appointment.customGoal,
-                                            customGoal: "",
-                                        });
-                                    }
-                                }
-                                next();
-                            } else {
-                                toast.error("Uzupełnij wszystkie pola");
-                            }
-                        }}
+                        onClick={handleNextClick}
                     >
                         Następna
                     </button>
@@ -153,9 +163,7 @@ export default function Appointments({}: Props) {
                 {currentIndex == steps.length - 1 && (
                     <button
                         className="px-12 py-1 text-white bg-green-500 rounded-md"
-                        onClick={async () => {
-                            await enrollToAppointment();
-                        }}
+                        onClick={handleConfirmClick}
                     >
                         Zatwierdź
                     </button>
