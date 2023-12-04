@@ -19,48 +19,6 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-// {
-//     studentId: 1,
-//     appointmentId: 'clphicmm4000a75sp7aiedfy3',
-//     goal: 'nauka',
-//     subject: 'Chemia',
-//     topic: null,
-//     student: { userId: 1, classId: 1 },
-//     appointment: {
-//       subject: { id: 4, name: 'Chemia' },
-//       teacher: {
-//         user: {
-//           id: 3,
-//           email: 'zmijewskab@chmura.zs14.edu.pl',
-//           firstName: 'Barbara',
-//           lastName: 'Żmijewska',
-//           password: '$2b$10$M8JgDT5FdzW6Ss2/18y0VOIEpCHFb7pP.rKt0PcVA1bLnGDMLaGma',
-//           role: 'TEACHER',
-//           lastLogin: '2023-12-02T13:17:03.718Z'
-//         }
-//       },
-//       location: {
-//         id: 'clphicmk1000075sps0dxw3d6',
-//         lat: 52.2639814,
-//         lng: 21.0312258,
-//         city: 'Warszawa',
-//         postalCode: '03-481',
-//         address: 'ul. Szanajcy 17'
-//       },
-//       dateTime: '2024-01-01T06:10:00.000Z',
-//       roomNumber: 24,
-//       studentAppointments: [
-//         {
-//           studentId: 1,
-//           appointmentId: 'clphicmm4000a75sp7aiedfy3',
-//           goal: 'nauka',
-//           subject: 'Chemia',
-//           topic: null
-//         }
-//       ],
-//       availableSlots: 32
-//     }
-//   }
 export interface StudentAppointment {
     studentId: number;
     appointmentId: string;
@@ -114,16 +72,20 @@ type Props = {
         upcoming: Appointment[];
     };
     session: any;
+    setCurrentAppointment: any;
+    setIsOpen: any;
 };
 
 export default function PersonalAppointments({
     studentAppointments,
     teacherAppointments,
     session,
+    setCurrentAppointment,
+    setIsOpen,
 }: Props) {
     const userRole = session?.user?.role;
     return (
-        <div className="flex flex-col items-center xl:items-start justify-start gap-5 overflow-y-auto w-full overflow-x-hidden">
+        <div className="flex flex-col items-center xl:items-start justify-start gap-5 overflow-y-auto w-full h-full overflow-x-hidden">
             {/* STUDENT APPOINTMENTS */}
 
             {userRole == "STUDENT" && studentAppointments ? (
@@ -181,6 +143,8 @@ export default function PersonalAppointments({
                                 : []
                         }
                         userRole={userRole}
+                        setCurrentAppointment={setCurrentAppointment}
+                        setModalOpen={setIsOpen}
                     />
                     <AppointmentSection
                         title="W tym tygodniu"
@@ -190,6 +154,8 @@ export default function PersonalAppointments({
                                 : []
                         }
                         userRole={userRole}
+                        setCurrentAppointment={setCurrentAppointment}
+                        setModalOpen={setIsOpen}
                     />
                     <AppointmentSection
                         title="Nadchodzące"
@@ -199,6 +165,8 @@ export default function PersonalAppointments({
                                 : []
                         }
                         userRole={userRole}
+                        setCurrentAppointment={setCurrentAppointment}
+                        setModalOpen={setIsOpen}
                     />
                 </>
             ) : (
@@ -216,10 +184,14 @@ function AppointmentSection({
     title,
     appointments,
     userRole,
+    setCurrentAppointment,
+    setModalOpen,
 }: {
     title: "Minione" | "W tym tygodniu" | "Nadchodzące";
     appointments: StudentAppointment[] | Appointment[];
     userRole: string;
+    setCurrentAppointment?: any;
+    setModalOpen?: any;
 }) {
     const [isOpen, setIsOpen] = useState(
         title == "W tym tygodniu" ? true : false
@@ -227,8 +199,7 @@ function AppointmentSection({
     return (
         <div
             className={clsx(
-                "flex flex-col items-center xl:items-start justify-start gap-5 w-full",
-                isOpen ? "flex-grow" : "flex-shrink-0"
+                "flex flex-col items-center xl:items-start justify-start gap-5 w-full"
             )}
         >
             <TooltipProvider>
@@ -297,6 +268,8 @@ function AppointmentSection({
                                 (appointment as Appointment)
                                     ?.studentAppointments?.length!
                             }
+                            setCurrentAppointment={setCurrentAppointment}
+                            setModalOpen={setModalOpen}
                         />
                     )
                 )}
@@ -416,9 +389,13 @@ function StudentAppointment({
 function TeacherAppointment({
     appointment,
     enrolledStudentsCount,
+    setCurrentAppointment,
+    setModalOpen,
 }: {
     appointment: Appointment;
     enrolledStudentsCount: number;
+    setCurrentAppointment: any;
+    setModalOpen: any;
 }) {
     return (
         <div className="relative flex space-x-6 p-3 w-full xl:static border border-neutral-300 rounded-lg">
@@ -497,15 +474,13 @@ function TeacherAppointment({
                         <dd>
                             <span
                                 className={clsx(
-                                    appointment.studentAppointments &&
-                                        appointment.studentAppointments.length >
-                                            appointment.availableSlots / 2
+                                    enrolledStudentsCount >
+                                        appointment.availableSlots / 2
                                         ? "text-orange-500"
                                         : "text-green-600"
                                 )}
                             >
-                                {appointment.studentAppointments &&
-                                    appointment.studentAppointments.length}
+                                {enrolledStudentsCount}
                             </span>
                             {" / "}
                             {appointment.availableSlots}
@@ -537,36 +512,40 @@ function TeacherAppointment({
                                 leaveFrom="transform opacity-100 scale-100"
                                 leaveTo="transform opacity-0 scale-95"
                             >
-                                <Menu.Items className="absolute right-0 z-10 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                <Menu.Items className="absolute right-0 z-10 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                     <div className="py-1">
                                         <Menu.Item>
                                             {({ active }) => (
-                                                <a
-                                                    href="#"
+                                                <button
+                                                    onClick={() => {
+                                                        setCurrentAppointment(
+                                                            appointment
+                                                        );
+                                                        setModalOpen(true);
+                                                    }}
                                                     className={clsx(
                                                         active
                                                             ? "bg-gray-100 text-gray-900"
                                                             : "text-gray-700",
-                                                        "block px-4 py-2 text-sm"
+                                                        "block px-4 py-2 text-sm w-full text-start"
                                                     )}
                                                 >
-                                                    Edit
-                                                </a>
+                                                    Szczegóły
+                                                </button>
                                             )}
                                         </Menu.Item>
                                         <Menu.Item>
                                             {({ active }) => (
-                                                <a
-                                                    href="#"
+                                                <button
                                                     className={clsx(
                                                         active
                                                             ? "bg-red-50 text-red-600"
                                                             : "text-red-400",
-                                                        "block px-4 py-2 text-sm"
+                                                        "block px-4 py-2 text-sm w-full text-start"
                                                     )}
                                                 >
-                                                    Delete
-                                                </a>
+                                                    Usuń
+                                                </button>
                                             )}
                                         </Menu.Item>
                                     </div>

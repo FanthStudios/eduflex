@@ -1,18 +1,19 @@
 "use client";
 
-import PersonalAppointments, {
-    StudentAppointment,
-} from "@/components/panel/appointments/PersonalAppointments";
+import PersonalAppointments from "@/components/panel/appointments/PersonalAppointments";
 import { Appointment, useAppointments } from "@/hooks/useAppointments";
 import { useStudent } from "@/hooks/useStudent";
 import { useTeacher } from "@/hooks/useTeacher";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import { sortAppointments } from "@/lib/appointments";
+import { AppointmentModal } from "./modal";
 
 type Props = {};
 
 export default function Page({}: Props) {
+    const [isOpen, setIsOpen] = useState(false);
+
     const { data: session } = useSession();
 
     const { teacher } = useTeacher(true, session?.user.id);
@@ -73,6 +74,9 @@ export default function Page({}: Props) {
         return { past: [], thisWeek: [], upcoming: [] };
     };
 
+    const [currentAppointment, setCurrentAppointment] =
+        useState<Appointment | null>(null);
+
     if (!session)
         return (
             <div className="flex items-center justify-center w-full h-full col-span-3 row-span-2">
@@ -81,15 +85,25 @@ export default function Page({}: Props) {
         );
 
     return (
-        <div className="flex flex-col items-start justify-start w-full h-full col-span-3 row-span-2 gap-4">
-            <h2 className="text-xl lg:text-2xl font-medium">
-                Moje korepetycje
-            </h2>
-            <PersonalAppointments
-                session={session}
-                teacherAppointments={teacherAppointments}
-                studentAppointments={studentSortedAppointments()}
+        <>
+            <AppointmentModal
+                isOpen={isOpen}
+                closeModal={() => setIsOpen(!isOpen)}
+                appointment={currentAppointment}
+                setAppointment={setCurrentAppointment}
             />
-        </div>
+            <div className="flex flex-col items-start justify-start w-full h-full col-span-3 row-span-2 gap-4">
+                <h2 className="text-xl lg:text-2xl font-medium">
+                    Moje korepetycje
+                </h2>
+                <PersonalAppointments
+                    session={session}
+                    teacherAppointments={teacherAppointments}
+                    studentAppointments={studentSortedAppointments()}
+                    setCurrentAppointment={setCurrentAppointment}
+                    setIsOpen={setIsOpen}
+                />
+            </div>
+        </>
     );
 }

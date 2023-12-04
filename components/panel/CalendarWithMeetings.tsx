@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import {
     CalendarIcon,
     EllipsisHorizontalIcon,
@@ -12,10 +12,14 @@ import { DoorOpen } from "lucide-react";
 import { Menu, Transition } from "@headlessui/react";
 import { Calendar } from "@/components/ui/calendar";
 import { DayClickEventHandler } from "react-day-picker";
-import { useAppointments } from "@/hooks/useAppointments";
+import { Appointment, useAppointments } from "@/hooks/useAppointments";
 import Avatar from "../Avatar";
 import { useSession } from "next-auth/react";
 import clsx from "clsx";
+import { AppointmentModal } from "@/app/panel/myAppointments/modal";
+import { Button } from "../ui/button";
+import { XMarkIcon } from "@heroicons/react/24/outline";
+import { toast } from "react-toastify";
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
@@ -26,7 +30,7 @@ export default function CalendarWithMeetings({}: Props) {
     const [day, setDay] = useState<Date | undefined>(new Date());
     const { data: session } = useSession();
 
-    // const appointmentDays = [new Date(2023, 11, 15), new Date(2023, 11, 8)];
+    const studentId = session?.user?.id;
 
     const { appointments } = useAppointments();
 
@@ -34,82 +38,109 @@ export default function CalendarWithMeetings({}: Props) {
     // filter appointments by studentAppointments where the userId is the current user
 
     // create appointmentDays variable with appointments with the teacherId of the current user
-    const appointmentDays =
-        userRole == "TEACHER"
-            ? appointments
-                  .filter(
-                      (appointment) =>
-                          appointment.teacherId ===
-                              parseInt(session?.user?.id!) &&
-                          new Date(appointment.dateTime) > new Date()
-                  )
-                  .map((appointment) => {
-                      // back up the date by a month and return it
-                      const date = new Date(appointment.dateTime);
-                      // date.setMonth(date.getMonth() - 1);
-                      return date;
-                  })
-            : appointments
-                  .filter(
-                      (appointment) =>
-                          appointment.studentAppointments?.find(
-                              (studentAppointment) =>
-                                  studentAppointment.studentId ===
-                                  parseInt(session?.user?.id!)
-                          ) && new Date(appointment.dateTime) > new Date()
-                  )
-                  .map((appointment) => {
-                      // back up the date by a month and return it
-                      const date = new Date(appointment.dateTime);
-                      // date.setMonth(date.getMonth() - 1);
-                      return date;
-                  });
+    const appointmentDays = useMemo(() => {
+        const getDate = (appointment: any) => new Date(appointment.dateTime);
+        const filterCondition = (appointment: any) => {
+            if (userRole === "TEACHER") {
+                return (
+                    appointment.teacherId === parseInt(session?.user?.id!) &&
+                    new Date(appointment.dateTime) > new Date()
+                );
+            } else {
+                return (
+                    appointment.studentAppointments?.find(
+                        (studentAppointment: any) =>
+                            studentAppointment.student.user.id ===
+                            parseInt(session?.user?.id!)
+                    ) && new Date(appointment.dateTime) > new Date()
+                );
+            }
+        };
+
+        return appointments.filter(filterCondition).map(getDate);
+    }, [appointments, session?.user?.id, userRole]);
 
     const [appointmentsForSelectedDay, setAppointmentsForSelectedDay] =
-        useState(
-            appointments.filter((app) => {
-                const date = new Date(app.dateTime);
-                return date === day;
-            })
-        );
+        useState<Appointment[]>([]);
 
     useEffect(() => {
-        // set appointmentsForSelectedDay to appointments with the teacherId of the current user and at the selected day and month
-        setAppointmentsForSelectedDay(
-            appointments.filter((app) => {
-                const date = new Date(app.dateTime);
-                return (
-                    date.getDate() === day?.getDate() &&
-                    date.getMonth() === day?.getMonth() &&
-                    date.getFullYear() === day?.getFullYear() &&
-                    ((userRole == "TEACHER" &&
-                        app.teacherId === parseInt(session?.user?.id!)) ||
-                        (userRole == "STUDENT" &&
-                            app.studentAppointments?.find(
-                                (studentAppointment) =>
-                                    studentAppointment.student.user.id ===
-                                    parseInt(session?.user?.id!)
-                            )))
-                );
-            })
-        );
+        const filteredAppointments = appointments.filter((app) => {
+            const date = new Date(app.dateTime);
+            return (
+                date.getDate() === day?.getDate() &&
+                date.getMonth() === day?.getMonth() &&
+                date.getFullYear() === day?.getFullYear() &&
+                ((userRole == "TEACHER" &&
+                    app.teacherId === parseInt(session?.user?.id!)) ||
+                    (userRole == "STUDENT" &&
+                        app.studentAppointments?.find(
+                            (studentAppointment) =>
+                                studentAppointment.student.user.id ===
+                                parseInt(session?.user?.id!)
+                        )))
+            );
+        });
+
+        setAppointmentsForSelectedDay(filteredAppointments);
     }, [day, appointments, session?.user?.id, userRole]);
+
+    const [modalOpen, setModalOpen] = useState(false);
+    const [currentAppointment, setCurrentAppointment] =
+        useState<Appointment | null>(null);
 
     const appointmentDaysClassNames =
         "after:bg-red-500 after:absolute after:top-0 after:right-0 after:rounded-md after:w-2 after:h-2";
 
+    async function leaveAppointment(appointment: Appointment) {
+        const leaveAppointment = await fetch(`/api/leave`, {
+            body: JSON.stringify({
+                appointmentId: appointment.id,
+                studentId: studentId,
+            }),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (leaveAppointment.status === 200) {
+            setAppointmentsForSelectedDay(
+                appointmentsForSelectedDay.filter(
+                    (app) => app.id !== appointment.id
+                )
+            );
+            toast.success(
+                "Pomyślnie opuszczono korepetycje: " +
+                    appointment.subject.name +
+                    " - " +
+                    appointment.teacher.user.firstName +
+                    " " +
+                    appointment.teacher.user.lastName
+            );
+        } else {
+            console.error(await leaveAppointment.json());
+            toast.error("Nie udało się opuścić korepetycji");
+        }
+    }
+
     return (
         <div className="flex flex-col items-start justify-start gap-2 w-full">
+            <AppointmentModal
+                isOpen={modalOpen}
+                closeModal={() => setModalOpen(!modalOpen)}
+                appointment={currentAppointment}
+                setAppointment={setCurrentAppointment}
+            />
             <h2 className="text-lg font-semibold leading-6 text-gray-900">
                 Nadchodzące korepetycje
             </h2>
-            <div className="flex xl:flex-row flex-col items-center xl:items-start justify-center shadow rounded-lg p-3 w-full">
+            <div className="flex xl:flex-row flex-col items-center xl:items-start justify-center shadow rounded-lg p-3 w-full h-full">
                 <ol className="h-full divide-y xl:flex-grow xl:flex-shrink-0 divide-gray-100 text-sm leading-6 overflow-y-auto overflow-x-hidden flex flex-col items-start justify-start">
                     {appointmentsForSelectedDay.length > 0 ? (
                         appointmentsForSelectedDay.map((appointment) => (
                             <li
                                 key={appointment.id}
-                                className="flex gap-6 py-6 w-full xl:pr-5 2xl:pr-10"
+                                className="flex gap-6 py-6 w-full xl:pr-5 2xl:pr-10 items-end"
                             >
                                 <Avatar
                                     width={16}
@@ -225,67 +256,86 @@ export default function CalendarWithMeetings({}: Props) {
                                         </div>
                                     </dl>
                                 </div>
-                                <Menu
-                                    as="div"
-                                    className="absolute right-0 top-6 xl:relative xl:right-auto xl:top-auto xl:self-center"
-                                >
-                                    <div>
-                                        <Menu.Button className="-m-2 flex items-center rounded-full p-2 text-gray-500 hover:text-gray-600">
-                                            <span className="sr-only">
-                                                Open options
-                                            </span>
-                                            <EllipsisHorizontalIcon
-                                                className="h-5 w-5"
-                                                aria-hidden="true"
-                                            />
-                                        </Menu.Button>
-                                    </div>
-
-                                    <Transition
-                                        as={Fragment}
-                                        enter="transition ease-out duration-100"
-                                        enterFrom="transform opacity-0 scale-95"
-                                        enterTo="transform opacity-100 scale-100"
-                                        leave="transition ease-in duration-75"
-                                        leaveFrom="transform opacity-100 scale-100"
-                                        leaveTo="transform opacity-0 scale-95"
+                                {userRole == "TEACHER" ? (
+                                    <Menu
+                                        as="div"
+                                        className="absolute right-0 top-6 xl:z-[99999] xl:relative xl:right-auto xl:top-auto xl:self-center"
                                     >
-                                        <Menu.Items className="absolute right-0 z-10 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                            <div className="py-1">
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <a
-                                                            href="#"
-                                                            className={classNames(
-                                                                active
-                                                                    ? "bg-gray-100 text-gray-900"
-                                                                    : "text-gray-700",
-                                                                "block px-4 py-2 text-sm"
-                                                            )}
-                                                        >
-                                                            Edit
-                                                        </a>
-                                                    )}
-                                                </Menu.Item>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <a
-                                                            href="#"
-                                                            className={classNames(
-                                                                active
-                                                                    ? "bg-red-50 text-red-600"
-                                                                    : "text-red-500",
-                                                                "block px-4 py-2 text-sm"
-                                                            )}
-                                                        >
-                                                            Delete
-                                                        </a>
-                                                    )}
-                                                </Menu.Item>
-                                            </div>
-                                        </Menu.Items>
-                                    </Transition>
-                                </Menu>
+                                        <div>
+                                            <Menu.Button className="-m-2 flex items-center rounded-full p-2 text-gray-500 hover:text-gray-600">
+                                                <span className="sr-only">
+                                                    Open options
+                                                </span>
+                                                <EllipsisHorizontalIcon
+                                                    className="h-5 w-5"
+                                                    aria-hidden="true"
+                                                />
+                                            </Menu.Button>
+                                        </div>
+
+                                        <Transition
+                                            as={Fragment}
+                                            enter="transition ease-out duration-100"
+                                            enterFrom="transform opacity-0 scale-95"
+                                            enterTo="transform opacity-100 scale-100"
+                                            leave="transition ease-in duration-75"
+                                            leaveFrom="transform opacity-100 scale-100"
+                                            leaveTo="transform opacity-0 scale-95"
+                                        >
+                                            <Menu.Items className="absolute right-0 z-[999999999] mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                                <div className="py-1">
+                                                    <Menu.Item>
+                                                        {({ active }) => (
+                                                            <button
+                                                                onClick={() => {
+                                                                    setCurrentAppointment(
+                                                                        appointment
+                                                                    );
+                                                                    setModalOpen(
+                                                                        true
+                                                                    );
+                                                                }}
+                                                                className={classNames(
+                                                                    active
+                                                                        ? "bg-gray-100 text-gray-900"
+                                                                        : "text-gray-700",
+                                                                    "block px-4 py-2 text-sm text-start w-full"
+                                                                )}
+                                                            >
+                                                                Szczegóły
+                                                            </button>
+                                                        )}
+                                                    </Menu.Item>
+                                                    <Menu.Item>
+                                                        {({ active }) => (
+                                                            <button
+                                                                className={classNames(
+                                                                    active
+                                                                        ? "bg-red-50 text-red-600"
+                                                                        : "text-red-500",
+                                                                    "block px-4 py-2 text-sm text-start w-full"
+                                                                )}
+                                                            >
+                                                                Usuń
+                                                            </button>
+                                                        )}
+                                                    </Menu.Item>
+                                                </div>
+                                            </Menu.Items>
+                                        </Transition>
+                                    </Menu>
+                                ) : (
+                                    <Button
+                                        size="xs"
+                                        className="flex items-center justify-center"
+                                        variant="ghost"
+                                        onClick={() => {
+                                            leaveAppointment(appointment);
+                                        }}
+                                    >
+                                        <XMarkIcon className="h-4 text-neutral-600 aspect-square" />
+                                    </Button>
+                                )}
                             </li>
                         ))
                     ) : (
