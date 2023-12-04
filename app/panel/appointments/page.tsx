@@ -32,6 +32,9 @@ const initialAppointment: Appointment = {
 };
 
 export default function Appointments({}: Props) {
+    const { data: session } = useSession();
+
+    const studentId = session?.user.id;
     //TODO neccessary informations to collect from students
     // 1. subject, teacher
     // 2. select available date and time
@@ -52,6 +55,7 @@ export default function Appointments({}: Props) {
             key={2}
             appointment={appointment}
             setAppointment={setAppointment}
+            studentId={studentId}
         />,
         <GoalSelection
             key={3}
@@ -87,8 +91,6 @@ export default function Appointments({}: Props) {
                 return false;
         }
     }
-
-    const { data: session } = useSession();
 
     async function enrollToAppointment() {
         if (!session?.user.id) {

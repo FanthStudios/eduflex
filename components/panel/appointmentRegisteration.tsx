@@ -23,6 +23,7 @@ type Appointment = {
 interface Props {
     appointment: Appointment;
     setAppointment: (arg: Appointment) => void;
+    studentId?: string;
 }
 
 const options = [
@@ -137,6 +138,7 @@ export const SubjectSelection = ({ appointment, setAppointment }: Props) => {
 export const DateAndTimeSelection = ({
     appointment,
     setAppointment,
+    studentId,
 }: Props) => {
     const { appointments } = useAppointments();
     const filteredAppointments =
@@ -144,7 +146,19 @@ export const DateAndTimeSelection = ({
         appointments.filter(
             (app) =>
                 app.teacherId == appointment.teacherId &&
-                app.subject.name == appointment.subject
+                app.subject.name == appointment.subject &&
+                (new Date(app.dateTime!).toLocaleDateString() ==
+                new Date().toLocaleDateString()
+                    ? new Date(app.dateTime!).getTime() >
+                      new Date(
+                          new Date().setHours(new Date().getHours() + 1)
+                      ).getTime()
+                    : new Date(app.dateTime!).getTime() >
+                      new Date().getTime()) &&
+                // if the student is already registered to an appointment with the same teacher and subject, then filter out the appointment
+                app.studentAppointments?.every(
+                    (studentApp) => studentApp.student.user.id != studentId
+                )
         );
     return (
         <div className="flex flex-col items-center justify-start w-full h-full lg:h-3/4 md:p-3 xl:p-10 gap-3">
