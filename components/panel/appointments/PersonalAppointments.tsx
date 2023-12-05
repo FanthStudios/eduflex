@@ -84,11 +84,32 @@ export default function PersonalAppointments({
     setIsOpen,
 }: Props) {
     const userRole = session?.user?.role;
+
+    function appointmentsNotEmpty() {
+        if (userRole == "STUDENT") {
+            return (
+                studentAppointments &&
+                (studentAppointments.past.length > 0 ||
+                    studentAppointments.thisWeek.length > 0 ||
+                    studentAppointments.upcoming.length > 0)
+            );
+        } else if (userRole == "TEACHER") {
+            return (
+                teacherAppointments &&
+                (teacherAppointments.past.length > 0 ||
+                    teacherAppointments.thisWeek.length > 0 ||
+                    teacherAppointments.upcoming.length > 0)
+            );
+        }
+    }
+
     return (
         <div className="flex flex-col items-center xl:items-start justify-start gap-5 overflow-y-auto w-full h-full overflow-x-hidden">
             {/* STUDENT APPOINTMENTS */}
 
-            {userRole == "STUDENT" && studentAppointments ? (
+            {userRole == "STUDENT" &&
+            studentAppointments &&
+            appointmentsNotEmpty() ? (
                 <>
                     <AppointmentSection
                         title="Minione"
@@ -133,7 +154,9 @@ export default function PersonalAppointments({
             {/*!TEACHER APPOINTMENTS  */}
             {/*!TEACHER APPOINTMENTS  */}
 
-            {userRole == "TEACHER" && teacherAppointments ? (
+            {userRole == "TEACHER" &&
+            teacherAppointments &&
+            appointmentsNotEmpty() ? (
                 <>
                     <AppointmentSection
                         title="Minione"
