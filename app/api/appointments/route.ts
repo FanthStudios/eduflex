@@ -325,3 +325,45 @@ export async function POST(request: Request) {
         );
     }
 }
+
+export async function UPDATE(request: Request) {
+    const body = await request.json();
+
+    const { id, subject, dateTime, location, roomNumber, availableSlots } =
+        body as PostProps;
+
+    // update appointment
+    const appointment = await prisma.appointment.update({
+        where: {
+            id: id.toString(),
+        },
+        data: {
+            subject: {
+                connect: {
+                    name: subject,
+                },
+            },
+            dateTime,
+            location: {
+                connect: {
+                    address: location.address,
+                },
+            },
+            roomNumber,
+            availableSlots,
+        },
+    });
+
+    return new NextResponse(
+        JSON.stringify({
+            message: "Pomyślnie zaktualizowano korepetycje",
+            appointment,
+        }),
+        {
+            status: 200,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }
+    );
+}
