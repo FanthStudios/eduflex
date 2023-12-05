@@ -20,7 +20,7 @@ export async function POST(request: Request) {
         !firstName ||
         !lastName ||
         !role ||
-        !(subjects.length > 0)
+        !(subjects && subjects.length > 0)
     ) {
         if (role === "TEACHER" && !(subjects.length > 0)) {
             return new NextResponse("Proszę wybrać przedmioty nauczania", {
