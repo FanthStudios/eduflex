@@ -52,7 +52,9 @@ export default function CalendarWithMeetings({}: Props) {
                         (studentAppointment: any) =>
                             studentAppointment.student.user.id ===
                             parseInt(session?.user?.id!)
-                    ) && new Date(appointment.dateTime) > new Date()
+                    ) &&
+                    new Date(appointment.dateTime).getTime() >
+                        new Date().getTime()
                 );
             }
         };
