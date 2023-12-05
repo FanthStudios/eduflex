@@ -343,7 +343,14 @@ export default function CalendarWithMeetings({}: Props) {
                     ) : (
                         <li className="relative flex space-x-6 py-6 xl:static">
                             <div className="flex-auto">
-                                <h3 className="pr-10 font-semibold text-gray-900 xl:pr-0">
+                                <h2 className="pr-10 text-[1rem] text-neutral-700 xl:pr-0 pb-2">
+                                    {new Date().toLocaleDateString("pl-PL", {
+                                        day: "numeric",
+                                        month: "long",
+                                        year: "numeric",
+                                    })}
+                                </h2>
+                                <h3 className="pr-10 text-neutral-500 xl:pr-0">
                                     Brak korepetycji tego dnia
                                 </h3>
                             </div>
