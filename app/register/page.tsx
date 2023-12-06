@@ -66,55 +66,65 @@ export default function Register({}: Props) {
         }
 
         if (user.role == "STUDENT") {
-            const res = await fetch("/api/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(user),
-            });
+            try {
+                const res = await fetch("/api/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(user),
+                });
 
-            if (res.status === 200) {
-                toast.success("Konto stworzone!", {
-                    autoClose: 6000,
-                });
-                await signIn("credentials", {
-                    redirect: true,
-                    email: user.email,
-                    password: user.password,
-                    callbackUrl: "/",
-                });
-            } else {
-                const data = await res.text();
-                toast.error(data, {
-                    autoClose: 60000,
-                });
+                if (res.status === 200) {
+                    toast.success("Konto stworzone!", {
+                        autoClose: 6000,
+                    });
+                    await signIn("credentials", {
+                        redirect: true,
+                        email: user.email,
+                        password: user.password,
+                        callbackUrl: "/",
+                    });
+                } else {
+                    const data = await res.text();
+                    toast.error(data, {
+                        autoClose: 60000,
+                    });
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error("Wystąpił błąd");
             }
         } else {
-            const res = await fetch("/api/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(user),
-            });
+            try {
+                const res = await fetch("/api/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(user),
+                });
 
-            if (res.status === 200) {
-                toast.success("Konto stworzone!", {
-                    autoClose: 6000,
-                });
-                await signIn("credentials", {
-                    redirect: true,
-                    email: user.email,
-                    password: user.password,
-                    callbackUrl: "/",
-                });
-                window.location.href = "/panel";
-            } else {
-                const data = await res.text();
-                toast.error(data, {
-                    autoClose: 6000,
-                });
+                if (res.status === 200) {
+                    toast.success("Konto stworzone!", {
+                        autoClose: 6000,
+                    });
+                    await signIn("credentials", {
+                        redirect: true,
+                        email: user.email,
+                        password: user.password,
+                        callbackUrl: "/",
+                    });
+                    window.location.href = "/panel";
+                } else {
+                    const data = await res.text();
+                    toast.error(data, {
+                        autoClose: 6000,
+                    });
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error("Wystąpił błąd");
             }
         }
     };

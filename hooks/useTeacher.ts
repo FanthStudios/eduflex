@@ -27,16 +27,20 @@ export function useTeacher(withAppoinments?: boolean, userId?: string) {
 
     useEffect(() => {
         const fetchTeachers = async () => {
-            const res = await fetch(`/api/teachers`, {
-                method: "POST",
-                body: JSON.stringify({ withAppoinments, userId }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+            try {
+                const res = await fetch(`/api/teachers`, {
+                    method: "POST",
+                    body: JSON.stringify({ withAppoinments, userId }),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
 
-            const data = await res.json();
-            setTeachers(data);
+                const data = await res.json();
+                setTeachers(data);
+            } catch (error) {
+                console.log(error);
+            }
         };
 
         fetchTeachers();

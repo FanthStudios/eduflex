@@ -94,33 +94,38 @@ export default function CalendarWithMeetings({}: Props) {
         "after:bg-red-500 after:absolute after:top-0 after:right-0 after:rounded-md after:w-2 after:h-2";
 
     async function leaveAppointment(appointment: Appointment) {
-        const leaveAppointment = await fetch(`/api/leave`, {
-            body: JSON.stringify({
-                appointmentId: appointment.id,
-                studentId: studentId,
-            }),
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+        try {
+            const leaveAppointment = await fetch(`/api/leave`, {
+                body: JSON.stringify({
+                    appointmentId: appointment.id,
+                    studentId: studentId,
+                }),
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
 
-        if (leaveAppointment.status === 200) {
-            setAppointmentsForSelectedDay(
-                appointmentsForSelectedDay.filter(
-                    (app) => app.id !== appointment.id
-                )
-            );
-            toast.success(
-                "Pomyślnie opuszczono korepetycje: " +
-                    appointment.subject.name +
-                    " - " +
-                    appointment.teacher.user.firstName +
-                    " " +
-                    appointment.teacher.user.lastName
-            );
-        } else {
-            console.error(await leaveAppointment.json());
+            if (leaveAppointment.status === 200) {
+                setAppointmentsForSelectedDay(
+                    appointmentsForSelectedDay.filter(
+                        (app) => app.id !== appointment.id
+                    )
+                );
+                toast.success(
+                    "Pomyślnie opuszczono korepetycje: " +
+                        appointment.subject.name +
+                        " - " +
+                        appointment.teacher.user.firstName +
+                        " " +
+                        appointment.teacher.user.lastName
+                );
+            } else {
+                console.error(await leaveAppointment.json());
+                toast.error("Nie udało się opuścić korepetycji");
+            }
+        } catch (error) {
+            console.error(error);
             toast.error("Nie udało się opuścić korepetycji");
         }
     }

@@ -136,22 +136,26 @@ function TeacherCard({ teacher, fillColor }: TeacherCardProps) {
     );
 
     async function addToFavorites() {
-        const res = await fetch("/api/favorite", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                teacherId: teacher.userId,
-                userId: session?.user.id,
-            }),
-        });
-        const data = await res.json();
+        try {
+            const res = await fetch("/api/favorite", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    teacherId: teacher.userId,
+                    userId: session?.user.id,
+                }),
+            });
+            const data = await res.json();
 
-        if (data.isFavorited) {
-            addStudentsFavoriteTeacher(teacher.userId, student!.userId);
-        } else {
-            removeStudentsFavoriteTeacher(teacher.userId, student!.userId);
+            if (data.isFavorited) {
+                addStudentsFavoriteTeacher(teacher.userId, student!.userId);
+            } else {
+                removeStudentsFavoriteTeacher(teacher.userId, student!.userId);
+            }
+        } catch (error) {
+            console.log(error);
         }
     }
 

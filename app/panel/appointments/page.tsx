@@ -98,22 +98,27 @@ export default function Appointments({}: Props) {
             return;
         }
 
-        const res = await fetch("/api/enroll", {
-            method: "POST",
-            body: JSON.stringify({
-                ...appointment,
-                studentId: session?.user.id!,
-            }),
-        });
+        try {
+            const res = await fetch("/api/enroll", {
+                method: "POST",
+                body: JSON.stringify({
+                    ...appointment,
+                    studentId: session?.user.id!,
+                }),
+            });
 
-        const body = await res.json();
+            const body = await res.json();
 
-        if (res.status == 200) {
-            window.location.href = "/panel/appointments";
-            toast.success("Zapisano na konsultacje");
-        } else {
-            console.log(body);
-            toast.error(body.message);
+            if (res.status == 200) {
+                window.location.href = "/panel/appointments";
+                toast.success("Zapisano na konsultacje");
+            } else {
+                console.log(body);
+                toast.error(body.message);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Wystąpił błąd");
         }
     }
 

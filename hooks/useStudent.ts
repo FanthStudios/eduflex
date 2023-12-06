@@ -68,16 +68,20 @@ export function useStudent(userId?: string) {
 
     useEffect(() => {
         const fetchStudents = async () => {
-            const res = await fetch(`/api/students`, {
-                method: "POST",
-                body: JSON.stringify({ userId }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+            try {
+                const res = await fetch(`/api/students`, {
+                    method: "POST",
+                    body: JSON.stringify({ userId }),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
 
-            const data = await res.json();
-            setStudents(data);
+                const data = await res.json();
+                setStudents(data);
+            } catch (error) {
+                console.log(error);
+            }
         };
 
         fetchStudents();

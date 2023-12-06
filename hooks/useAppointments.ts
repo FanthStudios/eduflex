@@ -68,10 +68,14 @@ export function useAppointments() {
 
     useEffect(() => {
         const fetchAppointments = async () => {
-            const res = await fetch(`/api/appointments`);
+            try {
+                const res = await fetch(`/api/appointments`);
 
-            const data = await res.json();
-            setAppointments(data.appointments);
+                const data = await res.json();
+                setAppointments(data.appointments);
+            } catch (error) {
+                console.log(error);
+            }
         };
 
         fetchAppointments();
