@@ -63,38 +63,53 @@ function calculateRecurringDates(
 }
 
 export async function GET() {
-    const appointments = await prisma.appointment.findMany({
-        include: {
-            subject: true,
-            teacher: {
-                select: {
-                    user: true,
+    try {
+        const appointments = await prisma.appointment.findMany({
+            include: {
+                subject: true,
+                teacher: {
+                    select: {
+                        user: true,
+                    },
                 },
-            },
-            location: true,
-            studentAppointments: {
-                select: {
-                    student: {
-                        select: {
-                            user: true,
+                location: true,
+                studentAppointments: {
+                    select: {
+                        student: {
+                            select: {
+                                user: true,
+                            },
                         },
                     },
                 },
             },
-        },
-    });
+        });
 
-    return new NextResponse(
-        JSON.stringify({
-            appointments,
-        }),
-        {
-            status: 200,
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }
-    );
+        return new NextResponse(
+            JSON.stringify({
+                appointments,
+            }),
+            {
+                status: 200,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+    } catch (e: any) {
+        return new NextResponse(
+            JSON.stringify({
+                message: e.message,
+                error: e,
+            }),
+            {
+                status: 400,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+    }
 }
 
 export async function POST(request: Request) {
