@@ -326,7 +326,7 @@ export async function POST(request: Request) {
     }
 }
 
-export async function UPDATE(request: Request) {
+export async function PATCH(request: Request) {
     const body = await request.json();
 
     const { id, subject, dateTime, location, roomNumber, availableSlots } =
