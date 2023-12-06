@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     const isFavorited =
         student &&
         student.favoriteTeachers.some(
-            (teacher) => teacher.userId === parseInt(teacherId)
+            (teacher: any) => teacher.userId === parseInt(teacherId)
         );
 
     if (isFavorited) {
