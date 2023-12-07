@@ -46,23 +46,23 @@ jobs:
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
 
-    # deploy:
-    #     needs: publish
-    #     name: Deploy Image
-    #     runs-on: ubuntu-latest
-    #     concurrency:
-    #         group: ci-${{ github.ref }}
-    #         cancel-in-progress: true
+    deploy:
+        needs: publish
+        name: Deploy Image
+        runs-on: ubuntu-latest
+        concurrency:
+            group: ci-${{ github.ref }}
+            cancel-in-progress: true
 
-    #     steps:
-    #         - name: Execute SSH commands
-    #           uses: appleboy/ssh-action@v1.0.0
-    #           with:
-    #               host: ${{ secrets.HOST }}
-    #               port: 22
-    #               username: ${{ secrets.USERNAME }}
-    #               password: ${{ secrets.PASSWORD }}
-    #               script: |
-    #                   cd ${{ github.ref == 'refs/heads/prod' && secrets.DOCKER_COMPOSE_DIR_PROD || secrets.DOCKER_COMPOSE_DIR_DEV }}
-    #                   docker compose pull frontend
-    #                   docker compose up -d frontend
+        steps:
+            - name: Execute SSH commands
+              uses: appleboy/ssh-action@v1.0.0
+              with:
+                  host: ${{ secrets.HOST }}
+                  port: 22
+                  username: ${{ secrets.USERNAME }}
+                  password: ${{ secrets.PASSWORD }}
+                  script: |
+                      cd ${{ secrets.DOCKER_COMPOSE_DIR }}
+                      docker compose pull
+                      docker compose up -d
