@@ -46,9 +46,9 @@ export default function Page({}: Props) {
 
         filteredAppointments.sort((a, b) => {
             let aDate = new Date(a.dateTime);
-            aDate.setMonth(aDate.getMonth() + 1);
+            aDate.setMonth(aDate.getMonth());
             let bDate = new Date(b.dateTime);
-            bDate.setMonth(bDate.getMonth() + 1);
+            bDate.setMonth(bDate.getMonth());
             return aDate.getTime() - bDate.getTime();
         });
 
