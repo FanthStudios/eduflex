@@ -28,7 +28,7 @@
         "clsx": "^2.0.0",
         "date-fns": "^2.30.0",
         "formik": "^2.4.5",
-        "framer-motion": "^10.16.4",
+        "framer-motion": "^10.16.15",
         "lucide-react": "^0.292.0",
         "luxon": "^3.4.4",
         "next": "14.0.2",
