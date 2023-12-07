@@ -10,8 +10,8 @@ WORKDIR /app
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
 RUN \
     if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-    elif [ -f package-lock.json ]; then npm ci && npx prisma generate; \
-    elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i --frozen-lockfile && pnpx prisma generate; \
+    elif [ -f package-lock.json ]; then npm ci && npx prisma migrate deploy; \
+    elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i --frozen-lockfile && pnpx prisma migrate deploy; \
     else echo "Lockfile not found." && exit 1; \
     fi
 
@@ -30,7 +30,7 @@ COPY . .
 RUN \
     if [ -f yarn.lock ]; then yarn build; \
     elif [ -f package-lock.json ]; then npm run build; \
-    elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpx prisma generate && pnpm run build; \
+    elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm run build; \
     else echo "Lockfile not found." && exit 1; \
     fi
 
