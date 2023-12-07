@@ -45,7 +45,7 @@
         "zod": "^3.22.4"
     },
     "devDependencies": {
-        "@types/luxon": "^3.3.5",
+        "@types/luxon": "^3.3.7",
         "@types/node": "^20",
         "@types/react": "^18",
         "@types/react-dom": "^18",
