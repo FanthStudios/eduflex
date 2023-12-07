@@ -10,7 +10,7 @@ export function useLocation() {
                 const res = await fetch("/api/locations");
                 const data = await res.json();
 
-                setLocations(data.locations);
+                setLocations(data);
             } catch (error) {
                 console.log(error);
             }
