@@ -1,7 +1,6 @@
 "use client";
 
 import Modal from "@/components/Modal";
-import { Input } from "@/components/ui/input";
 import {
     Select,
     SelectContent,
@@ -12,9 +11,8 @@ import {
 import { Appointment } from "@/hooks/useAppointments";
 import { useLocation } from "@/hooks/useLocation";
 import { useTeacher } from "@/hooks/useTeacher";
-import { prisma } from "@/prisma/client";
 import { CalendarDaysIcon, UsersIcon } from "@heroicons/react/24/outline";
-import { Dispatch, SetStateAction, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 
 type Props = {
     isOpen: boolean;
