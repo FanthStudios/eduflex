@@ -75,6 +75,10 @@ export function useStudent(userId?: string) {
                     headers: {
                         "Content-Type": "application/json",
                     },
+                    cache: "force-cache",
+                    next: {
+                        revalidate: 3600,
+                    },
                 });
 
                 const data = await res.json();

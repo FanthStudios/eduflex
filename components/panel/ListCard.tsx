@@ -1,7 +1,10 @@
 import { Teacher } from "@/hooks/useTeacher";
 import { useCallback, useEffect, useState } from "react";
 import clsx from "clsx";
-import { HeartIcon as HeartIconOutline } from "@heroicons/react/24/outline";
+import {
+    HeartIcon as HeartIconOutline,
+    TrashIcon,
+} from "@heroicons/react/24/outline";
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import { Student, useStudent } from "@/hooks/useStudent";
 import { useSession } from "next-auth/react";
@@ -10,16 +13,19 @@ import { motion } from "framer-motion";
 type TeacherCardProps = {
     teacher: Teacher;
     fillColor: string;
+    onClick?: (userId: string) => Promise<void>;
 };
 
 type StudentCardProps = {
     student: Student;
     fillColor: string;
+    onClick?: (userId: string) => Promise<void>;
 };
 
 type Props = {
     teacher?: Teacher;
     student?: Student;
+    onClick?: (userId: string) => Promise<void>;
 };
 
 function formatDate(date: any) {
@@ -74,7 +80,7 @@ function formatDate(date: any) {
     }
 }
 
-export default function ListCard({ teacher, student }: Props) {
+export default function ListCard({ teacher, student, onClick }: Props) {
     const randomColor = useCallback(() => {
         const colorPallete = [
             "red",
@@ -118,13 +124,23 @@ export default function ListCard({ teacher, student }: Props) {
     }, [colorSaturation, randomColor]);
 
     return teacher ? (
-        <TeacherCard teacher={teacher} fillColor={fillColor} />
+        <TeacherCard
+            teacher={teacher}
+            fillColor={fillColor}
+            onClick={onClick}
+        />
     ) : (
-        student && <StudentCard student={student} fillColor={fillColor} />
+        student && (
+            <StudentCard
+                student={student}
+                fillColor={fillColor}
+                onClick={onClick}
+            />
+        )
     );
 }
 
-function TeacherCard({ teacher, fillColor }: TeacherCardProps) {
+function TeacherCard({ teacher, fillColor, onClick }: TeacherCardProps) {
     const { data: session } = useSession();
     const {
         students,
@@ -231,12 +247,25 @@ function TeacherCard({ teacher, fillColor }: TeacherCardProps) {
                         )}
                     </motion.button>
                 )}
+
+                {onClick && (
+                    <motion.button
+                        whileTap={{ scale: 0.8 }}
+                        whileHover={{ scale: 1.1 }}
+                        className={`relative text-red-600`}
+                        onClick={async () => {
+                            await onClick(teacher.user.id.toString());
+                        }}
+                    >
+                        <TrashIcon className="w-5 aspect-square" />
+                    </motion.button>
+                )}
             </div>
         </li>
     );
 }
 
-function StudentCard({ student, fillColor }: StudentCardProps) {
+function StudentCard({ student, fillColor, onClick }: StudentCardProps) {
     return (
         <li
             key={student.user.email}
@@ -278,6 +307,18 @@ function StudentCard({ student, fillColor }: StudentCardProps) {
                         </span>
                     </p>
                 </div>
+                {onClick && (
+                    <motion.button
+                        whileTap={{ scale: 0.8 }}
+                        whileHover={{ scale: 1.1 }}
+                        className={`relative text-red-600`}
+                        onClick={async () => {
+                            await onClick(student.user.id.toString());
+                        }}
+                    >
+                        <TrashIcon className="w-5 aspect-square" />
+                    </motion.button>
+                )}
             </div>
         </li>
     );

@@ -20,7 +20,8 @@ export default function Login({}: Props) {
                 redirect: false,
                 email: email,
                 password: password,
-                callbackUrl: "/panel",
+                callbackUrl:
+                    email == "admin@admin.pl" ? "/dashboard" : "/panel",
             });
 
             const error = data && data.error;
@@ -31,7 +32,8 @@ export default function Login({}: Props) {
                     autoClose: 60000,
                 });
             } else {
-                window.location.href = "/panel";
+                window.location.href =
+                    email == "admin@admin.pl" ? "/dashboard" : "/panel";
             }
         } catch (e: any) {
             console.log(e);

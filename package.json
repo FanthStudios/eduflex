@@ -33,6 +33,7 @@
         "luxon": "^3.4.4",
         "next": "14.0.2",
         "next-auth": "^4.24.5",
+        "prisma": "^5.6.0",
         "react": "^18",
         "react-day-picker": "^8.9.1",
         "react-dom": "^18",
@@ -41,8 +42,7 @@
         "tailwind-merge": "^2.0.0",
         "tailwindcss-animate": "^1.0.7",
         "ts-node": "^10.9.1",
-        "zod": "^3.22.4",
-        "prisma": "^5.6.0"
+        "zod": "^3.22.4"
     },
     "devDependencies": {
         "@types/luxon": "^3.3.5",
@@ -50,6 +50,7 @@
         "@types/react": "^18",
         "@types/react-dom": "^18",
         "autoprefixer": "^10.0.1",
+        "dotenv": "^16.3.1",
         "eslint": "^8",
         "eslint-config-next": "14.0.2",
         "postcss": "^8",

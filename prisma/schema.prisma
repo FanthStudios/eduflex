@@ -37,17 +37,18 @@ model Session {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  firstName String
-  lastName  String
-  password  String
-  role      String
-  lastLogin DateTime?
-  accounts  Account?
-  sessions  Session[]
-  student   Student?
-  teacher   Teacher?
+  id             Int             @id @default(autoincrement())
+  email          String          @unique
+  firstName      String
+  lastName       String
+  password       String
+  role           String
+  lastLogin      DateTime?
+  accounts       Account?
+  sessions       Session[]
+  student        Student?
+  teacher        Teacher?
+  activationCode ActivationCode?
 }
 
 model Class {
@@ -90,6 +91,13 @@ model Location {
   postalCode   String
   address      String        @unique
   appointments Appointment[]
+}
+
+model ActivationCode {
+  value  String    @unique
+  userId Int?      @unique
+  date   DateTime
+  user   User?     @relation(fields: [userId], references: [id], onDelete: NoAction)
 }
 
 model Appointment {
