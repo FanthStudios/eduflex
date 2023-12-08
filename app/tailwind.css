@@ -1,3 +1,6 @@
+/* FILEPATH: /home/j5on/Desktop/eduflex/app/tailwind.css */
+
+/* BEGIN: abpxx6d04wxr */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -78,3 +81,20 @@
 html {
     scroll-behavior: smooth;
 }
+
+/* Add the following code to style the scrollbar */
+/* BEGIN: scrollbar-style */
+::-webkit-scrollbar {
+    width: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #22c55e;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: white;
+}
+/* END: scrollbar-style */
+
+/* END: abpxx6d04wxr */

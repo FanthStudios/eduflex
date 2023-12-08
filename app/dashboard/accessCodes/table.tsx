@@ -1,3 +1,5 @@
+"use client";
+
 import Modal from "@/components/Modal";
 import clsx from "clsx";
 import { Dispatch, SetStateAction, useState } from "react";
@@ -48,7 +50,7 @@ function Table({ codes, setCodes }: Props) {
         const res = await fetch("/api/accessCodes", {
             method: "POST",
             body: JSON.stringify({
-                count,
+                iteration: count,
             }),
             headers: {
                 "Content-Type": "application/json",
@@ -59,15 +61,17 @@ function Table({ codes, setCodes }: Props) {
             const newCodes = await res.json();
             setCodes((codes) => [...codes, ...newCodes]);
             toast.success("Wygenerowano nowe kody aktywacyjne");
+            setModalOpen(false);
         } else {
             toast.error("Nie udało się wygenerować nowych kodów aktywacyjnych");
         }
     }
 
     const [modalOpen, setModalOpen] = useState(false);
+    const [iterations, setIterations] = useState(0);
 
     return (
-        <div className="mt-8 flow-root w-5/6 self-center">
+        <div className="mt-8 flow-root w-full lg:w-5/6 self-center overflow-y-auto overflow-x-hidden">
             <Modal isOpen={modalOpen} closeModal={() => {}}>
                 <Modal.Title align="center">
                     <h1 className="text-lg font-medium xl:text-xl">
@@ -80,6 +84,10 @@ function Table({ codes, setCodes }: Props) {
                         type="number"
                         name="count"
                         id="count"
+                        value={iterations}
+                        onChange={(e) =>
+                            setIterations(parseInt(e.target.value))
+                        }
                         className="w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm focus:ring-neutral-500 focus:border-neutral-500 sm:text-sm"
                         placeholder="Ilość kodów"
                         min={1}
@@ -94,7 +102,7 @@ function Table({ codes, setCodes }: Props) {
                         Anuluj
                     </button>
                     <button
-                        onClick={() => setModalOpen(false)}
+                        onClick={() => createCodes(iterations)}
                         className="bg-green-500 py-1 px-3 rounded-lg text-white hover:bg-green-400 transition-colors duration-150"
                     >
                         Generuj
@@ -103,7 +111,7 @@ function Table({ codes, setCodes }: Props) {
             </Modal>
             <div className="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
                 <div className="inline-block min-w-full py-2 align-middle">
-                    <table className="min-w-full border-separate border-spacing-0">
+                    <table className="min-w-full border-separate border-spacing-0 lg:px-2">
                         <thead>
                             <tr>
                                 <th
@@ -210,7 +218,9 @@ function Row({
                     "whitespace-nowrap hidden px-3 py-4 text-sm text-neutral-500 sm:table-cell"
                 )}
             >
-                {createNew ? "" : code && code.date.toLocaleDateString()}
+                {createNew
+                    ? ""
+                    : code && new Date(code.date).toLocaleDateString()}
             </td>
             <td
                 className={clsx(

@@ -76,6 +76,15 @@ type Props = {
     setIsOpen: any;
 };
 
+function hasAppointments(appointments: any) {
+    return (
+        appointments &&
+        (appointments.past.length > 0 ||
+            appointments.thisWeek.length > 0 ||
+            appointments.upcoming.length > 0)
+    );
+}
+
 export default function PersonalAppointments({
     studentAppointments,
     teacherAppointments,
@@ -87,19 +96,9 @@ export default function PersonalAppointments({
 
     function appointmentsNotEmpty() {
         if (userRole == "STUDENT") {
-            return (
-                studentAppointments &&
-                (studentAppointments.past.length > 0 ||
-                    studentAppointments.thisWeek.length > 0 ||
-                    studentAppointments.upcoming.length > 0)
-            );
+            return hasAppointments(studentAppointments);
         } else if (userRole == "TEACHER") {
-            return (
-                teacherAppointments &&
-                (teacherAppointments.past.length > 0 ||
-                    teacherAppointments.thisWeek.length > 0 ||
-                    teacherAppointments.upcoming.length > 0)
-            );
+            return hasAppointments(teacherAppointments);
         }
     }
 
