@@ -20,7 +20,11 @@ function generateCode() {
 }
 
 export async function GET(request: Request) {
-    const codes = await prisma.activationCode.findMany();
+    const codes = await prisma.activationCode.findMany({
+        include: {
+            user: true,
+        },
+    });
 
     return new NextResponse(JSON.stringify(codes), {
         headers: {
