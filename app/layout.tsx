@@ -13,6 +13,12 @@ export const metadata: Metadata = {
     title: "EduFlex: Rewolucjonizuje naukę online",
     description:
         "Dołącz do EduFlex, wiodącej platformy do nauki online. Przeglądaj różnorodne przedmioty, ucz się od najlepszych nauczycieli i osiągaj swoje cele edukacyjne.",
+    authors: [
+        {
+            name: "Bartosz Paczesny",
+            url: "https://dev.paczesny.pl/",
+        },
+    ],
 };
 
 export default function RootLayout({

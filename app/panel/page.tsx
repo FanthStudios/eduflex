@@ -7,6 +7,12 @@ export const metadata: Metadata = {
     title: "Twój Panel | EduFlex",
     description:
         "Zarządzaj swoją podróżą edukacyjną. Sprawdź nadchodzące spotkania, ulubionych nauczycieli i postępy w jednym miejscu",
+    authors: [
+        {
+            name: "Bartosz Paczesny",
+            url: "https://dev.paczesny.pl/",
+        },
+    ],
 };
 
 export default async function Page() {
