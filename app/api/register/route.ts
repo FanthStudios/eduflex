@@ -1,6 +1,7 @@
 import { createUser, getUser } from "@/utils/user";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
+import { prisma } from "@/prisma/client";
 
 export async function POST(request: Request) {
     const body = await request.json();
@@ -12,6 +13,7 @@ export async function POST(request: Request) {
         role,
         subjects,
         studentsClass,
+        activationCode,
     } = body;
 
     if (
@@ -24,6 +26,10 @@ export async function POST(request: Request) {
     ) {
         if (role === "TEACHER" && !(subjects.length > 0)) {
             return new NextResponse("Proszę wybrać przedmioty nauczania", {
+                status: 401,
+            });
+        } else if (role === "TEACHER" && !activationCode) {
+            return new NextResponse("Proszę podać kod aktywacyjny", {
                 status: 401,
             });
         } else if (
@@ -50,6 +56,23 @@ export async function POST(request: Request) {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
+    const allActivationCodes = await prisma.activationCode.findMany();
+
+    const activationCodeExists = allActivationCodes.find(
+        (code) => code.value === activationCode
+    ) as any;
+
+    if (!activationCodeExists) {
+        console.log(activationCodeExists);
+        return new NextResponse("Nieprawidłowy kod aktywacyjny", {
+            status: 401,
+        });
+    } else if (activationCodeExists.userId) {
+        return new NextResponse("Kod aktywacyjny został już wykorzystany", {
+            status: 401,
+        });
+    }
+
     const newUser = await createUser({
         email,
         password: hash,
@@ -58,6 +81,7 @@ export async function POST(request: Request) {
         role,
         subjects,
         studentsClass,
+        activationCode,
     });
 
     return new NextResponse(JSON.stringify(newUser), {

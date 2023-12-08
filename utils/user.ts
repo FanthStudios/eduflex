@@ -16,6 +16,7 @@ interface UserProps {
     sessions?: any[];
     subjects?: any[];
     studentsClass?: string;
+    activationCode?: string;
 }
 
 export const getUser = async (email: string) => {
@@ -77,6 +78,17 @@ export const createUser = async (userObject: UserProps) => {
         const teacher = await prisma.teacher.create({
             data: {
                 userId: user.id,
+            },
+        });
+
+        const activationCode = await prisma.activationCode.update({
+            where: { value: userObject.activationCode },
+            data: {
+                user: {
+                    connect: {
+                        id: teacher.userId,
+                    },
+                },
             },
         });
 

@@ -7,7 +7,7 @@ import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 
 type Props = {};
@@ -96,35 +96,45 @@ export default function Register({}: Props) {
                 toast.error("Wystąpił błąd");
             }
         } else {
-            try {
-                const res = await fetch("/api/register", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(user),
-                });
+            if (currentStep == 0) {
+                setCurrentStep(1);
+            } else {
+                const activationCode = verificationCode.join("");
+                const formattedCode = activationCode.replace(/(.{4})/g, "$1-");
 
-                if (res.status === 200) {
-                    toast.success("Konto stworzone!", {
-                        autoClose: 6000,
+                try {
+                    const res = await fetch("/api/register", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            ...user,
+                            activationCode: formattedCode.slice(0, -1),
+                        }),
                     });
-                    await signIn("credentials", {
-                        redirect: true,
-                        email: user.email,
-                        password: user.password,
-                        callbackUrl: "/",
-                    });
-                    window.location.href = "/panel";
-                } else {
-                    const data = await res.text();
-                    toast.error(data, {
-                        autoClose: 6000,
-                    });
+
+                    if (res.status === 200) {
+                        toast.success("Konto stworzone!", {
+                            autoClose: 6000,
+                        });
+                        await signIn("credentials", {
+                            redirect: true,
+                            email: user.email,
+                            password: user.password,
+                            callbackUrl: "/",
+                        });
+                        window.location.href = "/panel";
+                    } else {
+                        const data = await res.text();
+                        toast.error(data, {
+                            autoClose: 6000,
+                        });
+                    }
+                } catch (error) {
+                    console.log(error);
+                    toast.error("Wystąpił błąd");
                 }
-            } catch (error) {
-                console.log(error);
-                toast.error("Wystąpił błąd");
             }
         }
     };
@@ -154,6 +164,36 @@ export default function Register({}: Props) {
         }
     }, [user]);
 
+    const [currentStep, setCurrentStep] = useState(0);
+
+    const [verificationCode, setVerificationCode] = useState<string[]>([
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+    ]);
+    const inputRefs = useRef<HTMLInputElement[]>([]);
+
+    const handleInputChange = (index: number, value: string) => {
+        const newVerificationCode = [...verificationCode];
+        newVerificationCode[index] = value;
+
+        setVerificationCode(newVerificationCode);
+
+        if (value !== "" && index < inputRefs.current.length - 1) {
+            inputRefs.current[index + 1].focus();
+        } else if (value === "" && index > 0) {
+            inputRefs.current[index - 1].focus();
+            setVerificationCode(newVerificationCode);
+        } else if (value === "" && index === 0) {
+            inputRefs.current[index].focus();
+        }
+    };
+
     return (
         <>
             <div className="relative w-screen h-screen isolate md:overflow-x-hidden overflow-y-auto">
@@ -175,309 +215,387 @@ export default function Register({}: Props) {
                             exit="exit"
                             className="mt-10 text-2xl font-bold leading-9 tracking-tight text-center text-gray-900"
                         >
-                            Załóż swoje konto
+                            {currentStep == 0
+                                ? "Załóż swoje konto"
+                                : "Podaj kod aktywacyjny"}
                         </motion.h2>
                     </div>
 
                     <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                        <form
-                            className="flex flex-col gap-2"
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                                handleRegister();
-                            }}
-                        >
-                            <div className="flex items-center w-full gap-4 justify-evenly">
-                                <div>
-                                    <motion.label
-                                        variants={slideInVariant("top", 0.35)}
-                                        initial="hidden"
-                                        animate="show"
-                                        exit="exit"
-                                        htmlFor="name"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Imię
-                                    </motion.label>
-                                    <div className="mt-0.5">
-                                        <motion.input
+                        {currentStep == 0 ? (
+                            <form
+                                className="flex flex-col gap-2"
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    handleRegister();
+                                }}
+                            >
+                                <div className="flex items-center w-full gap-4 justify-evenly">
+                                    <div>
+                                        <motion.label
                                             variants={slideInVariant(
                                                 "top",
-                                                0.3
+                                                0.35
                                             )}
                                             initial="hidden"
                                             animate="show"
                                             exit="exit"
-                                            id="name"
-                                            name="name"
-                                            type="text"
-                                            autoComplete="given-name"
+                                            htmlFor="name"
+                                            className="block text-sm font-medium leading-6 text-gray-900"
+                                        >
+                                            Imię
+                                        </motion.label>
+                                        <div className="mt-0.5">
+                                            <motion.input
+                                                variants={slideInVariant(
+                                                    "top",
+                                                    0.3
+                                                )}
+                                                initial="hidden"
+                                                animate="show"
+                                                exit="exit"
+                                                id="name"
+                                                name="name"
+                                                type="text"
+                                                autoComplete="given-name"
+                                                required
+                                                onChange={(e) => {
+                                                    setUser({
+                                                        ...user,
+                                                        firstName:
+                                                            e.target.value,
+                                                    });
+                                                }}
+                                                className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <motion.label
+                                            variants={slideInVariant(
+                                                "top",
+                                                0.45
+                                            )}
+                                            initial="hidden"
+                                            animate="show"
+                                            exit="exit"
+                                            htmlFor="surname"
+                                            className="block text-sm font-medium leading-6 text-gray-900"
+                                        >
+                                            Nazwisko
+                                        </motion.label>
+                                        <div className="mt-0.5">
+                                            <motion.input
+                                                variants={slideInVariant(
+                                                    "top",
+                                                    0.4
+                                                )}
+                                                initial="hidden"
+                                                animate="show"
+                                                exit="exit"
+                                                id="surname"
+                                                name="surname"
+                                                type="text"
+                                                autoComplete="family-name"
+                                                required
+                                                onChange={(e) => {
+                                                    setUser({
+                                                        ...user,
+                                                        lastName:
+                                                            e.target.value,
+                                                    });
+                                                }}
+                                                className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <motion.label
+                                        variants={slideInVariant("left", 0.5)}
+                                        initial="hidden"
+                                        animate="show"
+                                        exit="exit"
+                                        htmlFor="email"
+                                        className="block text-sm font-medium leading-6 text-gray-900"
+                                    >
+                                        Email
+                                    </motion.label>
+                                    <div className="mt-0.5">
+                                        <motion.input
+                                            variants={slideInVariant(
+                                                "left",
+                                                0.55
+                                            )}
+                                            initial="hidden"
+                                            animate="show"
+                                            exit="exit"
+                                            id="email"
+                                            name="email"
+                                            type="email"
+                                            autoComplete="email"
                                             required
                                             onChange={(e) => {
                                                 setUser({
                                                     ...user,
-                                                    firstName: e.target.value,
+                                                    email: e.target.value,
                                                 });
                                             }}
                                             className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
                                 </div>
+
                                 <div>
                                     <motion.label
-                                        variants={slideInVariant("top", 0.45)}
+                                        variants={slideInVariant("left", 0.6)}
                                         initial="hidden"
                                         animate="show"
                                         exit="exit"
-                                        htmlFor="surname"
+                                        htmlFor="password"
                                         className="block text-sm font-medium leading-6 text-gray-900"
                                     >
-                                        Nazwisko
+                                        Hasło
                                     </motion.label>
-                                    <div className="mt-0.5">
-                                        <motion.input
-                                            variants={slideInVariant(
-                                                "top",
-                                                0.4
-                                            )}
-                                            initial="hidden"
-                                            animate="show"
-                                            exit="exit"
-                                            id="surname"
-                                            name="surname"
-                                            type="text"
-                                            autoComplete="family-name"
+                                    <motion.div
+                                        variants={slideInVariant("left", 0.65)}
+                                        initial="hidden"
+                                        animate="show"
+                                        exit="exit"
+                                        className="relative mt-0.5"
+                                    >
+                                        <input
+                                            id="password"
+                                            name="password"
+                                            type={
+                                                showPassword
+                                                    ? "text"
+                                                    : "password"
+                                            }
+                                            autoComplete="current-password"
                                             required
                                             onChange={(e) => {
                                                 setUser({
                                                     ...user,
-                                                    lastName: e.target.value,
+                                                    password: e.target.value,
                                                 });
                                             }}
                                             className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
                                         />
-                                    </div>
+                                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 cursor-pointer">
+                                            {showPassword ? (
+                                                <EyeIcon
+                                                    className="h-5 w-5"
+                                                    onClick={() =>
+                                                        setShowPassword(
+                                                            !showPassword
+                                                        )
+                                                    }
+                                                />
+                                            ) : (
+                                                <EyeSlashIcon
+                                                    className="h-5 w-5"
+                                                    onClick={() =>
+                                                        setShowPassword(
+                                                            !showPassword
+                                                        )
+                                                    }
+                                                />
+                                            )}
+                                        </div>
+                                    </motion.div>
                                 </div>
-                            </div>
-                            <div>
-                                <motion.label
-                                    variants={slideInVariant("left", 0.5)}
-                                    initial="hidden"
-                                    animate="show"
-                                    exit="exit"
-                                    htmlFor="email"
-                                    className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                    Email
-                                </motion.label>
-                                <div className="mt-0.5">
-                                    <motion.input
-                                        variants={slideInVariant("left", 0.55)}
-                                        initial="hidden"
-                                        animate="show"
-                                        exit="exit"
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        autoComplete="email"
-                                        required
-                                        onChange={(e) => {
-                                            setUser({
-                                                ...user,
-                                                email: e.target.value,
-                                            });
-                                        }}
-                                        className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
-                                    />
-                                </div>
-                            </div>
 
-                            <div>
-                                <motion.label
-                                    variants={slideInVariant("left", 0.6)}
-                                    initial="hidden"
-                                    animate="show"
-                                    exit="exit"
-                                    htmlFor="password"
-                                    className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                    Hasło
-                                </motion.label>
-                                <motion.div
-                                    variants={slideInVariant("left", 0.65)}
-                                    initial="hidden"
-                                    animate="show"
-                                    exit="exit"
-                                    className="relative mt-0.5"
-                                >
-                                    <input
-                                        id="password"
-                                        name="password"
-                                        type={
-                                            showPassword ? "text" : "password"
-                                        }
-                                        autoComplete="current-password"
-                                        required
-                                        onChange={(e) => {
-                                            setUser({
-                                                ...user,
-                                                password: e.target.value,
-                                            });
-                                        }}
-                                        className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
-                                    />
-                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 cursor-pointer">
-                                        {showPassword ? (
-                                            <EyeIcon
-                                                className="h-5 w-5"
-                                                onClick={() =>
-                                                    setShowPassword(
-                                                        !showPassword
-                                                    )
-                                                }
-                                            />
-                                        ) : (
-                                            <EyeSlashIcon
-                                                className="h-5 w-5"
-                                                onClick={() =>
-                                                    setShowPassword(
-                                                        !showPassword
-                                                    )
-                                                }
-                                            />
-                                        )}
-                                    </div>
-                                </motion.div>
-                            </div>
-
-                            <div>
-                                <motion.label
-                                    variants={slideInVariant("left", 0.7)}
-                                    initial="hidden"
-                                    animate="show"
-                                    exit="exit"
-                                    htmlFor="role"
-                                    className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                    Rola
-                                </motion.label>
-                                <motion.div
-                                    className="mt-0.5"
-                                    variants={slideInVariant("left", 0.75)}
-                                    initial="hidden"
-                                    animate="show"
-                                    exit="exit"
-                                >
-                                    <select
-                                        id="role"
-                                        name="role"
-                                        autoComplete="role"
-                                        required
-                                        onChange={(e) => {
-                                            setUser({
-                                                ...user,
-                                                role: e.target.value,
-                                            });
-                                        }}
-                                        className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 bg-white focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
-                                    >
-                                        <option value="STUDENT">Uczeń</option>
-                                        <option value="TEACHER">
-                                            Nauczyciel
-                                        </option>
-                                    </select>
-                                </motion.div>
-                            </div>
-
-                            {user.role == "TEACHER" ? (
                                 <div>
                                     <motion.label
-                                        variants={slideInVariant("left", 0.1)}
+                                        variants={slideInVariant("left", 0.7)}
                                         initial="hidden"
                                         animate="show"
                                         exit="exit"
                                         htmlFor="role"
                                         className="block text-sm font-medium leading-6 text-gray-900"
                                     >
-                                        Przedmioty
-                                    </motion.label>
-                                    <MultiSelect
-                                        options={options}
-                                        selectedOptions={subjects}
-                                        setSelectedOptions={setSubjects}
-                                    />
-                                </div>
-                            ) : (
-                                <div>
-                                    <motion.label
-                                        variants={slideInVariant(
-                                            "left",
-                                            user.role == "TEACHER" ? 0.1 : 0.8
-                                        )}
-                                        initial="hidden"
-                                        animate="show"
-                                        exit="exit"
-                                        htmlFor="role"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                    >
-                                        Przedmioty
+                                        Rola
                                     </motion.label>
                                     <motion.div
                                         className="mt-0.5"
-                                        variants={slideInVariant(
-                                            "left",
-                                            user.role == "TEACHER" ? 0.15 : 0.85
-                                        )}
+                                        variants={slideInVariant("left", 0.75)}
                                         initial="hidden"
                                         animate="show"
                                         exit="exit"
                                     >
                                         <select
-                                            id="class"
-                                            name="class"
+                                            id="role"
+                                            name="role"
+                                            autoComplete="role"
                                             required
                                             onChange={(e) => {
                                                 setUser({
                                                     ...user,
-                                                    studentsClass:
-                                                        e.target.value,
+                                                    role: e.target.value,
                                                 });
                                             }}
                                             className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 bg-white focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
                                         >
-                                            {classes.map(
-                                                (
-                                                    studentsClass: string,
-                                                    index: number
-                                                ) => (
-                                                    <option
-                                                        key={index}
-                                                        value={studentsClass}
-                                                    >
-                                                        {studentsClass}
-                                                    </option>
-                                                )
-                                            )}
+                                            <option value="STUDENT">
+                                                Uczeń
+                                            </option>
+                                            <option value="TEACHER">
+                                                Nauczyciel
+                                            </option>
                                         </select>
                                     </motion.div>
                                 </div>
-                            )}
 
-                            <motion.div
-                                className="mt-6"
-                                variants={slideInVariant("bottom", 0.8)}
-                                initial="hidden"
-                                animate="show"
-                                exit="exit"
-                            >
-                                <button
-                                    type="submit"
-                                    className="flex w-full justify-center rounded-md bg-green-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 transition-all duration-200"
+                                {user.role == "TEACHER" ? (
+                                    <div>
+                                        <motion.label
+                                            variants={slideInVariant(
+                                                "left",
+                                                0.1
+                                            )}
+                                            initial="hidden"
+                                            animate="show"
+                                            exit="exit"
+                                            htmlFor="role"
+                                            className="block text-sm font-medium leading-6 text-gray-900"
+                                        >
+                                            Przedmioty
+                                        </motion.label>
+                                        <MultiSelect
+                                            options={options}
+                                            selectedOptions={subjects}
+                                            setSelectedOptions={setSubjects}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <motion.label
+                                            variants={slideInVariant(
+                                                "left",
+                                                user.role == "TEACHER"
+                                                    ? 0.1
+                                                    : 0.8
+                                            )}
+                                            initial="hidden"
+                                            animate="show"
+                                            exit="exit"
+                                            htmlFor="role"
+                                            className="block text-sm font-medium leading-6 text-gray-900"
+                                        >
+                                            Przedmioty
+                                        </motion.label>
+                                        <motion.div
+                                            className="mt-0.5"
+                                            variants={slideInVariant(
+                                                "left",
+                                                user.role == "TEACHER"
+                                                    ? 0.15
+                                                    : 0.85
+                                            )}
+                                            initial="hidden"
+                                            animate="show"
+                                            exit="exit"
+                                        >
+                                            <select
+                                                id="class"
+                                                name="class"
+                                                required
+                                                onChange={(e) => {
+                                                    setUser({
+                                                        ...user,
+                                                        studentsClass:
+                                                            e.target.value,
+                                                    });
+                                                }}
+                                                className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 bg-white focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
+                                            >
+                                                {classes.map(
+                                                    (
+                                                        studentsClass: string,
+                                                        index: number
+                                                    ) => (
+                                                        <option
+                                                            key={index}
+                                                            value={
+                                                                studentsClass
+                                                            }
+                                                        >
+                                                            {studentsClass}
+                                                        </option>
+                                                    )
+                                                )}
+                                            </select>
+                                        </motion.div>
+                                    </div>
+                                )}
+
+                                <motion.div
+                                    className="mt-6"
+                                    variants={slideInVariant("bottom", 0.8)}
+                                    initial="hidden"
+                                    animate="show"
+                                    exit="exit"
                                 >
-                                    Zarejestruj się
-                                </button>
-                            </motion.div>
-                        </form>
+                                    <button
+                                        type="submit"
+                                        className="flex w-full justify-center rounded-md bg-green-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 transition-all duration-200"
+                                    >
+                                        {user.role == "STUDENT"
+                                            ? "Zarejestruj się"
+                                            : "Dalej"}
+                                    </button>
+                                </motion.div>
+                            </form>
+                        ) : (
+                            <form
+                                className="flex flex-col gap-2"
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    handleRegister();
+                                }}
+                            >
+                                <div className="flex items-center w-full gap-4 justify-evenly">
+                                    {verificationCode.map((value, index) => (
+                                        <React.Fragment key={index}>
+                                            <input
+                                                ref={(ref) =>
+                                                    // @ts-ignore
+                                                    (inputRefs.current[index] =
+                                                        ref)
+                                                }
+                                                type="text"
+                                                maxLength={1}
+                                                value={value}
+                                                onChange={(e) =>
+                                                    handleInputChange(
+                                                        index,
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className="w-8 h-10 rounded-lg text-center border border-neutral-300"
+                                            />
+                                            {index === 3 && <span>-</span>}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+
+                                <motion.div
+                                    className="mt-6"
+                                    variants={slideInVariant("bottom", 0.8)}
+                                    initial="hidden"
+                                    animate="show"
+                                    exit="exit"
+                                >
+                                    <button
+                                        type="submit"
+                                        className="flex w-full justify-center rounded-md bg-green-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 transition-all duration-200"
+                                    >
+                                        Zarejestruj się
+                                    </button>
+                                </motion.div>
+                            </form>
+                        )}
 
                         <motion.p
                             variants={slideInVariant("bottom", 0.85)}

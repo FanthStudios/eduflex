@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type Props = {};
 
 const navigation = [
@@ -31,25 +33,25 @@ function Footer({}: Props) {
             <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between lg:px-8">
                 <div className="flex justify-center space-x-6 md:order-2">
                     {navigation.map((item) => (
-                        <a
+                        <Link
                             key={item.name}
                             href={item.href}
                             className="text-gray-400 hover:text-green-500 hover:scale-105 transition duration-150"
                         >
                             <span className="sr-only">{item.name}</span>
                             <item.icon className="h-6 w-6" aria-hidden="true" />
-                        </a>
+                        </Link>
                     ))}
                 </div>
                 <div className="mt-8 md:order-1 md:mt-0">
                     <p className="text-center text-sm leading-5 text-gray-500">
                         2023 Designed & Developed by{" "}
-                        <a
+                        <Link
                             href="https://dev.paczesny.pl/"
                             className="text-green-500 hover:text-green-600"
                         >
                             Bartek Paczesny
-                        </a>
+                        </Link>
                     </p>
                 </div>
             </div>
