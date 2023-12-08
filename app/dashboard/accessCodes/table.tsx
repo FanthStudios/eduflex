@@ -284,10 +284,10 @@ function Status({ status }: { status: "active" | "inactive" }) {
                 status === "active"
                     ? "text-green-800 border-green-400 bg-green-100"
                     : "text-red-800 border-red-400 bg-red-100",
-                "inline-flex items-center px-2 py-0.5 border rounded-md text-xs font-medium capitalize"
+                "inline-flex items-center px-2 py-0.5 border rounded-md text-xs font-medium"
             )}
         >
-            {status == "active" ? "Aktywny" : "Nieaktywny"}
+            {status == "active" ? "Aktywny" : "Nie aktywowany"}
         </span>
     );
 }

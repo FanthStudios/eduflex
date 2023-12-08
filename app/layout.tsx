@@ -15,7 +15,7 @@ export const metadata: Metadata = {
         "Dołącz do EduFlex, wiodącej platformy do nauki online. Przeglądaj różnorodne przedmioty, ucz się od najlepszych nauczycieli i osiągaj swoje cele edukacyjne.",
     authors: [
         {
-            name: "Bartosz Paczesny",
+            name: "Bartek Paczesny",
             url: "https://dev.paczesny.pl/",
         },
     ],
@@ -27,7 +27,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en">
+        <html lang="pl">
             <AuthProvider>
                 <body>
                     {children}

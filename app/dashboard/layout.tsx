@@ -3,14 +3,11 @@
 import { Mobile, Sidebar } from "@/components/Sidebar";
 import { useEffect, useState } from "react";
 import {
-    CalendarDaysIcon,
-    HomeIcon,
     LockOpenIcon,
-    PencilSquareIcon,
     Squares2X2Icon,
     UsersIcon,
 } from "@heroicons/react/24/outline";
-import { useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 
 const navigation = [
     {
@@ -34,9 +31,6 @@ const navigation = [
         icon: UsersIcon,
     },
 ];
-function classNames(...classes: string[]) {
-    return classes.filter(Boolean).join(" ");
-}
 
 type Props = {
     children: React.ReactNode;
@@ -44,13 +38,15 @@ type Props = {
 
 export default function PanelLayout({ children }: Props) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
 
     useEffect(() => {
         if (session && session?.user.role.toLocaleLowerCase() !== "admin") {
             window.location.href = "/panel";
+        } else if (!session && status !== "loading") {
+            window.location.href = "/login";
         }
-    }, [session]);
+    }, [session, status]);
 
     return (
         <>
@@ -64,19 +60,14 @@ export default function PanelLayout({ children }: Props) {
       */}
             <div>
                 <Mobile
-                    user={session?.user}
+                    user={session ? session.user : undefined}
                     sidebarOpen={sidebarOpen}
                     setSidebarOpen={setSidebarOpen}
                     navigation={navigation}
-                    classNames={classNames}
                 />
 
                 {/* Static sidebar for desktop */}
-                <Sidebar
-                    user={session?.user}
-                    classNames={classNames}
-                    navigation={navigation}
-                />
+                <Sidebar user={session?.user} navigation={navigation} />
 
                 <main className="fixed z-40 inset-0 pt-16 2xl:py-10 lg:pl-72 h-full">
                     <div className="px-4 py-4 sm:px-6 lg:px-8 grid grid-cols-3 grid-rows-2 gap-12 items-start h-full">
