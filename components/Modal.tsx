@@ -91,7 +91,7 @@ const Modal: ModalType = ({ isOpen, closeModal, children }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all gap-6 flex flex-col items-start justify-center">
+                            <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all gap-6 flex flex-col items-start justify-center">
                                 {children}
                             </Dialog.Panel>
                         </Transition.Child>
