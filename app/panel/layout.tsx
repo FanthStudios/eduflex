@@ -89,13 +89,11 @@ export default function PanelLayout({ children }: Props) {
                             ? navigation[0]
                             : navigation[1]
                     }
-                    classNames={classNames}
                 />
 
                 {/* Static sidebar for desktop */}
                 <Sidebar
                     user={session?.user}
-                    classNames={classNames}
                     navigation={
                         session?.user.role.toLocaleLowerCase() === "student"
                             ? navigation[0]
