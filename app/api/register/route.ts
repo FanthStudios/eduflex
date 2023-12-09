@@ -62,12 +62,16 @@ export async function POST(request: Request) {
         (code) => code.value === activationCode
     ) as any;
 
-    if (!activationCodeExists) {
+    if (!activationCodeExists && role === "TEACHER") {
         console.log(activationCodeExists);
         return new NextResponse("Nieprawidłowy kod aktywacyjny", {
             status: 401,
         });
-    } else if (activationCodeExists.userId) {
+    } else if (
+        activationCodeExists &&
+        activationCodeExists.userId &&
+        role === "TEACHER"
+    ) {
         return new NextResponse("Kod aktywacyjny został już wykorzystany", {
             status: 401,
         });
