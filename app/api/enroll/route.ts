@@ -58,8 +58,8 @@ export async function POST(request: Request) {
         const goal = appointment.goal;
         if (
             goal !== "poprawa_sprawdzianu" &&
-            goal !== "przygotowanie_do_sprawdzianu" &&
-            goal !== "przygotowanie_do_kolokwium"
+            goal !== "poprawa_kartkowki" &&
+            goal !== "nauka"
         ) {
             // the goal is "other" and the goal is saved to the appointment.goal field
             const studentAppointment = await prisma.studentAppointment.create({
