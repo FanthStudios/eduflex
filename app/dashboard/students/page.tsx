@@ -2,14 +2,25 @@
 
 import ListCard from "@/components/panel/ListCard";
 import { useStudent } from "@/hooks/useStudent";
+import { toast } from "react-toastify";
 
 type Props = {};
 
 export default function Students({}: Props) {
-    const { students } = useStudent();
+    const { students, setStudents } = useStudent();
 
     async function handleUserDelete(userId: string) {
-        console.log("Delete user", userId);
+        const res = await fetch(`/api/students`, {
+            method: "DELETE",
+            body: JSON.stringify({ id: userId }),
+        });
+
+        if (res.status === 200) {
+            toast.success("Uczeń został usunięty");
+            setStudents(students.filter((s) => s.userId !== parseInt(userId)));
+        } else {
+            toast.error("Nie udało się usunąć ucznia");
+        }
     }
 
     return (

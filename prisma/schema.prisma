@@ -71,7 +71,7 @@ model Student {
 model Teacher {
   userId       Int           @id
   appointments Appointment[]
-  user         User          @relation(fields: [userId], references: [id], onDelete: NoAction)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   favoritedBy  Student[]     @relation("FavoriteTeachers")
   subjects     Subject[]     @relation("TeacherSubjects")
 }

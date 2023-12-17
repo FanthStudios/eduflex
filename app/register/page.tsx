@@ -2,6 +2,8 @@
 
 import Logo from "@/components/Logo";
 import MultiSelect from "@/components/MultiSelect";
+import { useClasses } from "@/hooks/useClasses";
+import { useSubjects } from "@/hooks/useSubjects";
 import { slideInVariant } from "@/utils/motion";
 import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
@@ -9,6 +11,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import React, { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
+import { Class } from "@/hooks/useClasses";
 
 type Props = {};
 
@@ -35,25 +38,9 @@ export default function Register({}: Props) {
 
     const [subjects, setSubjects] = useState<string[]>([]);
 
-    const options = [
-        { id: 1, name: "Matematyka" },
-        { id: 2, name: "Fizyka" },
-        { id: 3, name: "Chemia" },
-        { id: 4, name: "Biologia" },
-        { id: 5, name: "Geografia" },
-        { id: 6, name: "Historia" },
-        { id: 7, name: "Wiedza o społeczeństwie" },
-        { id: 8, name: "Język polski" },
-        { id: 9, name: "Język angielski" },
-        { id: 10, name: "Język niemiecki" },
-        { id: 13, name: "Język rosyjski" },
-        { id: 17, name: "Informatyka" },
-        { id: 18, name: "Wychowanie fizyczne" },
-        { id: 19, name: "Edukacja dla bezpieczeństwa" },
-        { id: 21, name: "Religia" },
-    ];
+    const { subjects: options } = useSubjects();
 
-    const classes = ["5pi", "4i", "3i", "2gt", "3gt"];
+    const { classes } = useClasses();
 
     const handleRegister = async () => {
         // check if the domain in email is @chmura.zs14.edu.pl using regex
@@ -512,18 +499,22 @@ export default function Register({}: Props) {
                                             >
                                                 {classes.map(
                                                     (
-                                                        studentsClass: string,
+                                                        schoolClass: Class,
                                                         index: number
-                                                    ) => (
-                                                        <option
-                                                            key={index}
-                                                            value={
-                                                                studentsClass
-                                                            }
-                                                        >
-                                                            {studentsClass}
-                                                        </option>
-                                                    )
+                                                    ) => {
+                                                        return (
+                                                            <option
+                                                                key={index}
+                                                                value={
+                                                                    schoolClass.name
+                                                                }
+                                                            >
+                                                                {
+                                                                    schoolClass.name
+                                                                }
+                                                            </option>
+                                                        );
+                                                    }
                                                 )}
                                             </select>
                                         </motion.div>

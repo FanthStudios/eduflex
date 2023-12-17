@@ -94,6 +94,7 @@ export function useStudent(userId?: string) {
     return {
         student: students[0],
         students,
+        setStudents,
         removeStudentsFavoriteTeacher,
         addStudentsFavoriteTeacher,
     };

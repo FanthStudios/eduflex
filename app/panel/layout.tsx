@@ -1,7 +1,7 @@
 "use client";
 
 import { Mobile, Sidebar } from "@/components/Sidebar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     CalendarDaysIcon,
     HomeIcon,
@@ -9,6 +9,7 @@ import {
     UsersIcon,
 } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 const navigation = [
     [
@@ -57,10 +58,6 @@ const navigation = [
     ],
 ];
 
-function classNames(...classes: string[]) {
-    return classes.filter(Boolean).join(" ");
-}
-
 type Props = {
     children: React.ReactNode;
 };
@@ -68,6 +65,18 @@ type Props = {
 export default function PanelLayout({ children }: Props) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { data: session } = useSession();
+    const userRole = session?.user.role.toLocaleLowerCase();
+    const pathname = usePathname();
+
+    useEffect(() => {
+        if (pathname == "/panel" && userRole == "admin") {
+            window.location.href = "/dashboard";
+        }
+
+        if (pathname == "/dashboard" && userRole !== "admin") {
+            window.location.href = "/panel";
+        }
+    }, [pathname, userRole]);
 
     return (
         <>

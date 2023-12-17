@@ -59,3 +59,32 @@ export const getStundentAppointments = async () => {
 
     return student;
 };
+
+export const deleteStudent = async (id: number) => {
+    try {
+        // Usuń powiązane rekordy w modelu appointment
+        await prisma.studentAppointment.deleteMany({
+            where: {
+                studentId: id,
+            },
+        });
+
+        // Usuń studenta
+        const student = await prisma.student.delete({
+            where: {
+                userId: id,
+            },
+        });
+
+        // Usuń użytkownika
+        const user = await prisma.user.delete({
+            where: {
+                id,
+            },
+        });
+
+        return student;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};

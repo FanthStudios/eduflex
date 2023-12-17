@@ -3,11 +3,14 @@
 import { Mobile, Sidebar } from "@/components/Sidebar";
 import { useEffect, useState } from "react";
 import {
-    LockOpenIcon,
+    AcademicCapIcon,
+    BookOpenIcon,
+    BuildingLibraryIcon,
+    KeyIcon,
     Squares2X2Icon,
     UsersIcon,
 } from "@heroicons/react/24/outline";
-import { getSession, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 const navigation = [
     {
@@ -16,14 +19,24 @@ const navigation = [
         icon: Squares2X2Icon,
     },
     {
-        name: "Kody dostępu",
+        name: "Klucze aktywacji",
         href: "/dashboard/accessCodes",
-        icon: LockOpenIcon,
+        icon: KeyIcon,
+    },
+    {
+        name: "Przedmioty",
+        href: "/dashboard/subjects",
+        icon: BookOpenIcon,
+    },
+    {
+        name: "Klasy",
+        href: "/dashboard/classes",
+        icon: BuildingLibraryIcon,
     },
     {
         name: "Uczniowie",
         href: "/dashboard/students",
-        icon: UsersIcon,
+        icon: AcademicCapIcon,
     },
     {
         name: "Nauczyciele",

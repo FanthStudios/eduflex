@@ -52,6 +52,7 @@ export function useTeacher(withAppoinments?: boolean, userId?: string) {
 
     return {
         teachers,
+        setTeachers,
         teacher: teachers[0],
     };
 }

@@ -7,9 +7,7 @@ export const middleware = async (req: NextRequest, res: NextResponse) => {
         return cookie.name === "next-auth.session-token";
     });
 
-    if (!isLoggedIn) {
-        return NextResponse.redirect(new URL("/login", req.url));
-    } else if (isLoggedIn && req.url.includes("/login")) {
+    if (isLoggedIn && req.url.includes("/login")) {
         return NextResponse.redirect(new URL("/", req.url));
     }
 
@@ -18,4 +16,6 @@ export const middleware = async (req: NextRequest, res: NextResponse) => {
     }
 };
 
-export const config = { matcher: ["/panel", "/panel/:path*"] };
+export const config = {
+    matcher: ["/panel", "/panel/:path*", "/dashboard", "/dashboard/:path*"],
+};
