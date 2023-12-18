@@ -139,22 +139,6 @@ function Dashboardclasses({}: Props) {
                     </button>
                 </div>
                 <div className="flex flex-col items-start justify-start gap-6 w-full">
-                    {/* {classes.map((schoolClass) => (
-                        <div
-                            className="py-2 px-4 flex justify-between items-center rounded-lg border text-lg bg-neutral-50 border-neutral-200 max-w-[11rem] w-full"
-                            key={schoolClass.id}
-                        >
-                            <p>{schoolClass.name}</p>
-                            <button
-                                onClick={async () =>
-                                    await handleDelete(schoolClass.id)
-                                }
-                                className="text-sm font-medium transition-all duration-200 hover:scale-105 text-neutral-500 hover:text-red-500"
-                            >
-                                <TrashIcon className="w-5 h-5" />
-                            </button>
-                        </div>
-                    ))} */}
                     {Object.entries(classLevels).map(
                         ([level, classes]) =>
                             classes.length > 0 && (

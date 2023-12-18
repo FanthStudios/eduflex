@@ -19,6 +19,9 @@ import {
     UsersIcon,
 } from "@heroicons/react/24/outline";
 import type { Dispatch, SetStateAction } from "react";
+import { DateTimePicker } from "@/components/ui/datetime";
+import { Input } from "@/components/ui/input";
+import { toast } from "react-toastify";
 
 type Props = {
     isOpen: boolean;
@@ -27,16 +30,39 @@ type Props = {
     setAppointment: Dispatch<SetStateAction<Appointment | null>>;
 };
 
+async function handleSubmit(appointment: Appointment) {
+    // appointment update function
+    const res = await fetch("/api/appointments", {
+        method: "PATCH",
+        body: JSON.stringify({
+            id: appointment.id,
+            subject: appointment.subject.name,
+            location: appointment.location,
+            dateTime: appointment.dateTime,
+            roomNumber: appointment.roomNumber,
+            availableSlots: appointment.availableSlots,
+        }),
+    });
+
+    if (res.ok) {
+        const data = await res.json();
+        toast.success("Zaktualizowano korepetycje");
+        window.location.reload();
+    } else {
+        toast.error("Wystąpił błąd podczas aktualizacji korepetycji");
+        console.error(await res.json());
+    }
+}
+
 export const AppointmentModal = ({
     isOpen,
     closeModal,
     appointment,
     setAppointment,
 }: Props) => {
-    const { teacher } = useTeacher(
-        true,
-        appointment?.teacher.user.id.toString()
-    );
+    const teacherId = appointment?.teacher.user.id.toString();
+
+    const { teacher } = useTeacher(true, teacherId);
     const { locations } = useLocation();
 
     if (!appointment) return null;
@@ -177,6 +203,45 @@ export const AppointmentModal = ({
                                 </SelectContent>
                             </Select>
                         </div>
+                        <div className="w-full">
+                            <label
+                                htmlFor="dateAndTime"
+                                className="block text-sm font-medium leading-6 text-gray-900"
+                            >
+                                Data i godzina
+                            </label>
+                            <DateTimePicker
+                                date={new Date(appointment.dateTime)}
+                                setDate={(date) => {
+                                    setAppointment({
+                                        ...appointment,
+                                        dateTime: date,
+                                    });
+                                }}
+                            />
+                        </div>
+                        <div className="w-full">
+                            <label
+                                htmlFor="roomNumber"
+                                className="block text-sm font-medium leading-6 text-gray-900"
+                            >
+                                Numer sali
+                            </label>
+                            <Input
+                                type="number"
+                                name="roomNumber"
+                                id="roomNumber"
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-neutral-500 focus:border-neutral-500 sm:text-sm"
+                                placeholder="Numer sali"
+                                value={appointment.roomNumber}
+                                onChange={(e) => {
+                                    setAppointment({
+                                        ...appointment,
+                                        roomNumber: parseInt(e.target.value),
+                                    });
+                                }}
+                            />
+                        </div>
                     </Tab.Panel>
                     <Tab.Panel className="w-full flex gap-3 flex-col items-start justify-start divide-y divide-neutral-100">
                         {appointment.studentAppointments &&
@@ -243,7 +308,7 @@ export const AppointmentModal = ({
                 </Modal.Button>
                 <Modal.Button
                     color="green"
-                    onClick={() => console.log("hello")}
+                    onClick={async () => await handleSubmit(appointment)}
                 >
                     Zapisz
                 </Modal.Button>
