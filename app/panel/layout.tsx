@@ -10,53 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
-
-const navigation = [
-    [
-        {
-            name: "Strona główna",
-            href: "/panel",
-            icon: HomeIcon,
-        },
-        {
-            name: "Nauczyciele",
-            href: "/panel/teachers",
-            icon: UsersIcon,
-        },
-        {
-            name: "Zapisz się",
-            href: "/panel/appointments",
-            icon: PencilSquareIcon,
-        },
-        {
-            name: "Moje korepetycje",
-            href: "/panel/myAppointments",
-            icon: CalendarDaysIcon,
-        },
-    ],
-    [
-        {
-            name: "Strona główna",
-            href: "/panel",
-            icon: HomeIcon,
-        },
-        {
-            name: "Uczniowie",
-            href: "/panel/students",
-            icon: UsersIcon,
-        },
-        {
-            name: "Stwórz korepetycje",
-            href: "/panel/createAppointment",
-            icon: PencilSquareIcon,
-        },
-        {
-            name: "Moje korepetycje",
-            href: "/panel/myAppointments",
-            icon: CalendarDaysIcon,
-        },
-    ],
-];
+import { useNotification } from "@/hooks/useNotifications";
 
 type Props = {
     children: React.ReactNode;
@@ -66,7 +20,57 @@ export default function PanelLayout({ children }: Props) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { data: session } = useSession();
     const userRole = session?.user.role.toLocaleLowerCase();
+    const userId = session?.user.id;
     const pathname = usePathname();
+
+    const [navigation, setNavigation] = useState([
+        [
+            {
+                name: "Strona główna",
+                href: "/panel",
+                icon: HomeIcon,
+            },
+            {
+                name: "Nauczyciele",
+                href: "/panel/teachers",
+                icon: UsersIcon,
+            },
+            {
+                name: "Zapisz się",
+                href: "/panel/appointments",
+                icon: PencilSquareIcon,
+            },
+            {
+                name: "Moje korepetycje",
+                href: "/panel/myAppointments",
+                icon: CalendarDaysIcon,
+            },
+        ],
+        [
+            {
+                name: "Strona główna",
+                href: "/panel",
+                icon: HomeIcon,
+            },
+            {
+                name: "Uczniowie",
+                href: "/panel/students",
+                icon: UsersIcon,
+            },
+            {
+                name: "Stwórz korepetycje",
+                href: "/panel/createAppointment",
+                icon: PencilSquareIcon,
+            },
+            {
+                name: "Moje korepetycje",
+                href: "/panel/myAppointments",
+                icon: CalendarDaysIcon,
+            },
+        ],
+    ]);
+
+    const { notifications, setNotifications } = useNotification(userId);
 
     useEffect(() => {
         if (pathname == "/panel" && userRole == "admin") {
@@ -102,19 +106,20 @@ export default function PanelLayout({ children }: Props) {
 
                 {/* Static sidebar for desktop */}
                 <Sidebar
+                    setNotifications={setNotifications}
+                    notifications={notifications}
+                    setSidebarOpen={setSidebarOpen}
                     user={session?.user}
                     navigation={
                         session?.user.role.toLocaleLowerCase() === "student"
                             ? navigation[0]
                             : navigation[1]
                     }
-                />
-
-                <main className="fixed z-40 inset-0 pt-16 2xl:py-10 lg:pl-72 h-full">
+                >
                     <div className="px-4 py-4 sm:px-6 lg:px-8 grid grid-cols-3 grid-rows-2 gap-12 items-start h-full">
                         {children}
                     </div>
-                </main>
+                </Sidebar>
             </div>
         </>
     );

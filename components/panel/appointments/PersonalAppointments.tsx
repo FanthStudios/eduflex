@@ -18,6 +18,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { toast } from "react-toastify";
 
 export interface StudentAppointment {
     studentId: number;
@@ -419,6 +420,29 @@ function TeacherAppointment({
     setCurrentAppointment: any;
     setModalOpen: any;
 }) {
+    async function deleteAppointment() {
+        const res = await fetch(`/api/appointments`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                appointmentId: appointment.id,
+                subjectId: appointment.subject.id,
+                teacherId: appointment.teacherId,
+                locationAddress: appointment.location.address,
+            }),
+        });
+        if (res.status == 200) {
+            toast.success("Pomyślnie usunięto korepetycje");
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            window.location.reload();
+        } else {
+            toast.error("Wystąpił błąd podczas usuwania korepetycji");
+            console.error(await res.json());
+        }
+    }
+
     return (
         <div className="relative flex space-x-6 p-3 w-full xl:static border border-neutral-300 rounded-lg">
             <div className="flex-auto text-start">
@@ -559,6 +583,9 @@ function TeacherAppointment({
                                         <Menu.Item>
                                             {({ active }) => (
                                                 <button
+                                                    onClick={async () =>
+                                                        await deleteAppointment()
+                                                    }
                                                     className={clsx(
                                                         active
                                                             ? "bg-red-50 text-red-600"

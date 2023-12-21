@@ -372,6 +372,37 @@ export async function PATCH(request: Request) {
         },
     });
 
+    // create notifications for eache student enrolled in this appointment
+    const studentAppointments = await prisma.studentAppointment.findMany({
+        where: {
+            appointmentId: id.toString(),
+        },
+        include: {
+            student: {
+                select: {
+                    user: true,
+                },
+            },
+        },
+    });
+
+    for (let studentAppointment of studentAppointments) {
+        await prisma.notification.create({
+            data: {
+                message: `Korepetycje w dniu ${new Date(
+                    dateTime
+                ).toLocaleDateString("pl-PL", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                })} z przedmiotu ${subject} zostały zaktualizowane`,
+                type: "appointment_udate",
+                userId: studentAppointment.student.user.id,
+                createdAt: new Date(),
+            },
+        });
+    }
+
     return new NextResponse(
         JSON.stringify({
             message: "Pomyślnie zaktualizowano korepetycje",
@@ -384,4 +415,86 @@ export async function PATCH(request: Request) {
             },
         }
     );
+}
+
+export async function DELETE(request: Request) {
+    const body = await request.json();
+
+    const { appointmentId, subjectId, teacherId, locationAddress } = body as {
+        appointmentId: string;
+        subjectId: number;
+        teacherId: number;
+        locationAddress: string;
+    };
+
+    try {
+        // create notifications for eache student enrolled in this appointment
+        const studentAppointments = await prisma.studentAppointment.findMany({
+            where: {
+                appointmentId: appointmentId,
+            },
+            include: {
+                student: {
+                    select: {
+                        user: true,
+                    },
+                },
+            },
+        });
+
+        const appointment = await prisma.appointment.findFirst({
+            where: {
+                id: appointmentId,
+            },
+        });
+
+        for (let studentAppointment of studentAppointments) {
+            await prisma.notification.create({
+                data: {
+                    message: `Korepetycje w dniu ${new Date(
+                        appointment?.dateTime!
+                    ).toLocaleDateString("pl-PL", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                    })} z przedmiotu ${
+                        studentAppointment.subject
+                    } zostały odwołane`,
+                    type: "appointment_delete",
+                    userId: studentAppointment.studentId,
+                    createdAt: new Date(),
+                },
+            });
+        }
+
+        // delete appointment
+        await prisma.appointment.delete({
+            where: {
+                locationAddress,
+                subjectId,
+                teacherId,
+                id: appointmentId,
+            },
+        });
+
+        return new NextResponse(JSON.stringify({}), {
+            status: 200,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+    } catch (e: any) {
+        return new NextResponse(
+            JSON.stringify({
+                message: e.message,
+                error: e,
+            }),
+            {
+                status: 500,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+    }
 }

@@ -12,39 +12,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
 
-const navigation = [
-    {
-        name: "Strona główna",
-        href: "/dashboard",
-        icon: Squares2X2Icon,
-    },
-    {
-        name: "Klucze aktywacji",
-        href: "/dashboard/accessCodes",
-        icon: KeyIcon,
-    },
-    {
-        name: "Przedmioty",
-        href: "/dashboard/subjects",
-        icon: BookOpenIcon,
-    },
-    {
-        name: "Klasy",
-        href: "/dashboard/classes",
-        icon: BuildingLibraryIcon,
-    },
-    {
-        name: "Uczniowie",
-        href: "/dashboard/students",
-        icon: AcademicCapIcon,
-    },
-    {
-        name: "Nauczyciele",
-        href: "/dashboard/teachers",
-        icon: UsersIcon,
-    },
-];
-
 type Props = {
     children: React.ReactNode;
 };
@@ -60,6 +27,111 @@ export default function PanelLayout({ children }: Props) {
             window.location.href = "/login";
         }
     }, [session, status]);
+
+    const [navigation, setNavigation] = useState([
+        {
+            name: "Strona główna",
+            href: "/dashboard",
+            icon: Squares2X2Icon,
+        },
+        {
+            name: "Klucze aktywacji",
+            href: "/dashboard/accessCodes",
+            icon: KeyIcon,
+            count: 0,
+        },
+        {
+            name: "Przedmioty",
+            href: "/dashboard/subjects",
+            icon: BookOpenIcon,
+        },
+        {
+            name: "Klasy",
+            href: "/dashboard/classes",
+            icon: BuildingLibraryIcon,
+        },
+        {
+            name: "Uczniowie",
+            href: "/dashboard/students",
+            icon: AcademicCapIcon,
+        },
+        {
+            name: "Nauczyciele",
+            href: "/dashboard/teachers",
+            icon: UsersIcon,
+        },
+    ]);
+
+    useEffect(() => {
+        const getValues = async () => {
+            const accessCodes = await fetch("/api/accessCodes");
+            await accessCodes.json().then((data) => {
+                const count = data.length;
+                setNavigation((prev) => {
+                    return prev.map((item) => {
+                        if (item.name === "Klucze aktywacji") {
+                            return { ...item, count };
+                        }
+                        return item;
+                    });
+                });
+            });
+
+            const subjects = await fetch("/api/subjects");
+            await subjects.json().then((data) => {
+                const count = data.length;
+                setNavigation((prev) => {
+                    return prev.map((item) => {
+                        if (item.name === "Przedmioty") {
+                            return { ...item, count };
+                        }
+                        return item;
+                    });
+                });
+            });
+
+            const classes = await fetch("/api/classes");
+            await classes.json().then((data) => {
+                const count = data.length;
+                setNavigation((prev) => {
+                    return prev.map((item) => {
+                        if (item.name === "Klasy") {
+                            return { ...item, count };
+                        }
+                        return item;
+                    });
+                });
+            });
+
+            const students = await fetch("/api/students");
+            await students.json().then((data) => {
+                const count = data.length;
+                setNavigation((prev) => {
+                    return prev.map((item) => {
+                        if (item.name === "Uczniowie") {
+                            return { ...item, count };
+                        }
+                        return item;
+                    });
+                });
+            });
+
+            const teachers = await fetch("/api/teachers");
+            await teachers.json().then((data) => {
+                const count = data.length;
+                setNavigation((prev) => {
+                    return prev.map((item) => {
+                        if (item.name === "Nauczyciele") {
+                            return { ...item, count };
+                        }
+                        return item;
+                    });
+                });
+            });
+        };
+
+        getValues();
+    }, []);
 
     return (
         <>

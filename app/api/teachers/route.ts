@@ -1,5 +1,21 @@
+import { prisma } from "@/prisma/client";
 import { deleteTeacher, getTeachers } from "@/utils/teacher";
 import { NextResponse } from "next/server";
+
+export async function GET(request: Request) {
+    const teachers = await prisma.teacher.findMany({
+        include: {
+            user: false,
+        },
+    });
+
+    return new NextResponse(JSON.stringify(teachers), {
+        status: 200,
+        headers: {
+            "content-type": "application/json",
+        },
+    });
+}
 
 export async function POST(request: Request) {
     const body = await request.json();

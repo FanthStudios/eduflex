@@ -49,6 +49,7 @@ model User {
   student        Student?
   teacher        Teacher?
   activationCode ActivationCode?
+  notifications  Notification[]
 }
 
 model Class {
@@ -125,12 +126,23 @@ model StudentAppointment {
   goal          String
   subject       String
   topic         String?
-  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: NoAction)
-  student       Student     @relation(fields: [studentId], references: [userId], onDelete: NoAction)
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  student       Student     @relation(fields: [studentId], references: [userId], onDelete: Cascade)
 
   @@id([studentId, appointmentId])
   @@index([appointmentId], map: "StudentAppointment_appointmentId_fkey")
   @@index([studentId], map: "StudentAppointment_studentId_key")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  reason    String   @default("")
+  user      User     @relation(fields: [userId], references: [id], onDelete: NoAction)
 }
 
 model VerificationToken {

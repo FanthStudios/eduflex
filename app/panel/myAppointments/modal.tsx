@@ -15,13 +15,15 @@ import { useTeacher } from "@/hooks/useTeacher";
 import {
     AdjustmentsHorizontalIcon,
     CalendarDaysIcon,
+    CheckIcon,
     HandThumbDownIcon,
     UsersIcon,
 } from "@heroicons/react/24/outline";
-import type { Dispatch, SetStateAction } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { DateTimePicker } from "@/components/ui/datetime";
 import { Input } from "@/components/ui/input";
 import { toast } from "react-toastify";
+import Accordion from "./accordion";
 
 type Props = {
     isOpen: boolean;
@@ -54,6 +56,42 @@ async function handleSubmit(appointment: Appointment) {
     }
 }
 
+async function handleDeleteStudent(
+    studentId: number,
+    appointmentId: number,
+    subjectId: number,
+    teacherId: number,
+    locationAddress: string,
+    reason: string
+) {
+    if (!reason) {
+        toast.error("Wpisz powód usunięcia uczestnika");
+        return;
+    }
+
+    // appointment update function
+    const res = await fetch("/api/appointments/student", {
+        method: "DELETE",
+        body: JSON.stringify({
+            studentId,
+            appointmentId,
+            subjectId,
+            teacherId,
+            locationAddress,
+            reason,
+        }),
+    });
+
+    if (res.status === 200) {
+        const data = await res.json();
+        toast.success("Usunięto uczestnika");
+        window.location.reload();
+    } else {
+        toast.error("Wystąpił błąd podczas usuwania uczestnika");
+        console.error(await res.json());
+    }
+}
+
 export const AppointmentModal = ({
     isOpen,
     closeModal,
@@ -64,6 +102,8 @@ export const AppointmentModal = ({
 
     const { teacher } = useTeacher(true, teacherId);
     const { locations } = useLocation();
+
+    const [reason, setReason] = useState("");
 
     if (!appointment) return null;
 
@@ -249,46 +289,95 @@ export const AppointmentModal = ({
                             appointment.studentAppointments.map(
                                 (studentAppointment: any, index: number) => {
                                     return (
-                                        <div
+                                        <Accordion
                                             key={index}
                                             className="w-full flex items-center justify-between gap-3"
                                         >
-                                            <p className="text-neutral-700 font-medium whitespace-nowrap">
-                                                {
-                                                    studentAppointment.student
-                                                        .user.firstName
-                                                }{" "}
-                                                {
-                                                    studentAppointment.student
-                                                        .user.lastName
-                                                }
-                                            </p>
-                                            <div className="flex items-center justify-end gap-2 flex-grow w-full">
-                                                <p>
-                                                    {studentAppointment.goal ==
-                                                    "poprawa_kartkowki"
-                                                        ? "pop. kartkówki"
-                                                        : studentAppointment.goal ==
-                                                          "poprawa_sprawdzianu"
-                                                        ? "pop. sprawdzianu"
-                                                        : studentAppointment.goal ==
-                                                          "nauka"
-                                                        ? "Nauka"
-                                                        : studentAppointment.goal}
+                                            <Accordion.Head>
+                                                <p className="text-neutral-700 font-medium whitespace-nowrap">
+                                                    {
+                                                        studentAppointment
+                                                            .student.user
+                                                            .firstName
+                                                    }{" "}
+                                                    {
+                                                        studentAppointment
+                                                            .student.user
+                                                            .lastName
+                                                    }
                                                 </p>
-                                                <p>
-                                                    {studentAppointment.goal !==
-                                                    ("poprawa_kartkówki" ||
-                                                        "poprawa_sprawdzianu" ||
-                                                        "nauka")
-                                                        ? studentAppointment.topic
-                                                        : ""}
-                                                </p>
-                                            </div>
-                                            <button className="p-2 flex items-center justify-center border rounded-lg border-transparent transition-all duration-100 hover:shadow-md hover:text-red-500 hover:bg-neutral-50/10">
-                                                <HandThumbDownIcon className="w-5 aspect-square" />
-                                            </button>
-                                        </div>
+                                                <div className="flex items-center justify-end gap-2 flex-grow w-full">
+                                                    <p>
+                                                        {studentAppointment.goal ==
+                                                        "poprawa_kartkowki"
+                                                            ? "pop. kartkówki"
+                                                            : studentAppointment.goal ==
+                                                              "poprawa_sprawdzianu"
+                                                            ? "pop. sprawdzianu"
+                                                            : studentAppointment.goal ==
+                                                              "nauka"
+                                                            ? "Nauka"
+                                                            : studentAppointment.goal}
+                                                    </p>
+                                                    <p>
+                                                        {studentAppointment.goal !==
+                                                        ("poprawa_kartkówki" ||
+                                                            "poprawa_sprawdzianu" ||
+                                                            "nauka")
+                                                            ? studentAppointment
+                                                                  .topic
+                                                                  .length > 25
+                                                                ? studentAppointment.topic.substring(
+                                                                      0,
+                                                                      25
+                                                                  ) + "..."
+                                                                : studentAppointment.topic
+                                                            : ""}
+                                                    </p>
+                                                </div>
+                                            </Accordion.Head>
+                                            <Accordion.Body>
+                                                <div className="w-full flex gap-2">
+                                                    <Input
+                                                        type="text"
+                                                        name="reason"
+                                                        id="reason"
+                                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-neutral-500 focus:border-neutral-500 sm:text-sm"
+                                                        placeholder="Powód usunięcia"
+                                                        onChange={(e) => {
+                                                            setReason(
+                                                                e.target.value
+                                                            );
+                                                        }}
+                                                    />
+                                                    <button
+                                                        onClick={async () => {
+                                                            await handleDeleteStudent(
+                                                                studentAppointment
+                                                                    .student
+                                                                    .user.id,
+                                                                appointment.id,
+                                                                appointment
+                                                                    .subject.id,
+                                                                appointment
+                                                                    .teacher
+                                                                    .user.id,
+                                                                appointment
+                                                                    .location
+                                                                    .address,
+                                                                reason
+                                                            );
+                                                        }}
+                                                        className="p-2 flex gap-2 items-center justify-center border rounded-lg border-transparent transition-all duration-100 hover:shadow-md hover:text-red-500 hover:bg-neutral-50/10"
+                                                    >
+                                                        <span className="lg:block hidden">
+                                                            Potwierdź
+                                                        </span>
+                                                        <CheckIcon className="w-5 aspect-square" />
+                                                    </button>
+                                                </div>
+                                            </Accordion.Body>
+                                        </Accordion>
                                     );
                                 }
                             )
