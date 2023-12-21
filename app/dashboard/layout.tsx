@@ -11,6 +11,7 @@ import {
     UsersIcon,
 } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
+import { useNotification } from "@/hooks/useNotifications";
 
 type Props = {
     children: React.ReactNode;
@@ -19,6 +20,7 @@ type Props = {
 export default function PanelLayout({ children }: Props) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { data: session, status } = useSession();
+    const userId = session?.user.id;
 
     useEffect(() => {
         if (session && session?.user.role.toLocaleLowerCase() !== "admin") {
@@ -61,6 +63,8 @@ export default function PanelLayout({ children }: Props) {
             icon: UsersIcon,
         },
     ]);
+
+    const { notifications, setNotifications } = useNotification(userId);
 
     useEffect(() => {
         const getValues = async () => {
@@ -152,13 +156,17 @@ export default function PanelLayout({ children }: Props) {
                 />
 
                 {/* Static sidebar for desktop */}
-                <Sidebar user={session?.user} navigation={navigation} />
-
-                <main className="fixed z-40 inset-0 pt-16 2xl:py-10 lg:pl-72 h-full">
+                <Sidebar
+                    setNotifications={setNotifications}
+                    notifications={notifications}
+                    setSidebarOpen={setSidebarOpen}
+                    user={session?.user}
+                    navigation={navigation}
+                >
                     <div className="px-4 py-4 sm:px-6 lg:px-8 grid grid-cols-3 grid-rows-2 gap-12 items-start h-full">
                         {children}
                     </div>
-                </main>
+                </Sidebar>
             </div>
         </>
     );
