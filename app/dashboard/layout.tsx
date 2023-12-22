@@ -20,7 +20,7 @@ type Props = {
 export default function PanelLayout({ children }: Props) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { data: session, status } = useSession();
-    const userId = session?.user.id as number | undefined;
+    const userId = session?.user.id;
 
     useEffect(() => {
         if (session && session?.user.role.toLocaleLowerCase() !== "admin") {
