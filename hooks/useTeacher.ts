@@ -14,6 +14,7 @@ export interface Teacher {
         password: string;
         role: string;
         lastLogin?: Date;
+        avatar: string;
     };
     appointments?: any[];
     favoritedBy?: {

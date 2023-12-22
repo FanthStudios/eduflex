@@ -11,7 +11,7 @@ export interface Notification {
     createdAt: Date;
 }
 
-export function useNotification(userId?: string) {
+export function useNotification(userId?: number) {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<

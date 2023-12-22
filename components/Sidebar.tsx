@@ -9,6 +9,7 @@ import {
     Bars3Icon,
     BellIcon,
     ChevronDownIcon,
+    Cog6ToothIcon,
     TrashIcon,
     UserMinusIcon,
     XMarkIcon,
@@ -79,6 +80,7 @@ interface SidebarProps {
               lastName: string;
               email: string;
               role: string;
+              avatar: string;
           }
         | undefined;
     setSidebarOpen: (value: boolean) => void;
@@ -94,6 +96,7 @@ export function Sidebar({
     children,
     notifications,
 }: SidebarProps) {
+    const userRole = user?.role;
     const [fillColor, setFillColor] = useState("");
 
     useEffect(() => {
@@ -168,7 +171,7 @@ export function Sidebar({
                                                     pathname == item.href
                                                         ? "bg-neutral-50 text-green-600"
                                                         : "text-neutral-700 hover:text-green-600 hover:bg-neutral-50",
-                                                    "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold w-full"
+                                                    "group flex items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold w-full"
                                                 )}
                                             >
                                                 <item.icon
@@ -193,6 +196,39 @@ export function Sidebar({
                                     ))}
                                 </ul>
                             </li>
+
+                            {userRole?.toLowerCase() !== "admin" && (
+                                <motion.li
+                                    whileTap={{
+                                        scale: 0.95,
+                                        transition: {
+                                            duration: 0.1,
+                                        },
+                                    }}
+                                    className="flex items-center justify-between w-full mt-auto"
+                                >
+                                    <Link
+                                        href="/panel/settings"
+                                        className={clsx(
+                                            pathname == "/panel/settings"
+                                                ? "bg-neutral-50 text-green-600"
+                                                : "text-neutral-700 hover:text-green-600 hover:bg-neutral-50",
+                                            "group flex items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold w-full"
+                                        )}
+                                    >
+                                        <Cog6ToothIcon
+                                            className={clsx(
+                                                pathname == "/panel/settings"
+                                                    ? "text-green-600"
+                                                    : "text-neutral-400 group-hover:text-green-600",
+                                                "h-8 w-8 shrink-0"
+                                            )}
+                                            aria-hidden="true"
+                                        />
+                                        <p>Ustawienia</p>
+                                    </Link>
+                                </motion.li>
+                            )}
                         </ul>
                     </nav>
                 </div>
@@ -302,9 +338,19 @@ export function Sidebar({
                                     <span className="sr-only">
                                         Open user menu
                                     </span>
-                                    <div className={fillColor}>
-                                        <p>{user?.firstName[0]}</p>
-                                    </div>
+                                    {user?.avatar ? (
+                                        <div className={fillColor}>
+                                            <img
+                                                className="w-full h-full rounded-full"
+                                                src={user?.avatar}
+                                                alt=""
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className={fillColor}>
+                                            <p>{user?.firstName[0]}</p>
+                                        </div>
+                                    )}
                                     <span className="hidden lg:flex lg:items-center">
                                         <span
                                             className="ml-4 text-sm font-semibold leading-6 text-gray-900"
@@ -395,6 +441,7 @@ export const Mobile = ({
     user,
 }: MobileProps) => {
     const [fillColor, setFillColor] = useState("");
+    const userRole = user?.role;
 
     useEffect(() => {
         setFillColor(
@@ -523,6 +570,41 @@ export const Mobile = ({
                                                         )}
                                                     </ul>
                                                 </li>
+                                                {userRole?.toLowerCase() !==
+                                                    "admin" && (
+                                                    <motion.li
+                                                        whileTap={{
+                                                            scale: 0.95,
+                                                            transition: {
+                                                                duration: 0.1,
+                                                            },
+                                                        }}
+                                                        className="flex items-center justify-between w-full mt-auto"
+                                                    >
+                                                        <Link
+                                                            href="/panel/settings"
+                                                            className={clsx(
+                                                                pathname ==
+                                                                    "/panel/settings"
+                                                                    ? "bg-neutral-50 text-green-600"
+                                                                    : "text-neutral-700 hover:text-green-600 hover:bg-neutral-50",
+                                                                "group flex items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold w-full"
+                                                            )}
+                                                        >
+                                                            <Cog6ToothIcon
+                                                                className={clsx(
+                                                                    pathname ==
+                                                                        "/panel/settings"
+                                                                        ? "text-green-600"
+                                                                        : "text-neutral-400 group-hover:text-green-600",
+                                                                    "h-8 w-8 shrink-0"
+                                                                )}
+                                                                aria-hidden="true"
+                                                            />
+                                                            <p>Ustawienia</p>
+                                                        </Link>
+                                                    </motion.li>
+                                                )}
                                             </ul>
                                         </nav>
                                     </div>

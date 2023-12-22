@@ -41,15 +41,33 @@ export async function POST(request: Request) {
                 name: appointment.subject,
             },
         },
+        include: {
+            studentAppointments: true,
+        },
     });
 
     if (!teacherAppointment) {
         return new NextResponse(
             JSON.stringify({
-                message: "Appointment not found",
+                message: "Nie znaleziono korepetycji",
             }),
             {
                 status: 404,
+            }
+        );
+    }
+
+    // check if there are any free slots
+    if (
+        teacherAppointment.studentAppointments.length ==
+        teacherAppointment.availableSlots
+    ) {
+        return new NextResponse(
+            JSON.stringify({
+                message: "Brak wolnych miejsc",
+            }),
+            {
+                status: 400,
             }
         );
     }
@@ -73,7 +91,7 @@ export async function POST(request: Request) {
 
             return new NextResponse(
                 JSON.stringify({
-                    message: "Appointment created successfully",
+                    message: "Pomyślnie zapisano na korepetycje",
                     data: studentAppointment,
                 }),
                 {
@@ -94,7 +112,7 @@ export async function POST(request: Request) {
 
             return new NextResponse(
                 JSON.stringify({
-                    message: "Appointment created successfully",
+                    message: "Pomyślnie zapisano na korepetycje",
                     data: studentAppointment,
                 }),
                 {

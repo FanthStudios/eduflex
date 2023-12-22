@@ -1,5 +1,7 @@
 "use client";
 
+import { EdgeStoreProvider } from "@/lib/edgestore";
+
 import { Mobile, Sidebar } from "@/components/Sidebar";
 import { useEffect, useState } from "react";
 import {
@@ -83,15 +85,7 @@ export default function PanelLayout({ children }: Props) {
     }, [pathname, userRole]);
 
     return (
-        <>
-            {/*
-        This example requires updating your template:
-
-        ```
-        <html class="h-full bg-white">
-        <body class="h-full">
-        ```
-      */}
+        <EdgeStoreProvider>
             <div>
                 <Mobile
                     user={session?.user}
@@ -121,6 +115,6 @@ export default function PanelLayout({ children }: Props) {
                     </div>
                 </Sidebar>
             </div>
-        </>
+        </EdgeStoreProvider>
     );
 }

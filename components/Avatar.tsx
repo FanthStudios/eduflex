@@ -1,15 +1,17 @@
 "use client";
 
 import clsx from "clsx";
+import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
 type Props = {
+    src?: string;
     letter: string;
     width: number;
     className?: string;
 };
 
-export default function Avatar({ letter, width = 12, className }: Props) {
+export default function Avatar({ src, letter, width = 12, className }: Props) {
     const randomColor = useCallback(() => {
         const colorPallete = [
             "red",
@@ -53,18 +55,28 @@ export default function Avatar({ letter, width = 12, className }: Props) {
     }, [colorSaturation, randomColor, width, className]);
     return (
         <div className={fillColor}>
-            <p
-                className={clsx(
-                    width < 12
-                        ? "text-xl"
-                        : width < 16
-                        ? "text-2xl"
-                        : "text-3xl",
-                    "text-center"
-                )}
-            >
-                {letter}
-            </p>
+            {src ? (
+                <Image
+                    width={64}
+                    height={64}
+                    src={src}
+                    alt="avatar"
+                    className="aspect-square rounded-full"
+                />
+            ) : (
+                <p
+                    className={clsx(
+                        width < 12
+                            ? "text-xl"
+                            : width < 16
+                            ? "text-2xl"
+                            : "text-3xl",
+                        "text-center"
+                    )}
+                >
+                    {letter}
+                </p>
+            )}
         </div>
     );
 }

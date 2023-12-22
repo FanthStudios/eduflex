@@ -109,7 +109,7 @@ export default function Appointments({}: Props) {
 
             const body = await res.json();
 
-            if (res.status == 200) {
+            if (res.status === 200) {
                 window.location.href = "/panel/appointments";
                 toast.success("Zapisano na konsultacje");
             } else {

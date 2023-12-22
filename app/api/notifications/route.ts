@@ -1,9 +1,10 @@
+import { prisma } from "@/prisma/client";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
     const body = await request.json();
 
-    const { userId } = body as { userId: string };
+    const { userId } = body as { userId: number };
 
     const notifications = await prisma.notification.findMany({
         where: {
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
     const body = await request.json();
 
-    const { id, read } = body as { id: string; read: boolean };
+    const { id, read } = body as { id: number; read: boolean };
 
     await prisma.notification.update({
         where: {
