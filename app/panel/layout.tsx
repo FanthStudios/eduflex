@@ -1,7 +1,5 @@
 "use client";
 
-import { EdgeStoreProvider } from "@/lib/edgestore";
-
 import { Mobile, Sidebar } from "@/components/Sidebar";
 import { useEffect, useState } from "react";
 import {
@@ -85,36 +83,34 @@ export default function PanelLayout({ children }: Props) {
     }, [pathname, userRole]);
 
     return (
-        <EdgeStoreProvider>
-            <div>
-                <Mobile
-                    user={session?.user}
-                    sidebarOpen={sidebarOpen}
-                    setSidebarOpen={setSidebarOpen}
-                    navigation={
-                        session?.user.role.toLocaleLowerCase() === "student"
-                            ? navigation[0]
-                            : navigation[1]
-                    }
-                />
+        <div>
+            <Mobile
+                user={session?.user}
+                sidebarOpen={sidebarOpen}
+                setSidebarOpen={setSidebarOpen}
+                navigation={
+                    session?.user.role.toLocaleLowerCase() === "student"
+                        ? navigation[0]
+                        : navigation[1]
+                }
+            />
 
-                {/* Static sidebar for desktop */}
-                <Sidebar
-                    setNotifications={setNotifications}
-                    notifications={notifications}
-                    setSidebarOpen={setSidebarOpen}
-                    user={session?.user}
-                    navigation={
-                        session?.user.role.toLocaleLowerCase() === "student"
-                            ? navigation[0]
-                            : navigation[1]
-                    }
-                >
-                    <div className="px-4 py-4 sm:px-6 lg:px-8 grid grid-cols-3 grid-rows-2 gap-12 items-start h-full">
-                        {children}
-                    </div>
-                </Sidebar>
-            </div>
-        </EdgeStoreProvider>
+            {/* Static sidebar for desktop */}
+            <Sidebar
+                setNotifications={setNotifications}
+                notifications={notifications}
+                setSidebarOpen={setSidebarOpen}
+                user={session?.user}
+                navigation={
+                    session?.user.role.toLocaleLowerCase() === "student"
+                        ? navigation[0]
+                        : navigation[1]
+                }
+            >
+                <div className="px-4 py-4 sm:px-6 lg:px-8 grid grid-cols-3 grid-rows-2 gap-12 items-start h-full">
+                    {children}
+                </div>
+            </Sidebar>
+        </div>
     );
 }
