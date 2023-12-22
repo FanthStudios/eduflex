@@ -9,7 +9,10 @@ import clsx from "clsx";
 type Props = {};
 
 const secondaryNavigation = [
-    { name: "Konto", component: <Account /> },
+    {
+        name: "Konto",
+        component: <Account />,
+    },
     { name: "Powiadomienia", component: <Notifications /> },
 ];
 

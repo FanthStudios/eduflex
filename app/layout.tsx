@@ -3,8 +3,6 @@ import type { Metadata } from "next";
 import "@/app/tailwind.css";
 import AuthProvider from "@/context/AuthProvider";
 
-import { EdgeStoreProvider } from "@/lib/edgestore";
-
 import { ToastContainer } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
@@ -31,12 +29,10 @@ export default function RootLayout({
     return (
         <html lang="pl">
             <AuthProvider>
-                <EdgeStoreProvider>
-                    <body>
-                        {children}
-                        <ToastContainer />
-                    </body>
-                </EdgeStoreProvider>
+                <body>
+                    {children}
+                    <ToastContainer />
+                </body>
             </AuthProvider>
         </html>
     );
