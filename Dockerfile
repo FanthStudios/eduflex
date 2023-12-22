@@ -27,7 +27,10 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN \
+RUN --mount=type=secret,id=EDGE_STORE_ACCESS_KEY \
+    --mount=type=secret,id=EDGE_STORE_SECRET_KEY \
+    export EDGE_STORE_ACCESS_KEY=$(cat /run/secrets/EDGE_STORE_ACCESS_KEY) && \
+    export EDGE_STORE_SECRET_KEY=$(cat /run/secrets/EDGE_STORE_SECRET_KEY) && \
     if [ -f yarn.lock ]; then yarn build; \
     elif [ -f package-lock.json ]; then npx prisma generate && npm run build; \
     elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpx prisma generate && pnpm run build; \
