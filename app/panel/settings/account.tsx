@@ -1,6 +1,5 @@
 "use client";
 
-import type { Session } from "next-auth";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -8,74 +7,11 @@ import { toast } from "react-toastify";
 import { useEdgeStore } from "@/lib/edgestore";
 import clsx from "clsx";
 import { Loader2 } from "lucide-react";
-
-async function handleUserChange(
-    e: FormData,
-    session: Session,
-    setLoading: (loading: boolean) => void,
-    edgestore: any,
-    avatarFile: File | undefined
-) {
-    setLoading(true);
-    let avatarUrl = "";
-
-    if (session.user.avatar === "" && avatarFile !== undefined) {
-        // upload the new avatar
-        const res = await edgestore.profilePictures.upload({
-            file: avatarFile,
-        });
-
-        avatarUrl = res.url;
-    } else if (session.user.avatar !== "" && avatarFile !== undefined) {
-        const res = await edgestore.profilePictures.upload({
-            file: avatarFile,
-            options: {
-                replaceTargetUrl: session.user.avatar,
-            },
-        });
-
-        avatarUrl = res.url;
-    }
-
-    if (
-        session?.user?.firstName !== e.get("first-name") ||
-        session?.user?.lastName !== e.get("last-name") ||
-        session?.user?.email !== e.get("email") ||
-        avatarUrl !== ""
-    ) {
-        const res = await fetch("/api/user", {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                firstName: e.get("first-name"),
-                lastName: e.get("last-name"),
-                email: e.get("email"),
-                avatar: avatarUrl,
-                userId: session.user.id,
-            }),
-        });
-
-        if (res.status === 200) {
-            setLoading(false);
-            toast.success(
-                "Zaktualizowano informacje. Za chwilę zostaniesz wylogowany."
-            );
-            await new Promise((resolve) => setTimeout(resolve, 2500));
-            signOut({
-                callbackUrl: "/",
-                redirect: true,
-            });
-        } else {
-            setLoading(false);
-            toast.error("Wystąpił błąd podczas aktualizacji informacji.");
-        }
-    } else {
-        setLoading(false);
-        toast.info("Nie zmieniono żadnych informacji.");
-    }
-}
+import {
+    handleDeleteAccount,
+    handlePasswordChange,
+    handleUserChange,
+} from "./functions";
 
 type Props = {};
 
@@ -111,7 +47,9 @@ function Account({}: Props) {
                             session!,
                             setLoading,
                             edgestore,
-                            avatarFile
+                            avatarFile,
+                            toast,
+                            signOut
                         );
                     }}
                     className="md:col-span-2"
@@ -253,7 +191,17 @@ function Account({}: Props) {
                     </p>
                 </div>
 
-                <form className="md:col-span-2">
+                <form
+                    action={async (event: FormData) => {
+                        await handlePasswordChange(
+                            session!,
+                            event,
+                            setLoading,
+                            toast
+                        );
+                    }}
+                    className="md:col-span-2"
+                >
                     <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
                         <div className="col-span-full">
                             <label
@@ -313,9 +261,17 @@ function Account({}: Props) {
                     <div className="mt-8 flex">
                         <button
                             type="submit"
-                            className="rounded-md bg-green-200 text-green-600 px-3 py-2 text-sm font-semibold shadow-sm hover:bg-green-300 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500"
+                            className={clsx(
+                                loading
+                                    ? "cursor-not-allowed bg-neutral-200 text-neutral-600"
+                                    : "bg-green-200 text-green-600 hover:bg-green-300 transition-colors duration-200",
+                                "rounded-md px-3 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500 flex items-center"
+                            )}
                         >
-                            Zapisz
+                            {loading && (
+                                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                            )}
+                            {loading ? "Zmienianie..." : "Zmień"}
                         </button>
                     </div>
                 </form>
@@ -333,7 +289,18 @@ function Account({}: Props) {
                     </p>
                 </div>
 
-                <form className="flex items-start md:col-span-2">
+                <form
+                    action={async () =>
+                        await handleDeleteAccount(
+                            Number(session?.user.id!),
+                            signOut,
+                            toast,
+                            edgestore,
+                            userAvatar!
+                        )
+                    }
+                    className="flex items-start md:col-span-2"
+                >
                     <button
                         type="submit"
                         className="rounded-md bg-red-200 text-red-600 px-3 py-2 text-sm font-semibold shadow-sm hover:bg-red-300/80 transition-colors duration-200"

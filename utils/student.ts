@@ -69,8 +69,33 @@ export const deleteStudent = async (id: number) => {
             },
         });
 
+        // Usuń powiązane rekordy w modelu favoriteTeacher
+        const student = await prisma.student.findUnique({
+            where: {
+                userId: id,
+            },
+            include: {
+                favoriteTeachers: true,
+            },
+        });
+
+        student?.favoriteTeachers.forEach(async (favoriteTeacher) => {
+            await prisma.student.update({
+                where: {
+                    userId: id,
+                },
+                data: {
+                    favoriteTeachers: {
+                        disconnect: {
+                            userId: favoriteTeacher.userId,
+                        },
+                    },
+                },
+            });
+        });
+
         // Usuń studenta
-        const student = await prisma.student.delete({
+        const deletedStudent = await prisma.student.delete({
             where: {
                 userId: id,
             },

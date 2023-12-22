@@ -1,4 +1,6 @@
 import { prisma } from "@/prisma/client";
+import { deleteStudent } from "./student";
+import { deleteTeacher } from "./teacher";
 
 enum Role {
     STUDENT = "STUDENT",
@@ -114,3 +116,17 @@ export const createUser = async (userObject: UserProps) => {
 
     return user;
 };
+
+export async function deleteUser(userId: number) {
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+    });
+
+    if (!user) throw new Error("User not found.");
+
+    if (user.role === Role.STUDENT) {
+        deleteStudent(userId);
+    } else if (user.role === Role.TEACHER) {
+        deleteTeacher(userId);
+    }
+}

@@ -1,4 +1,5 @@
 import { prisma } from "@/prisma/client";
+import { deleteUser } from "@/utils/user";
 import { NextResponse } from "next/server";
 
 type Props = {
@@ -25,4 +26,24 @@ export async function PATCH(req: Request) {
     });
 
     return new NextResponse(null, { status: 200 });
+}
+
+export async function DELETE(req: Request) {
+    const body = await req.json();
+
+    const { userId } = body as Props;
+
+    try {
+        await deleteUser(userId);
+
+        return new NextResponse(null, { status: 200 });
+    } catch (e) {
+        console.log(e);
+        return new NextResponse(
+            JSON.stringify({
+                error: e,
+            }),
+            { status: 500 }
+        );
+    }
 }
