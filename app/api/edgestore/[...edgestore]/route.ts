@@ -14,6 +14,8 @@ const handler = createEdgeStoreNextHandler({
     router: edgeStoreRouter,
 });
 
+export const dynamic = "force-dynamic";
+
 export { handler as GET, handler as POST };
 
 /**

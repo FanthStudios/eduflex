@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 import { EdgeStoreProvider, useEdgeStore } from "@/lib/edgestore";
 import clsx from "clsx";
 import { Loader2 } from "lucide-react";
-import dynamic from "next/dynamic";
 
 async function handleUserChange(
     e: FormData,
@@ -80,7 +79,7 @@ async function handleUserChange(
 
 type Props = {};
 
-function NoSSRAccount({}: Props) {
+function Account({}: Props) {
     const { edgestore } = useEdgeStore();
     const { data: session } = useSession();
     const userAvatar = session?.user?.avatar!;
@@ -352,9 +351,5 @@ function NoSSRAccount({}: Props) {
         </EdgeStoreProvider>
     );
 }
-
-const Account = dynamic(() => Promise.resolve(NoSSRAccount), {
-    ssr: false,
-});
 
 export default Account;
