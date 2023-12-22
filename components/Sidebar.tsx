@@ -95,6 +95,7 @@ export function Sidebar({
     setSidebarOpen,
     children,
     notifications,
+    setNotifications,
 }: SidebarProps) {
     const userRole = user?.role;
     const [fillColor, setFillColor] = useState("");
@@ -112,9 +113,32 @@ export function Sidebar({
 
     const pathname = usePathname();
 
-    const [filteredNotifications, setFilteredNotifications] = useState(
+    const [filteredNotifications, setFilteredNotifications] =
+        useState(notifications);
+
+    const [unreadNotifications, setUnreadNotifications] = useState(
         notifications.filter((notification) => notification.read == false)
+            .length
     );
+
+    useEffect(() => {
+        if (
+            notifications != filteredNotifications &&
+            filteredNotifications.length == 0
+        ) {
+            setFilteredNotifications(
+                notifications.filter(
+                    (notification) => notification.read == false
+                )
+            );
+        }
+
+        setUnreadNotifications(
+            filteredNotifications.filter(
+                (notification) => notification.read == false
+            ).length
+        );
+    }, [notifications]);
 
     async function handleNotificationRead(id: number) {
         await fetch(`/api/notifications`, {
@@ -125,14 +149,17 @@ export function Sidebar({
             body: JSON.stringify({ id, read: true }),
         });
 
-        const newNotifications = filteredNotifications.map((notification) => {
-            if (notification.id == id) {
-                notification.read = true;
-            }
+        const newNotifications = notifications
+            .filter((notification) => notification.read == false)
+            .map((notification: any) => {
+                if (notification.id == id) {
+                    notification.read = true;
+                }
 
-            return notification;
-        });
+                return notification;
+            });
 
+        setNotifications(newNotifications);
         setFilteredNotifications(newNotifications);
     }
 
@@ -262,7 +289,7 @@ export function Sidebar({
                                         className="h-8 w-8"
                                         aria-hidden="true"
                                     />
-                                    {filteredNotifications.length > 0 && (
+                                    {unreadNotifications > 0 && (
                                         <span className="absolute -mt-8 ml-5 flex">
                                             <span className="absolute inline-flex h-2.5 w-2.5 animate-ping rounded-full bg-green-400 opacity-75"></span>
                                             <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500"></span>
@@ -274,7 +301,7 @@ export function Sidebar({
                                         Powiadomienia
                                     </DropdownMenuLabel>
                                     <DropdownMenuSeparator />
-                                    {filteredNotifications.length > 0 ? (
+                                    {unreadNotifications > 0 ? (
                                         filteredNotifications.map(
                                             (notification, index) => (
                                                 <DropdownMenuItem
@@ -290,9 +317,10 @@ export function Sidebar({
                                                             : "bg-white hover:bg-neutral-100"
                                                     )}
                                                 >
-                                                    <div className="flex items-center justify-between p-0.5 gap-3">
+                                                    <div className="flex items-center justify-between p-0.5 gap-3 cursor-pointer">
                                                         {notification.type ==
-                                                        "appointment_kick" ? (
+                                                            "appointment_kick" ||
+                                                        "appointment_leave" ? (
                                                             <UserMinusIcon
                                                                 className="h-8 w-8 text-red-500"
                                                                 aria-hidden="true"

@@ -9,7 +9,12 @@ async function leave(appointmentId: string, studentId: number) {
                 appointmentId: appointmentId,
             },
         },
+        include: {
+            appointment: true,
+        },
     });
+
+    return appointment;
 }
 
 export async function POST(request: Request) {
@@ -17,7 +22,31 @@ export async function POST(request: Request) {
     const { appointmentId, studentId } = body;
 
     try {
-        await leave(appointmentId, studentId);
+        const appointment = await leave(appointmentId, studentId);
+
+        const student = await prisma.student.findUnique({
+            where: {
+                userId: studentId,
+            },
+            include: {
+                user: true,
+            },
+        });
+
+        const studentName = `${student?.user.firstName} ${student?.user.lastName}`;
+
+        await prisma.notification.create({
+            data: {
+                userId: appointment.appointment.teacherId,
+                type: "appointment_leave",
+                reason: "",
+                message: `${studentName} opuścił korepetycje z ${
+                    appointment.subject
+                } odbuwające się w dniu ${appointment.appointment.dateTime.toLocaleDateString(
+                    "pl-PL"
+                )}.`,
+            },
+        });
 
         return new NextResponse(null, {
             status: 200,

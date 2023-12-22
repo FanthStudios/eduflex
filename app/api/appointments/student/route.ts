@@ -22,13 +22,6 @@ export async function DELETE(request: Request) {
         reason,
     } = body as PostProps;
 
-    // get the student
-    const student = await prisma.student.findUnique({
-        where: {
-            userId: studentId,
-        },
-    });
-
     // get the appointment
     const appointment = await prisma.appointment.findUnique({
         where: {
@@ -57,10 +50,10 @@ export async function DELETE(request: Request) {
         data: {
             message: `Zostałeś wyrzucony z zajęć z przedmiotu ${
                 appointment?.subject.name
-            } w dniu: ${appointment?.dateTime.toLocaleString("pl-PL", {
-                weekday: "short",
+            } w dniu: ${appointment?.dateTime.toLocaleDateString("pl-PL", {
                 day: "numeric",
-                month: "numeric",
+                month: "short",
+                year: "numeric",
             })}`,
             reason,
             userId: studentId,
