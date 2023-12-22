@@ -5,7 +5,7 @@ import { createEdgeStoreNextHandler } from "@edgestore/server/adapters/next/app"
 import { EdgeStoreProvider } from "@edgestore/server/providers/edgestore";
 import getConfig from "next/config";
 
-const { serverRuntimeConfig } = getConfig();
+const { publicRuntimeConfig } = getConfig();
 
 const es = initEdgeStore.create();
 
@@ -19,8 +19,8 @@ const edgeStoreRouter = es.router({
 const handler = createEdgeStoreNextHandler({
     router: edgeStoreRouter,
     provider: EdgeStoreProvider({
-        accessKey: serverRuntimeConfig.edgestoreAccessKey,
-        secretKey: serverRuntimeConfig.edgestoreSecretKey,
+        accessKey: publicRuntimeConfig.edgestoreAccessKey,
+        secretKey: publicRuntimeConfig.edgestoreSecretKey,
     }),
 });
 
