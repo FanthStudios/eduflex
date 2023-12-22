@@ -373,6 +373,7 @@ export default function CalendarWithMeetings({}: Props) {
                     modifiersClassNames={{
                         appointment: appointmentDaysClassNames,
                     }}
+                    className="capitalize"
                 />
             </div>
         </div>
