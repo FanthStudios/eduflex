@@ -341,7 +341,7 @@ export function Sidebar({
                                     {user?.avatar ? (
                                         <div className={fillColor}>
                                             <img
-                                                className="w-full h-full rounded-full"
+                                                className="w-full h-full rounded-full object-cover object-center aspect-square"
                                                 src={user?.avatar}
                                                 alt=""
                                             />
