@@ -14,8 +14,8 @@ const edgeStoreRouter = es.router({
 const handler = createEdgeStoreNextHandler({
     router: edgeStoreRouter,
     provider: EdgeStoreProvider({
-        accessKey: process.env.EDGE_STORE_ACCESS_KEY,
-        secretKey: process.env.EDGE_STORE_SECRET_KEY,
+        accessKey: process.env.EDGE_STORE_ACCESS_KEY || "",
+        secretKey: process.env.EDGE_STORE_SECRET_KEY || "",
     }), // this is the default provider and can be omitted
 });
 
