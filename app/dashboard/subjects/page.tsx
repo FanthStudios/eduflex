@@ -128,13 +128,13 @@ function DashboardSubjects({}: Props) {
                         Dodaj przedmiot
                     </button>
                 </div>
-                <div className="flex flex-wrap items-start justify-start gap-10 w-full">
+                <div className="flex flex-wrap items-start justify-start gap-5 w-full">
                     {subjects.map((subject) => (
                         <div
-                            className="py-2 px-4 flex justify-between items-center rounded-lg border text-lg bg-neutral-50 border-neutral-200 max-w-[11rem] w-full"
+                            className="py-2 px-4 flex justify-between items-center rounded-lg border text-lg bg-neutral-50 border-neutral-200 w-fit gap-x-5"
                             key={subject.id}
                         >
-                            <p>{subject.name}</p>
+                            <p className="whitespace-nowrap">{subject.name}</p>
                             <button
                                 onClick={async () =>
                                     await handleDelete(subject.id)

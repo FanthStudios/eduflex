@@ -324,7 +324,8 @@ export const AppointmentModal = ({
                                                         ("poprawa_kartkówki" ||
                                                             "poprawa_sprawdzianu" ||
                                                             "nauka")
-                                                            ? studentAppointment
+                                                            ? studentAppointment.topic &&
+                                                              studentAppointment
                                                                   .topic
                                                                   .length > 25
                                                                 ? studentAppointment.topic.substring(

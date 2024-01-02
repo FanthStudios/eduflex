@@ -98,6 +98,7 @@ export function Sidebar({
     setNotifications,
 }: SidebarProps) {
     const userRole = user?.role;
+    const userId = user?.id;
     const [fillColor, setFillColor] = useState("");
 
     useEffect(() => {
@@ -117,8 +118,11 @@ export function Sidebar({
         useState(notifications);
 
     const [unreadNotifications, setUnreadNotifications] = useState(
-        notifications.filter((notification) => notification.read == false)
-            .length
+        notifications.filter(
+            (notification) =>
+                notification.read == false &&
+                notification.userId == Number(userId)
+        ).length
     );
 
     useEffect(() => {
@@ -128,17 +132,21 @@ export function Sidebar({
         ) {
             setFilteredNotifications(
                 notifications.filter(
-                    (notification) => notification.read == false
+                    (notification) =>
+                        notification.read == false &&
+                        notification.userId == Number(userId)
                 )
             );
         }
 
         setUnreadNotifications(
             filteredNotifications.filter(
-                (notification) => notification.read == false
+                (notification) =>
+                    notification.read == false &&
+                    notification.userId == Number(userId)
             ).length
         );
-    }, [notifications]);
+    }, [notifications, userId]);
 
     async function handleNotificationRead(id: number) {
         await fetch(`/api/notifications`, {
@@ -150,7 +158,11 @@ export function Sidebar({
         });
 
         const newNotifications = notifications
-            .filter((notification) => notification.read == false)
+            .filter(
+                (notification) =>
+                    notification.read == false &&
+                    notification.userId == Number(userId)
+            )
             .map((notification: any) => {
                 if (notification.id == id) {
                     notification.read = true;
@@ -198,19 +210,24 @@ export function Sidebar({
                                                     pathname == item.href
                                                         ? "bg-neutral-50 text-green-600"
                                                         : "text-neutral-700 hover:text-green-600 hover:bg-neutral-50",
-                                                    "group flex items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold w-full"
+                                                    "group flex items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold w-full",
+                                                    item.count &&
+                                                        "justify-between"
                                                 )}
                                             >
-                                                <item.icon
-                                                    className={clsx(
-                                                        pathname == item.href
-                                                            ? "text-green-600"
-                                                            : "text-neutral-400 group-hover:text-green-600",
-                                                        "h-8 w-8 shrink-0"
-                                                    )}
-                                                    aria-hidden="true"
-                                                />
-                                                <p>{item.name}</p>
+                                                <div className="flex items-center justify-center gap-x-3">
+                                                    <item.icon
+                                                        className={clsx(
+                                                            pathname ==
+                                                                item.href
+                                                                ? "text-green-600"
+                                                                : "text-neutral-400 group-hover:text-green-600",
+                                                            "h-8 w-8 shrink-0"
+                                                        )}
+                                                        aria-hidden="true"
+                                                    />
+                                                    <p>{item.name}</p>
+                                                </div>
                                                 {item.count && (
                                                     <div className="py-1 flex items-center justify-center w-1/6 h-fit bg-neutral-50 border border-neutral-200 rounded-xl">
                                                         <p className="text-xs font-semibold text-neutral-400 text-center">

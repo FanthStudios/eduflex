@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { useSubjects } from "@/hooks/useSubjects";
 
 type Appointment = {
     subject: string;
@@ -26,25 +27,8 @@ interface Props {
     studentId?: string;
 }
 
-const options = [
-    { id: 1, name: "Matematyka" },
-    { id: 2, name: "Fizyka" },
-    { id: 3, name: "Chemia" },
-    { id: 4, name: "Biologia" },
-    { id: 5, name: "Geografia" },
-    { id: 6, name: "Historia" },
-    { id: 7, name: "Wiedza o społeczeństwie" },
-    { id: 8, name: "Język polski" },
-    { id: 9, name: "Język angielski" },
-    { id: 10, name: "Język niemiecki" },
-    { id: 13, name: "Język rosyjski" },
-    { id: 17, name: "Informatyka" },
-    { id: 18, name: "Wychowanie fizyczne" },
-    { id: 19, name: "Edukacja dla bezpieczeństwa" },
-    { id: 21, name: "Religia" },
-];
-
 export const SubjectSelection = ({ appointment, setAppointment }: Props) => {
+    const { subjects } = useSubjects();
     const { teachers } = useTeacher();
     const filteredTeachers =
         appointment.subject != ""
@@ -81,7 +65,7 @@ export const SubjectSelection = ({ appointment, setAppointment }: Props) => {
                             <SelectValue placeholder="Wybierz przedmiot" />
                         </SelectTrigger>
                         <SelectContent>
-                            {options.map((option) => (
+                            {subjects.map((option) => (
                                 <SelectItem key={option.id} value={option.name}>
                                     {option.name}
                                 </SelectItem>
