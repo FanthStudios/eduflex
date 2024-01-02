@@ -2,7 +2,7 @@ name: Build and Deploy Image
 
 on:
     push:
-        branches: ["main"]
+        branches: ["main", "prod"]
 
 env:
     REGISTRY: ghcr.io
