@@ -20,7 +20,9 @@ export default function MultiSelect({
         // check if the checkbox is checked or unchecked
         if (e.target.checked) {
             // add the numerical value of the checkbox to options array
-            setSelectedOptions([...selectedOptions, e.target.value]);
+            if (!selectedOptions.includes(e.target.value)) {
+                setSelectedOptions([...selectedOptions, e.target.value]);
+            }
         } else {
             // or remove the value from the unchecked checkbox from the array
             setSelectedOptions(
@@ -57,9 +59,9 @@ export default function MultiSelect({
                     <ul className="w-full">
                         {options.map((option, i) => {
                             return (
-                                <li key={i} className="w-full">
+                                <li key={i} className="w-full mt-1">
                                     <label
-                                        className={`flex whitespace-nowrap cursor-pointer rounded-lg px-1 py-1 transition-colors hover:bg-blue-100 [&:has(input:checked)]:bg-blue-200`}
+                                        className={`flex whitespace-nowrap cursor-pointer rounded-lg mb-1 px-1 py-1 transition-colors hover:bg-blue-100 [&:has(input:checked)]:bg-blue-200`}
                                     >
                                         <input
                                             type="checkbox"
@@ -67,6 +69,9 @@ export default function MultiSelect({
                                             value={options[i].name}
                                             className="cursor-pointer"
                                             onChange={handleChange}
+                                            checked={selectedOptions.includes(
+                                                option.name
+                                            )}
                                         />
                                         <span className="ml-1">
                                             {option.name}
