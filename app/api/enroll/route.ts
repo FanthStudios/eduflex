@@ -24,6 +24,15 @@ export async function POST(request: Request) {
         studentId: body.studentId,
     };
 
+    const student = await prisma.student.findUnique({
+        where: {
+            userId: appointment.studentId,
+        },
+        include: {
+            user: true,
+        },
+    });
+
     //   studentId     Int
     //   appointmentId String
     //   subject       String
@@ -89,6 +98,16 @@ export async function POST(request: Request) {
                 },
             });
 
+            if (student) {
+                await prisma.notification.create({
+                    data: {
+                        message: `${student.user.firstName} ${student.user.lastName} zapisał się na korepetycje z przedmiotu ${appointment.subject}`,
+                        type: "appointment_enroll",
+                        userId: appointment.teacherId,
+                    },
+                });
+            }
+
             return new NextResponse(
                 JSON.stringify({
                     message: "Pomyślnie zapisano na korepetycje",
@@ -109,6 +128,16 @@ export async function POST(request: Request) {
                     appointmentId: teacherAppointment!.id,
                 },
             });
+
+            if (student) {
+                await prisma.notification.create({
+                    data: {
+                        message: `${student.user.firstName} ${student.user.lastName} zapisał się na korepetycje z przedmiotu ${appointment.subject}`,
+                        type: "appointment_enroll",
+                        userId: appointment.teacherId,
+                    },
+                });
+            }
 
             return new NextResponse(
                 JSON.stringify({

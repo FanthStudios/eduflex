@@ -12,6 +12,7 @@ import {
     Cog6ToothIcon,
     TrashIcon,
     UserMinusIcon,
+    UserPlusIcon,
     XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Logo from "./Logo";
@@ -345,6 +346,12 @@ export function Sidebar({
                                                         ) : notification.type ==
                                                           "appointment_delete" ? (
                                                             <TrashIcon
+                                                                className="h-8 w-8 text-neutral-500"
+                                                                aria-hidden="true"
+                                                            />
+                                                        ) : notification.type ==
+                                                          "appointment_enroll" ? (
+                                                            <UserPlusIcon
                                                                 className="h-8 w-8 text-neutral-500"
                                                                 aria-hidden="true"
                                                             />
