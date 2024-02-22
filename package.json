@@ -34,7 +34,7 @@
         "date-fns": "^2.30.0",
         "formik": "^2.4.5",
         "framer-motion": "^10.16.16",
-        "lucide-react": "^0.292.0",
+        "lucide-react": "^0.336.0",
         "luxon": "^3.4.4",
         "next": "14.0.2",
         "next-auth": "^4.24.5",
